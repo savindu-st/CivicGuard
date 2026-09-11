@@ -284,6 +284,20 @@ flowchart TB
   6. **Dynamic In-App Rerouting**: Embed Leaflet navigation calling `/api/incidents/routes/safe-path`, dynamically recalculating detours if a newly closed road event is received while en route.
 - **Consequences**: Streamlined architecture; zero distributed transaction overhead; resilient field operations in disaster zones; auditable photo-verified road reopening.
 
+### ADR-017: Modular AI Vision Architecture with Flood Depth Benchmarking, EXIF Geofencing, and Continuous Feedback Loop
+- **Date**: 2026-09-12
+- **Status**: Accepted
+- **Context**: In severe weather events, `ai-service` must evaluate incoming citizen photos with high throughput, robust classification, and offline resilience within the 3000ms SLA of `incident-service`. Deep learning models must run on CPU without heavy GPU infrastructure or network latency on boot. Furthermore, false-positive memes, spoofed overseas EXIF geotags, and dynamic flood depth benchmarks must be accounted for, and closed-loop field outcomes must be logged for drift analysis.
+- **Decision**:
+  1. **Modular Architecture**: Restructure `ai-service` into clean domain directories: `schemas/`, `checks/` (`image_check.py`, `location_check.py`, `risk_check.py`), `services/` (`image_service.py`, `exif_service.py`, `model_service.py`, `feedback_service.py`), and `api/`.
+  2. **YOLOv8 Nano & Bundled Weights**: Pre-bundle `yolov8n.pt` (~6.2 MB) in `models/` with CPU thread optimization (`torch.set_num_threads(2)`) and an in-memory Pillow/NumPy hydrological heuristic fallback.
+  3. **Strict Ingestion SLA**: Enforce a strict 1500ms async download timeout and 5MB size limit; fall back to neutral image scoring (`0.50`) if an image URL fails or times out.
+  4. **Forensic EXIF Location Validation**: Compare photo EXIF GPS with reported citizen GPS; reward matches ($\le 500\text{m}$) with $\ge 0.95$, provide neutral baseline ($0.85$) for stripped EXIF, and heavily penalize contradictions ($> 2\text{km}$) with $0.20$.
+  5. **Spam & Meme Rejection**: Detect flat background/monochrome screenshots and memes via luminance histogram analysis, returning `IRRELEVANT_OR_SPAM` with a penalized score ($0.10$) and high confidence ($0.95$).
+  6. **Dynamic 45/35/20 Risk Urgency**: Calculate risk using a balanced index: 45% visual hazard depth + 35% road hierarchy + 20% weather intensity, mapping dynamically to P1 (`CRITICAL`) through P4 (`LOW`).
+  7. **Stage 6 Continuous Retuning Ledger**: Ingest field crew closure photos and officer overrides via `POST /feedback` to an append-only JSONL ledger (`data/feedback_records.jsonl`), exposing `GET /feedback/metrics` and `GET /feedback/export`.
+- **Consequences**: Zero external network dependency for model weights; sub-second CPU inference (< 500ms); strict SLA preservation; automated spam and spoofing defense; auditable retuning feedback loop.
+
 ---
 
 ## 5. Database Schema & Data Models Overview
