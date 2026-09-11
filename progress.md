@@ -1,8 +1,8 @@
 # Civic Guard — Implementation Progress & Engineering Tracker
 
-> **Last Updated:** 2026-09-11  
-> **Current Phase:** Phase 2 — Microservices Backend Core Implementation (Complete)  
-> **Overall Completion:** 70%  
+> **Last Updated:** 2026-09-12  
+> **Current Phase:** Phase 3 — Operations Web Application & Field Ops (Active)  
+> **Overall Completion:** 80%  
 > **Maintenance Policy:** This document is automatically updated by the AI pair programmer upon completing any feature, milestone, bugfix, or architectural change.
 
 ---
@@ -12,15 +12,16 @@
 | Subsystem | Health / Status | Progress (%) | Highlights / Next Focus |
 | :--- | :--- | :--- | :--- |
 | **Database & Migrations** | 🟢 Ready | 100% | 16 Supabase tables & Sri Lanka demo seed data created |
-| **Architecture & Specifications** | 🟢 Ready | 100% | `architecture.md`, `workflow.md`, and ADRs 001–015 defined |
+| **Architecture & Specifications** | 🟢 Ready | 100% | `architecture.md`, `workflow.md`, and ADRs 001–016 defined |
 | **API Gateway (Kong)** | 🟢 Configured | 90% | Declarative routing configured; services mapped and verified |
 | **Shared Library (`@civicguard/shared`)** | 🟢 Ready | 100% | Types, status constants, geo math, auth guard & Supabase client built |
 | **Incident Service (`incident-service`)** | 🟢 Ready | 100% | Ingestion, 5-signal verification, corroboration, safe detour & telemetry |
-| **Ticket Service (`ticket-service`)** | 🟢 Ready | 100% | Ticket lifecycle, crew tracking & photo-verified resolution loop |
+| **Ticket Service (`ticket-service`)** | 🟢 Ready | 100% | Ticket lifecycle, 2km soft limit, crew telematics, SOS broadcast & resolution loop |
 | **Notification Service (`notification-service`)**| 🟢 Ready | 100% | Socket.IO server, spatial/role rooms & broadcast RPC |
 | **Relief Service (`relief-service`)** | 🟢 Ready | 100% | SOS requests, atomic bed allocation & nearest shelter matching |
 | **AI Vision Service (`ai-service`)** | 🟢 Functional | 75% | FastAPI microservice created with `/health` & `/predict/hazard`, virtualenv configured & dependencies verified |
-| **Operations Web Frontend (`web`)** | 🟡 Ready for UI Dev | 40% | React + Vite dependencies installed, production build verified cleanly |
+| **Operations Web Frontend (`web`)** | 🟢 In Progress | 65% | Field Crew Mobile Portal complete with Leaflet detour map, photo proof upload, SOS beacon & offline sync |
+
 
 ---
 
@@ -112,10 +113,12 @@
 - [ ] Manual road closure / reopening toggle.
 
 #### 3.2 Field Crew Mobile Portal
-- [ ] Assigned job task list with real-time push alerts.
-- [ ] Turn-by-turn navigation map routing around confirmed hazard zones.
-- [ ] Photo-verified job completion camera capture UI.
-- [ ] Background GPS beacon simulator.
+- [x] Assigned job task list with real-time push alerts.
+- [x] Turn-by-turn navigation map routing around confirmed hazard zones.
+- [x] Photo-verified job completion camera capture UI.
+- [x] Background GPS beacon simulator.
+- [x] IndexedDB offline queueing with auto-sync.
+- [x] Two-tier emergency assistance: SOS panic beacon and return ticket workflow.
 
 #### 3.3 Relief Logistics Desk
 - [ ] SOS help request triage queue sorted by urgency (P1 to P4).
@@ -140,7 +143,7 @@
 
 ## 3. Active Sprint & Immediate Next Tasks
 
-1. **Operations Web Frontend**: Build Officer Control Dashboard, Field Crew Portal, Relief Desk, and Live Public Leaflet Map connecting to Kong Gateway.
+1. **Operations Web Frontend**: Build Officer Control Dashboard, Relief Desk, and Live Public Leaflet Map connecting to Kong Gateway.
 2. **End-to-End Integration Verification**: Validate closed-loop flows across Kong, microservices, and web frontend.
 
 ---
@@ -149,6 +152,7 @@
 
 | Date | Author / Agent | Change Summary | Impacted Files |
 | :--- | :--- | :--- | :--- |
+| **2026-09-12** | Antigravity AI | Implemented complete Field Crew subsystem across backend and frontend (ADR-016): enhanced `ticket-service` with soft 2km multi-ticket co-assignment rule, `returnTicket` workflow, `GET /crews/me`, `triggerCrewSos` emergency beacon, and `updateCrewLocation` real-time broadcasting. Updated `notification-service` socket handler. Built mobile-first `FieldCrewPortal` React application with tactical Leaflet navigation map, dynamic road-closure rerouting, photo-verified resolution modal, GPS beacon simulator, and IndexedDB offline sync engine. Verified clean TypeScript build across all services and frontend. | `backend/shared/*`, `backend/services/ticket-service/*`, `backend/services/notification-service/*`, `web/*`, `architecture.md`, `progress.md` |
 | **2026-09-11** | Antigravity AI | Fixed Kong API gateway image tag in `docker-compose.yml` (`kong:3.4-alpine` ➔ `kong:3.4`), removed obsolete `version` schema attribute, and verified image pull. | `docker-compose.yml`, `progress.md` |
 | **2026-09-11** | Antigravity AI | Configured dedicated Python 3 virtual environment for `ai-service`, installed dependencies (`fastapi`, `uvicorn`, `pydantic`), linked root `.venv`, configured `pyrightconfig.json` & `.vscode/settings.json`, and resolved IDE import resolution errors. | `backend/services/ai-service/.venv`, `.venv`, `pyrightconfig.json`, `.vscode/settings.json`, `.gitignore`, `progress.md` |
 | **2026-09-11** | Antigravity AI | Implemented `ai-service` FastAPI application (`/health`, `/predict/hazard`) and Dockerfile. Verified `web` package installation and successful production build. Added workspace dev scripts. | `backend/services/ai-service/*`, `backend/package.json`, `progress.md` |

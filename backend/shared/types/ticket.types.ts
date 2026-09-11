@@ -10,13 +10,24 @@ export type TicketStatus =
 
 export type CrewAvailability = 'AVAILABLE' | 'BUSY' | 'OFF_DUTY';
 
+export type CrewType = 
+  | 'ARMY_RESCUE'
+  | 'MUNICIPAL_WORKS'
+  | 'NAVY_BOAT_UNIT'
+  | 'POLICE_TRIAGE'
+  | 'DMC_DISASTER_TEAM';
+
 export interface FieldCrew {
   id: string;
   user_id?: string | null;
   crew_name: string;
+  crew_type?: CrewType | string;
   availability: CrewAvailability;
   latitude?: number | null;
   longitude?: number | null;
+  vehicle_type?: string | null;
+  contact_phone?: string | null;
+  assigned_ward_id?: string | null;
   created_at?: string;
   // Joined relation fields
   user_name?: string;
@@ -49,6 +60,8 @@ export interface TicketCreateDTO {
 
 export interface TicketAssignDTO {
   crew_id: string;
+  emergency_override?: boolean;
+  justification?: string;
 }
 
 export interface TicketCompleteDTO {
@@ -56,7 +69,30 @@ export interface TicketCompleteDTO {
   notes?: string;
 }
 
+export interface TicketReturnDTO {
+  reason: string;
+}
+
 export interface CrewLocationUpdateDTO {
   latitude: number;
   longitude: number;
 }
+
+export interface CrewLocationBroadcastPayload {
+  crew_id: string;
+  crew_name: string;
+  latitude: number;
+  longitude: number;
+  availability: CrewAvailability;
+  timestamp: string;
+}
+
+export interface CrewSosPayload {
+  crew_id: string;
+  crew_name: string;
+  latitude: number;
+  longitude: number;
+  message: string;
+  timestamp: string;
+}
+

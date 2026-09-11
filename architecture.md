@@ -271,6 +271,18 @@ flowchart TB
 - **Decision**: Every microservice exposes `GET /health` checking database connectivity, uptime, and memory usage. Services hook `SIGTERM` and `SIGINT` to drain HTTP and Socket.IO connections before exiting.
 - **Consequences**: Eliminates dropped connections during restarts; provides real-time container health metrics for monitoring.
 
+### ADR-016: Unified Field Operations Subsystem with Soft-Limit Multi-Assignment, Two-Tier SOS, and Offline-First Sync
+- **Date**: 2026-09-12
+- **Status**: Accepted
+- **Context**: Field rescue crews (Sri Lanka Tri-forces, Disaster Management Centre, municipal road works) operate in high-stress, low-connectivity disaster environments. A proposal was made to construct a separate backend microservice specifically for field crews.
+- **Decision**:
+  1. **Unified Backend Domain**: Reject the separate persona-based microservice anti-pattern. Keep field dispatch and task execution unified within `ticket-service` (ADR-001/005) to eliminate cyclic RPCs and distributed data locks.
+  2. **Soft 2 km Multi-Assignment Limit**: Enable co-assigning adjacent tickets to a crew if within 2.0 km (Haversine distance); enforce dispatcher warning and mandatory emergency override justification for assignments beyond 2 km.
+  3. **Per-Ticket Execution State Machine**: Crews may hold multiple assigned tasks, but mark one as active ("On Site") at a time. Each ticket independently requires photo proof before closing and reopening its respective road.
+  4. **Offline-First Resilience**: Implement an IndexedDB queue caching status updates and photo blobs with client timestamps during network dropouts, auto-syncing when connectivity restores.
+  5. **Two-Tier Assistance**: Provide a Tier-1 SOS panic beacon broadcasting high-priority siren alerts with live coordinates to the command desk, plus a Tier-2 "Cannot Complete / Return Ticket" workflow with mandatory reason notes.
+  6. **Dynamic In-App Rerouting**: Embed Leaflet navigation calling `/api/incidents/routes/safe-path`, dynamically recalculating detours if a newly closed road event is received while en route.
+- **Consequences**: Streamlined architecture; zero distributed transaction overhead; resilient field operations in disaster zones; auditable photo-verified road reopening.
 
 ---
 

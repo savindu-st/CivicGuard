@@ -48,12 +48,15 @@ export class TicketController {
 
   assignCrew = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { crew_id } = req.body;
+      const { crew_id, emergency_override, justification } = req.body;
       if (!crew_id) {
         sendError(res, 'crew_id is required', 400);
         return;
       }
-      const ticket = await this.ticketService.assignTicketToCrew(req.params.id, crew_id);
+      const ticket = await this.ticketService.assignTicketToCrew(req.params.id, crew_id, {
+        emergency_override: Boolean(emergency_override),
+        justification,
+      });
       sendSuccess(res, ticket, 'Ticket assigned to field crew successfully');
     } catch (err: any) {
       sendError(res, err.message, 400);
@@ -69,6 +72,36 @@ export class TicketController {
       }
       const ticket = await this.ticketService.updateTicketStatus(req.params.id, status);
       sendSuccess(res, ticket, `Ticket status updated to ${status}`);
+    } catch (err: any) {
+      sendError(res, err.message, 400);
+    }
+  };
+
+  returnTicket = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { reason, crew_id } = req.body;
+      if (!reason) {
+        sendError(res, 'Mandatory reason notes are required to return ticket', 400);
+        return;
+      }
+
+      // Resolve crew ID from body or from logged in user
+      let targetCrewId = crew_id;
+      if (!targetCrewId) {
+        const userId = (req as any).user?.userId;
+        if (userId) {
+          const crew = await this.crewService.getCrewByUserId(userId);
+          targetCrewId = crew?.id;
+        }
+      }
+
+      if (!targetCrewId) {
+        sendError(res, 'Could not determine crew identity for ticket return', 400);
+        return;
+      }
+
+      const ticket = await this.ticketService.returnTicket(req.params.id, targetCrewId, reason);
+      sendSuccess(res, ticket, 'Ticket returned to council dispatch queue');
     } catch (err: any) {
       sendError(res, err.message, 400);
     }
@@ -121,12 +154,47 @@ export class TicketController {
   };
 
   // --- Field Crew Endpoints ---
+  getMyCrewProfile = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const userId = (req as any).user?.userId;
+      if (!userId) {
+        sendError(res, 'Authentication required', 401);
+        return;
+      }
+
+      const crew = await this.crewService.getCrewByUserId(userId);
+      if (!crew) {
+        sendError(res, 'No field crew profile associated with this user account', 404);
+        return;
+      }
+
+      const tasks = await this.crewService.getCrewTasks(crew.id);
+      sendSuccess(res, { crew, tasks });
+    } catch (err: any) {
+      sendError(res, err.message, 500);
+    }
+  };
+
   getAllCrews = async (req: Request, res: Response): Promise<void> => {
     try {
       const crews = await this.crewService.getAllCrews();
       sendSuccess(res, { crews });
     } catch (err: any) {
       sendError(res, err.message, 500);
+    }
+  };
+
+  setAvailability = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { availability } = req.body;
+      if (!availability || !['AVAILABLE', 'BUSY', 'OFF_DUTY'].includes(availability)) {
+        sendError(res, 'Valid availability (AVAILABLE, BUSY, OFF_DUTY) is required', 400);
+        return;
+      }
+      const crew = await this.crewService.setCrewAvailability(req.params.id, availability);
+      sendSuccess(res, crew, `Crew availability updated to ${availability}`);
+    } catch (err: any) {
+      sendError(res, err.message, 400);
     }
   };
 
@@ -138,9 +206,28 @@ export class TicketController {
         return;
       }
       const crew = await this.crewService.updateCrewLocation(req.params.id, Number(latitude), Number(longitude));
-      sendSuccess(res, crew, 'Crew location updated');
+      sendSuccess(res, crew, 'Crew location updated and broadcasted');
     } catch (err: any) {
       sendError(res, err.message, 400);
+    }
+  };
+
+  triggerSos = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { latitude, longitude, message } = req.body;
+      if (latitude === undefined || longitude === undefined) {
+        sendError(res, 'latitude and longitude are required for SOS beacon', 400);
+        return;
+      }
+      const sos = await this.crewService.triggerCrewSos(
+        req.params.id,
+        Number(latitude),
+        Number(longitude),
+        message || 'EMERGENCY: Field crew requested backup'
+      );
+      sendSuccess(res, sos, '🚨 SOS emergency beacon broadcasted to command officers', 201);
+    } catch (err: any) {
+      sendError(res, err.message, 500);
     }
   };
 

@@ -41,6 +41,10 @@ export function setupSocketHandler(io: Server): void {
       }
       if (user.roles.includes('FIELD_CREW')) {
         socket.join('crews');
+        const crewId = socket.handshake.auth?.crewId || (socket.handshake.query?.crewId as string);
+        if (crewId) {
+          socket.join(`crew:${crewId}`);
+        }
       }
       if (user.roles.includes('RELIEF_COORDINATOR')) {
         socket.join('relief');
