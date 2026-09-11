@@ -1,0 +1,63 @@
+_format_version: "3.0"
+
+services:
+  # Incident Service Route (/api/incidents -> incident-service:4001)
+  - name: incident-service
+    url: http://incident-service:4001
+    routes:
+      - name: incident-routes
+        paths:
+          - /api/incidents
+        strip_path: false
+
+  # Ticket Service Route (/api/tickets -> ticket-service:4002)
+  - name: ticket-service
+    url: http://ticket-service:4002
+    routes:
+      - name: ticket-routes
+        paths:
+          - /api/tickets
+        strip_path: false
+
+  # Notification Service Route (/api/notifications -> notification-service:4003)
+  - name: notification-service
+    url: http://notification-service:4003
+    routes:
+      - name: notification-routes
+        paths:
+          - /api/notifications
+        strip_path: false
+
+  # Relief Service Route (/api/relief -> relief-service:4004)
+  - name: relief-service
+    url: http://relief-service:4004
+    routes:
+      - name: relief-routes
+        paths:
+          - /api/relief
+        strip_path: false
+
+plugins:
+  - name: cors
+    config:
+      origins:
+        - "*"
+      methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      headers:
+        - Accept
+        - Accept-Version
+        - Content-Length
+        - Content-MD5
+        - Content-Type
+        - Date
+        - Authorization
+      exposed_headers:
+        - Authorization
+      credentials: true
+      max_age: 3600
