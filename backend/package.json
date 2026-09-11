@@ -1,0 +1,30 @@
+{
+  "name": "civicguard-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Civic Guard Microservices Monorepo",
+  "workspaces": [
+    "shared",
+    "services/incident-service",
+    "services/ticket-service",
+    "services/notification-service",
+    "services/relief-service"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:shared": "npm run build --workspace=shared",
+    "typecheck": "npm run typecheck --workspaces",
+    "clean": "npm run clean --workspaces",
+    "dev:incident": "npm run dev --workspace=@civicguard/incident-service",
+    "dev:ticket": "npm run dev --workspace=@civicguard/ticket-service",
+    "dev:notification": "npm run dev --workspace=@civicguard/notification-service",
+    "dev:relief": "npm run dev --workspace=@civicguard/relief-service"
+  },
+  "keywords": [
+    "disaster-response",
+    "microservices",
+    "civicguard"
+  ],
+  "author": "CivicGuard Team",
+  "license": "MIT"
+}
