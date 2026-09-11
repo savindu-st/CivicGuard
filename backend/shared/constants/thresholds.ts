@@ -1,0 +1,28 @@
+export const VERIFICATION_THRESHOLDS = {
+  CONFIRMATION_SCORE: 0.85,
+  NEEDS_VERIFICATION_SCORE: 0.40,
+} as const;
+
+export const CLUSTER_SETTINGS = {
+  RADIUS_METERS: 200,
+  TIME_WINDOW_HOURS: 3,
+  BOUNDING_BOX_DELTA_METERS: 250,
+} as const;
+
+export const DANGER_THRESHOLDS = {
+  DEFAULT_RAINFALL_MM: 50.0,
+  DEFAULT_RIVER_LEVEL_M: 3.0,
+} as const;
+
+export const CORROBORATION_WEIGHTS = {
+  CONFIRM: 0.15,
+  REFUTE: -0.20,
+} as const;
+
+export const SIGNAL_WEIGHTS = {
+  IMAGE_AI: 0.35,
+  LOCATION_AI: 0.15,
+  RISK_AI: 0.15,
+  WEATHER_CHECK: 0.20,
+  CLUSTER_CHECK: 0.15,
+} as const;

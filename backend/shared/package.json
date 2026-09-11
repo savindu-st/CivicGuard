@@ -1,0 +1,23 @@
+{
+  "name": "@civicguard/shared",
+  "version": "1.0.0",
+  "description": "Shared domain types, constants, geo algorithms, and Supabase client for Civic Guard",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.8",
+    "axios": "^1.6.8",
+    "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.11.30",
+    "typescript": "^5.3.3"
+  }
+}
