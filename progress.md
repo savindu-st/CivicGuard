@@ -2,7 +2,7 @@
 
 > **Last Updated:** 2026-09-12  
 > **Current Phase:** Phase 3 — Operations Web Application & Field Ops (Active)  
-> **Overall Completion:** 80%  
+> **Overall Completion:** 85%  
 > **Maintenance Policy:** This document is automatically updated by the AI pair programmer upon completing any feature, milestone, bugfix, or architectural change.
 
 ---
@@ -12,14 +12,14 @@
 | Subsystem | Health / Status | Progress (%) | Highlights / Next Focus |
 | :--- | :--- | :--- | :--- |
 | **Database & Migrations** | 🟢 Ready | 100% | 16 Supabase tables & Sri Lanka demo seed data created |
-| **Architecture & Specifications** | 🟢 Ready | 100% | `architecture.md`, `workflow.md`, and ADRs 001–016 defined |
+| **Architecture & Specifications** | 🟢 Ready | 100% | `architecture.md`, `workflow.md`, and ADRs 001–017 defined |
 | **API Gateway (Kong)** | 🟢 Configured | 90% | Declarative routing configured; services mapped and verified |
 | **Shared Library (`@civicguard/shared`)** | 🟢 Ready | 100% | Types, status constants, geo math, auth guard & Supabase client built |
 | **Incident Service (`incident-service`)** | 🟢 Ready | 100% | Ingestion, 5-signal verification, corroboration, safe detour & telemetry |
 | **Ticket Service (`ticket-service`)** | 🟢 Ready | 100% | Ticket lifecycle, 2km soft limit, crew telematics, SOS broadcast & resolution loop |
 | **Notification Service (`notification-service`)**| 🟢 Ready | 100% | Socket.IO server, spatial/role rooms & broadcast RPC |
 | **Relief Service (`relief-service`)** | 🟢 Ready | 100% | SOS requests, atomic bed allocation & nearest shelter matching |
-| **AI Vision Service (`ai-service`)** | 🟢 Functional | 75% | FastAPI microservice created with `/health` & `/predict/hazard`, virtualenv configured & dependencies verified |
+| **AI Vision Service (`ai-service`)** | 🟢 Ready | 100% | Modular FastAPI microservice with YOLOv8, depth benchmarking, EXIF geofencing, spam filter & retuning loop |
 | **Operations Web Frontend (`web`)** | 🟢 In Progress | 65% | Field Crew Mobile Portal complete with Leaflet detour map, photo proof upload, SOS beacon & offline sync |
 
 
@@ -101,6 +101,18 @@
 - [x] Health check endpoint (`/health`) and SIGTERM/SIGINT graceful shutdown.
 - [x] Dockerfile for containerized build.
 
+#### 2.6 `ai-service` (Port 5000)
+- [x] Pre-bundled YOLOv8 nano weights (`models/yolov8n.pt`) with in-memory Pillow/NumPy hydrological heuristic fallback.
+- [x] Clean modular architecture: `schemas/`, `checks/`, `services/`, and `api/` routers.
+- [x] Multimodal Image AI: Multi-hazard classification (`FLOOD`, `FALLEN_TREE`, `ROAD_DAMAGE`, `LANDSLIDE`) and flood depth benchmarking (`SURFACE_PUDDLE`, `TIRE_LEVEL`, `BUMPER_LEVEL`, `SUBMERGED_VEHICLES`).
+- [x] Spam / Meme / Screenshot rejection filter with `0.10` score and `0.95` confidence (`IRRELEVANT_OR_SPAM`).
+- [x] Location AI: Photo EXIF GPS extraction, Haversine delta verification, and Sri Lankan territorial geofencing (`5.8°N - 9.9°N`, `79.5°E - 82.0°E`).
+- [x] Risk AI: Multi-factor 45/35/20 operational urgency engine (P1–P4).
+- [x] Stage 6 Continuous Retuning Ledger (`POST /feedback`, `GET /feedback/metrics`, `GET /feedback/export`).
+- [x] Synthetic test dataset in `test_assets/` (Colombo EXIF flood, puddle, fallen tree, spam meme, London mismatched EXIF).
+- [x] Automated test suite: 14 passing unit, integration, and SLA latency tests (< 600ms).
+- [x] Dockerfile updated with CPU-optimized PyTorch and OS dependencies.
+
 ---
 
 ### Phase 3: Operations Web Application (Upcoming)
@@ -152,6 +164,10 @@
 
 | Date | Author / Agent | Change Summary | Impacted Files |
 | :--- | :--- | :--- | :--- |
+| **2026-09-12** | Antigravity AI | Fixed Pyright static type checker error (`reportOptionalOperand: Operator "<" not supported for "None"`) in `backend/services/ai-service/tests/test_checks.py` (lines 34 and 46). Added explicit type narrowing `assert result.distance_delta_meters is not None` before comparing `distance_delta_meters` (`< 50.0` and `> 10000.0`), resolving the type mismatch with `Optional[float]` and making test assertions more explicit. Verified 0 Pyright errors and 14 passing pytest tests. | `backend/services/ai-service/tests/test_checks.py`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Resolved Pyright static type checker error `Expected a callable, got None` on line 102 in `backend/services/ai-service/app/services/model_service.py`. Added explicit `Any` type annotation to `_yolo_model: Any = None` and `_is_loaded: bool = False`, added explicit `and cls._yolo_model is not None` guard before model invocation, and added numeric type guard for PIL `getextrema()` image analysis. Verified 0 Pyright diagnostics and all 14 passing pytest tests. | `backend/services/ai-service/app/services/model_service.py`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Fixed Pyright & Pylance language server import resolution for `backend/services/ai-service` by adding `extraPaths` and `executionEnvironments` to `pyrightconfig.json` and `python.analysis.extraPaths` to `.vscode/settings.json`. Resolved `Cannot find module app.schemas.feedback` diagnostic in `routes_feedback.py`. Verified 14 passing pytest checks and zero Pyright diagnostics. | `pyrightconfig.json`, `.vscode/settings.json`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Upgraded `ai-service` to full production-ready status (ADR-017). Modularized app into `schemas/`, `services/`, `checks/`, and `api/`. Bundled YOLOv8 nano weights (`yolov8n.pt`) with in-memory Pillow/NumPy hydrological heuristic fallback. Implemented multi-hazard classification & flood depth benchmarking (`SUBMERGED_VEHICLES`, `BUMPER_LEVEL`, `TIRE_LEVEL`, `SURFACE_PUDDLE`), flat-background spam/meme rejection (0.10 score / 0.95 confidence), EXIF GPS extraction with Haversine delta & Sri Lankan territorial geofencing, dynamic 45/35/20 risk urgency engine (P1–P4), and Stage 6 continuous retuning feedback ledger (`POST /feedback`, `GET /feedback/metrics`, `GET /feedback/export`). Built synthetic benchmark dataset in `test_assets/` and comprehensive pytest suite with 14 passing tests including sub-600ms latency validation. | `backend/services/ai-service/*`, `architecture.md`, `progress.md` |
 | **2026-09-12** | Antigravity AI | Implemented complete Field Crew subsystem across backend and frontend (ADR-016): enhanced `ticket-service` with soft 2km multi-ticket co-assignment rule, `returnTicket` workflow, `GET /crews/me`, `triggerCrewSos` emergency beacon, and `updateCrewLocation` real-time broadcasting. Updated `notification-service` socket handler. Built mobile-first `FieldCrewPortal` React application with tactical Leaflet navigation map, dynamic road-closure rerouting, photo-verified resolution modal, GPS beacon simulator, and IndexedDB offline sync engine. Verified clean TypeScript build across all services and frontend. | `backend/shared/*`, `backend/services/ticket-service/*`, `backend/services/notification-service/*`, `web/*`, `architecture.md`, `progress.md` |
 | **2026-09-11** | Antigravity AI | Fixed Kong API gateway image tag in `docker-compose.yml` (`kong:3.4-alpine` ➔ `kong:3.4`), removed obsolete `version` schema attribute, and verified image pull. | `docker-compose.yml`, `progress.md` |
 | **2026-09-11** | Antigravity AI | Configured dedicated Python 3 virtual environment for `ai-service`, installed dependencies (`fastapi`, `uvicorn`, `pydantic`), linked root `.venv`, configured `pyrightconfig.json` & `.vscode/settings.json`, and resolved IDE import resolution errors. | `backend/services/ai-service/.venv`, `.venv`, `pyrightconfig.json`, `.vscode/settings.json`, `.gitignore`, `progress.md` |
