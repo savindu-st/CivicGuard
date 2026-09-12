@@ -138,7 +138,7 @@ export const CrewNavigationMap: React.FC<CrewNavMapProps> = ({
     : [[crewLat, crewLon]];
 
   return (
-    <div className="relative w-full h-[360px] md:h-[420px] rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-100">
+    <div className="relative isolate z-0 w-full h-[360px] md:h-[420px] rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-100">
       {/* Route Info Overlay Banner */}
       <div className="absolute top-3 left-3 right-3 z-[1000] flex flex-wrap gap-2 items-center justify-between pointer-events-none">
         <div className="flex items-center gap-2 pointer-events-auto">

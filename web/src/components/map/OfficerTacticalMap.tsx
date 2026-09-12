@@ -198,7 +198,7 @@ export const OfficerTacticalMap: React.FC<OfficerTacticalMapProps> = ({
   });
 
   return (
-    <div className="relative w-full h-full min-h-[500px] rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50">
+    <div className="relative isolate z-0 w-full h-full min-h-[500px] rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50">
       {/* Tactical Map Overlay Legend */}
       <div className="absolute top-3 left-3 z-[400] bg-white/95 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs shadow-md space-y-1.5 pointer-events-auto">
         <div className="flex items-center gap-2 font-bold text-slate-900 tracking-wider text-[11px] uppercase pb-1 border-b border-slate-200">
