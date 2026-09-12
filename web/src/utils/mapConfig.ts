@@ -47,19 +47,19 @@ export const getMapTileConfig = (): MapTileConfig => {
     };
   }
 
-  // 4. CARTO with registered API key
+  // 4. CARTO with registered API key (Light Positron)
   if (cartoApiKey) {
     return {
-      url: `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=${cartoApiKey}`,
+      url: `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?api_key=${cartoApiKey}`,
       attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 19,
     };
   }
 
-  // 5. Default Fallback: Esri World Dark Gray Canvas
-  // Clean dark aesthetic, zero watermark, completely free with no API key required
+  // 5. Default Fallback: Esri World Light Gray Canvas
+  // Clean, high-clarity light aesthetic, zero watermark, completely free with no API key required
   return {
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
     attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
     maxZoom: 16,
   };

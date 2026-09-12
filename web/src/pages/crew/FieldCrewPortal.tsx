@@ -280,25 +280,25 @@ export const FieldCrewPortal: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-dark-950 text-slate-100 flex flex-col pb-12">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col pb-12">
       {/* High-Contrast Mobile Emergency Header */}
-      <header className="border-b border-slate-800 bg-dark-900/90 backdrop-blur-md sticky top-0 z-40 px-4 py-3">
+      <header className="border-b border-slate-200 bg-white/95 backdrop-blur-md sticky top-0 z-40 px-4 py-3 shadow-sm">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+            <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600">
               <Navigation className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-sm font-bold text-white tracking-tight truncate max-w-[200px] sm:max-w-xs">
+                <h1 className="text-sm font-bold text-slate-900 tracking-tight truncate max-w-[200px] sm:max-w-xs">
                   {crew?.crew_name || 'Field Response Unit'}
                 </h1>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase">
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 uppercase">
                   {crew?.crew_type || 'ARMY / DMC RESCUE'}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
-                Lead: <span className="text-slate-300 font-medium">{crew?.user_name || 'Sunil Shantha'}</span>
+              <p className="text-[11px] text-slate-500">
+                Lead: <span className="text-slate-700 font-medium">{crew?.user_name || 'Sunil Shantha'}</span>
               </p>
             </div>
           </div>
@@ -307,7 +307,7 @@ export const FieldCrewPortal: React.FC = () => {
             {/* SOS Panic Trigger Button */}
             <button
               onClick={() => setShowSosModal(true)}
-              className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs tracking-wider flex items-center gap-1.5 shadow-lg shadow-red-600/30 animate-pulse border border-red-400"
+              className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs tracking-wider flex items-center gap-1.5 shadow-sm shadow-red-600/20 border border-red-500 transition-colors"
             >
               <AlertOctagon className="w-4 h-4" />
               <span>SOS</span>
@@ -317,8 +317,8 @@ export const FieldCrewPortal: React.FC = () => {
             <div
               className={`p-1.5 rounded-lg border text-xs flex items-center gap-1 ${
                 isOnline
-                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                  : 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                  : 'bg-amber-50 border-amber-200 text-amber-700'
               }`}
               title={isOnline ? 'Network Connected' : 'Working Offline'}
             >
@@ -331,11 +331,11 @@ export const FieldCrewPortal: React.FC = () => {
       {/* Alert Notification Toast */}
       {actionSuccessMessage && (
         <div className="max-w-4xl mx-auto w-full px-4 pt-3">
-          <div className="p-3 bg-brand-500/20 border border-brand-500/40 rounded-xl text-xs font-semibold text-brand-300 flex items-center justify-between shadow-lg">
+          <div className="p-3 bg-brand-50 border border-brand-200 rounded-xl text-xs font-semibold text-brand-800 flex items-center justify-between shadow-sm">
             <span>{actionSuccessMessage}</span>
             <button
               onClick={() => setActionSuccessMessage(null)}
-              className="text-slate-400 hover:text-white ml-2 text-sm"
+              className="text-slate-400 hover:text-slate-700 ml-2 text-sm"
             >
               ✕
             </button>
@@ -346,11 +346,11 @@ export const FieldCrewPortal: React.FC = () => {
       {/* Main Container */}
       <main className="max-w-4xl mx-auto w-full p-4 space-y-4 flex-1">
         {/* Availability & Shift Status Selector */}
-        <div className="glass-panel p-3 bg-dark-900/80 flex items-center justify-between gap-3">
-          <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-            <Radio className="w-3.5 h-3.5 text-slate-400" /> Operational Readiness:
+        <div className="bg-white border border-slate-200 rounded-2xl p-3 flex items-center justify-between gap-3 shadow-sm">
+          <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+            <Radio className="w-3.5 h-3.5 text-slate-500" /> Operational Readiness:
           </span>
-          <div className="flex rounded-lg bg-dark-950 p-1 border border-slate-800 text-xs">
+          <div className="flex rounded-lg bg-slate-100 p-1 border border-slate-200 text-xs">
             {(['AVAILABLE', 'BUSY', 'OFF_DUTY'] as const).map((status) => (
               <button
                 key={status}
@@ -358,11 +358,11 @@ export const FieldCrewPortal: React.FC = () => {
                 className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
                   crew?.availability === status
                     ? status === 'AVAILABLE'
-                      ? 'bg-emerald-500 text-dark-950 shadow'
+                      ? 'bg-emerald-600 text-white shadow-sm'
                       : status === 'BUSY'
-                      ? 'bg-orange-500 text-white shadow'
-                      : 'bg-slate-700 text-white shadow'
-                    : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-amber-500 text-white shadow-sm'
+                      : 'bg-slate-700 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {status.replace('_', ' ')}
@@ -373,12 +373,12 @@ export const FieldCrewPortal: React.FC = () => {
 
         {/* Multi-Ticket Proximity Tabs (if multiple tickets assigned) */}
         {pendingOrAssignedTasks.length > 1 && (
-          <div className="glass-panel p-3 bg-dark-900/80 space-y-2">
-            <div className="flex items-center justify-between text-xs text-slate-400">
-              <span className="font-semibold text-slate-300 flex items-center gap-1">
-                <Layers className="w-3.5 h-3.5 text-blue-400" /> Multi-Incident Queue ({pendingOrAssignedTasks.length} Assigned):
+          <div className="bg-white border border-slate-200 rounded-2xl p-3 space-y-2 shadow-sm">
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span className="font-semibold text-slate-700 flex items-center gap-1">
+                <Layers className="w-3.5 h-3.5 text-blue-600" /> Multi-Incident Queue ({pendingOrAssignedTasks.length} Assigned):
               </span>
-              <span className="text-[11px] text-amber-400">Co-assigned within 2 km</span>
+              <span className="text-[11px] text-amber-600 font-medium">Co-assigned within 2 km</span>
             </div>
             <div className="flex gap-2 overflow-x-auto pb-1">
               {pendingOrAssignedTasks.map((t, idx) => (
@@ -387,8 +387,8 @@ export const FieldCrewPortal: React.FC = () => {
                   onClick={() => setActiveTicketId(t.id)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border ${
                     activeTicketId === t.id
-                      ? 'bg-blue-600 text-white border-blue-400 shadow-md'
-                      : 'bg-dark-850 text-slate-400 border-slate-800 hover:border-slate-700'
+                      ? 'bg-blue-600 text-white border-blue-500 shadow-sm'
+                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
                   }`}
                 >
                   #{idx + 1}: {t.incidents?.incident_type?.replace(/_/g, ' ') || 'Incident'} ({t.status})
@@ -400,31 +400,31 @@ export const FieldCrewPortal: React.FC = () => {
 
         {/* Active Response Order Card */}
         {activeTask ? (
-          <div className="glass-panel p-5 bg-dark-900/90 border border-slate-700/80 rounded-2xl shadow-xl space-y-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
                   <span
                     className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${
                       activeTask.priority === 'CRITICAL'
-                        ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                        ? 'bg-red-50 text-red-700 border-red-200'
                         : activeTask.priority === 'HIGH'
-                        ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
-                        : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                        ? 'bg-amber-50 text-amber-700 border-amber-200'
+                        : 'bg-blue-50 text-blue-700 border-blue-200'
                     }`}
                   >
                     PRIORITY {activeTask.priority}
                   </span>
-                  <span className="text-xs font-bold text-slate-400">
-                    STATUS: <span className="text-brand-400">{activeTask.status}</span>
+                  <span className="text-xs font-bold text-slate-500">
+                    STATUS: <span className="text-brand-600">{activeTask.status}</span>
                   </span>
                 </div>
-                <h3 className="text-base font-bold text-white mt-1.5">
+                <h3 className="text-base font-bold text-slate-900 mt-1.5">
                   {activeTask.incidents?.incident_type?.replace(/_/g, ' ') || 'Hazard Clearance'}
                 </h3>
-                <p className="text-xs text-slate-300 mt-0.5 flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
-                  <span className="font-semibold text-white">{activeTask.incidents?.roads?.name || 'Road Segment'}</span>, {activeTask.incidents?.wards?.name || 'Ward'}
+                <p className="text-xs text-slate-600 mt-0.5 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+                  <span className="font-semibold text-slate-900">{activeTask.incidents?.roads?.name || 'Road Segment'}</span>, {activeTask.incidents?.wards?.name || 'Ward'}
                 </p>
               </div>
 
@@ -433,7 +433,7 @@ export const FieldCrewPortal: React.FC = () => {
                   <Clock className="w-3 h-3" />
                   {new Date(activeTask.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
-                <span className="text-[10px] text-slate-500 font-mono mt-1 block">
+                <span className="text-[10px] text-slate-400 font-mono mt-1 block">
                   ID: #{activeTask.id.slice(0, 8)}
                 </span>
               </div>
@@ -441,7 +441,7 @@ export const FieldCrewPortal: React.FC = () => {
 
             {/* Description & Citizen Report Info */}
             {activeTask.incidents?.description && (
-              <div className="p-3 rounded-xl bg-dark-950/70 border border-slate-800/80 text-xs text-slate-300">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700">
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mb-1">
                   Citizen Hazard Description:
                 </span>
@@ -452,10 +452,10 @@ export const FieldCrewPortal: React.FC = () => {
             {/* Tactical Safe Detour Navigation Map */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-slate-200 flex items-center gap-1.5">
-                  <Navigation className="w-3.5 h-3.5 text-emerald-400" /> Tactical Detour Route (Live GPS):
+                <span className="font-semibold text-slate-700 flex items-center gap-1.5">
+                  <Navigation className="w-3.5 h-3.5 text-emerald-600" /> Tactical Detour Route (Live GPS):
                 </span>
-                <span className="text-[11px] text-slate-400">Avoids closed roads & hazards</span>
+                <span className="text-[11px] text-slate-500">Avoids closed roads & hazards</span>
               </div>
 
               <CrewNavigationMap
@@ -471,12 +471,12 @@ export const FieldCrewPortal: React.FC = () => {
             </div>
 
             {/* Step-by-Step Execution Action Buttons */}
-            <div className="pt-2 border-t border-slate-800 space-y-2">
+            <div className="pt-2 border-t border-slate-100 space-y-2">
               {activeTask.status === 'ASSIGNED' && (
                 <button
                   onClick={() => handleStatusTransition(activeTask.id, 'ACCEPTED')}
                   disabled={isSubmitting}
-                  className="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm tracking-wide shadow-lg shadow-brand-600/20 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm tracking-wide shadow-sm shadow-brand-600/20 transition-all flex items-center justify-center gap-2"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Accept Assignment & Depart</span>
@@ -487,7 +487,7 @@ export const FieldCrewPortal: React.FC = () => {
                 <button
                   onClick={() => handleStatusTransition(activeTask.id, 'IN_PROGRESS')}
                   disabled={isSubmitting}
-                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm tracking-wide shadow-lg shadow-blue-600/20 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm tracking-wide shadow-sm shadow-blue-600/20 transition-all flex items-center justify-center gap-2"
                 >
                   <MapPin className="w-4 h-4" />
                   <span>Arrived on Site — Begin Clearance</span>
@@ -497,7 +497,7 @@ export const FieldCrewPortal: React.FC = () => {
               {activeTask.status === 'IN_PROGRESS' && (
                 <button
                   onClick={() => setShowCompleteModal(true)}
-                  className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm tracking-wide shadow-xl shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 border border-emerald-400"
+                  className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm tracking-wide shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2"
                 >
                   <Camera className="w-5 h-5" />
                   <span>Verify Resolution with Photo Proof</span>
@@ -507,7 +507,7 @@ export const FieldCrewPortal: React.FC = () => {
               {/* Unable to complete / return ticket option */}
               <button
                 onClick={() => setShowReturnModal(true)}
-                className="w-full py-2 rounded-lg bg-dark-950 text-slate-400 hover:text-red-400 border border-slate-800 hover:border-red-500/40 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+                className="w-full py-2 rounded-lg bg-slate-50 text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-300 hover:bg-red-50 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Unable to Complete / Return to Council Queue</span>
@@ -515,12 +515,12 @@ export const FieldCrewPortal: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="glass-panel p-8 text-center space-y-3 bg-dark-900/60 border-slate-800">
-            <div className="w-12 h-12 rounded-full bg-slate-800/80 flex items-center justify-center mx-auto text-slate-400">
-              <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+          <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center space-y-3 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto text-emerald-600">
+              <CheckCircle2 className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-white">No Active Response Orders</h3>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <h3 className="text-base font-bold text-slate-900">No Active Response Orders</h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
               Your crew is currently standing by. Council officers will dispatch high-priority disaster tickets to your terminal in real-time.
             </p>
           </div>
@@ -538,9 +538,9 @@ export const FieldCrewPortal: React.FC = () => {
         )}
 
         {/* Completed Shift History */}
-        <div className="glass-panel p-5 bg-dark-900/80 rounded-2xl space-y-3">
-          <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-            <Clock className="w-4 h-4 text-emerald-400" /> Completed Clearance Missions
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
+          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+            <Clock className="w-4 h-4 text-emerald-600" /> Completed Clearance Missions
           </h4>
           <CrewTaskHistory tasks={tasks} />
         </div>
@@ -548,15 +548,15 @@ export const FieldCrewPortal: React.FC = () => {
 
       {/* --- MODAL 1: Photo-Verified Task Completion Modal --- */}
       {showCompleteModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-dark-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Camera className="w-4 h-4 text-emerald-400" /> Submit Resolution Photo Proof
+        <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Camera className="w-4 h-4 text-emerald-600" /> Submit Resolution Photo Proof
               </h3>
               <button
                 onClick={() => setShowCompleteModal(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-slate-400 hover:text-slate-700"
               >
                 ✕
               </button>
@@ -564,10 +564,10 @@ export const FieldCrewPortal: React.FC = () => {
 
             <form onSubmit={handleCompleteTicket} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Resolution Proof Photo <span className="text-red-400">* (Mandatory)</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Resolution Proof Photo <span className="text-red-500">* (Mandatory)</span>
                 </label>
-                <div className="border-2 border-dashed border-slate-700 hover:border-emerald-500/50 rounded-xl p-4 text-center cursor-pointer bg-dark-950/60 relative">
+                <div className="border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-xl p-4 text-center cursor-pointer bg-slate-50 hover:bg-emerald-50/20 relative transition-colors">
                   <input
                     type="file"
                     accept="image/*"
@@ -587,16 +587,16 @@ export const FieldCrewPortal: React.FC = () => {
                       <img
                         src={photoPreview}
                         alt="Preview"
-                        className="max-h-40 mx-auto rounded-lg object-cover border border-slate-700"
+                        className="max-h-40 mx-auto rounded-lg object-cover border border-slate-200"
                       />
-                      <span className="text-[11px] text-emerald-400 font-semibold block">
+                      <span className="text-[11px] text-emerald-600 font-semibold block">
                         Photo selected. Tap to change.
                       </span>
                     </div>
                   ) : (
-                    <div className="space-y-1.5 text-slate-400">
-                      <Camera className="w-8 h-8 mx-auto text-slate-500" />
-                      <p className="text-xs font-medium text-slate-300">Tap to Capture Camera Photo</p>
+                    <div className="space-y-1.5 text-slate-500">
+                      <Camera className="w-8 h-8 mx-auto text-slate-400" />
+                      <p className="text-xs font-medium text-slate-700">Tap to Capture Camera Photo</p>
                       <p className="text-[10px] text-slate-500">
                         Shows road cleared or water pumped down
                       </p>
@@ -606,7 +606,7 @@ export const FieldCrewPortal: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Field Resolution Notes (Optional)
                 </label>
                 <textarea
@@ -614,11 +614,11 @@ export const FieldCrewPortal: React.FC = () => {
                   onChange={(e) => setResolutionNotes(e.target.value)}
                   placeholder="e.g. Fallen tree cut and hauled away. Drainage culvert unblocked. Road safe for traffic."
                   rows={3}
-                  className="w-full bg-dark-950 border border-slate-800 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:bg-white transition-colors"
                 />
               </div>
 
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300">
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-800">
                 Submitting this proof will automatically mark the ticket COMPLETED and reopen the road on the public map.
               </div>
 
@@ -626,14 +626,14 @@ export const FieldCrewPortal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowCompleteModal(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 font-semibold text-xs"
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold text-xs transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30"
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-colors"
                 >
                   {isSubmitting ? 'Uploading Proof...' : 'Verify & Reopen Road'}
                 </button>
@@ -645,21 +645,21 @@ export const FieldCrewPortal: React.FC = () => {
 
       {/* --- MODAL 2: Return Ticket Workflow Modal --- */}
       {showReturnModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-dark-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <RotateCcw className="w-4 h-4 text-orange-400" /> Return Response Order
+        <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <RotateCcw className="w-4 h-4 text-amber-600" /> Return Response Order
               </h3>
-              <button onClick={() => setShowReturnModal(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setShowReturnModal(false)} className="text-slate-400 hover:text-slate-700">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleReturnTicket} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Mandatory Return Justification <span className="text-red-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Mandatory Return Justification <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   required
@@ -667,7 +667,7 @@ export const FieldCrewPortal: React.FC = () => {
                   onChange={(e) => setReturnReason(e.target.value)}
                   placeholder="Explain why this order cannot be completed (e.g. Flood depth exceeds 1.5m, amphibious boat or heavy crane required, live electrical power line down)..."
                   rows={4}
-                  className="w-full bg-dark-950 border border-slate-800 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:bg-white transition-colors"
                 />
               </div>
 
@@ -675,14 +675,14 @@ export const FieldCrewPortal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowReturnModal(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 font-semibold text-xs"
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold text-xs transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs shadow-lg shadow-orange-600/30"
+                  className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-sm transition-colors"
                 >
                   {isSubmitting ? 'Returning...' : 'Return to Dispatch'}
                 </button>
@@ -694,20 +694,20 @@ export const FieldCrewPortal: React.FC = () => {
 
       {/* --- MODAL 3: Emergency SOS Panic Beacon Confirmation --- */}
       {showSosModal && (
-        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-dark-950 border-2 border-red-500 rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl shadow-red-500/30">
-            <div className="w-16 h-16 rounded-full bg-red-500/20 border-2 border-red-500/50 flex items-center justify-center mx-auto text-red-500 animate-pulse">
+        <div className="fixed inset-0 z-50 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border-2 border-red-500 rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-xl">
+            <div className="w-14 h-14 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto text-red-600">
               <AlertOctagon className="w-8 h-8" />
             </div>
 
             <div>
-              <h3 className="text-lg font-extrabold text-white tracking-tight">CONFIRM SOS PANIC BEACON</h3>
-              <p className="text-xs text-red-300 mt-1">
+              <h3 className="text-lg font-bold text-slate-900 tracking-tight">CONFIRM SOS PANIC BEACON</h3>
+              <p className="text-xs text-red-600 mt-1">
                 This triggers a critical priority emergency siren across all Council Officer command terminals with your live GPS location.
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-dark-900 border border-slate-800 text-xs text-slate-300 text-left space-y-1">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 text-left space-y-1">
               <p>
                 <strong>Crew:</strong> {crew?.crew_name}
               </p>
@@ -720,14 +720,14 @@ export const FieldCrewPortal: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowSosModal(false)}
-                className="flex-1 py-3 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 font-bold text-xs"
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold text-xs transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleTriggerSos}
                 disabled={isSubmitting}
-                className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-xl shadow-red-600/40 animate-bounce border border-red-400"
+                className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-sm transition-colors"
               >
                 {isSubmitting ? 'Transmitting...' : 'CONFIRM SOS'}
               </button>

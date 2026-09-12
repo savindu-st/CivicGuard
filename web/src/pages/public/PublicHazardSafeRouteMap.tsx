@@ -151,44 +151,44 @@ export const PublicHazardSafeRouteMap: React.FC = () => {
   );
 
   return (
-    <div className="relative flex-1 flex flex-col h-[calc(100vh-65px)] bg-dark-950 overflow-hidden">
+    <div className="relative flex-1 flex flex-col h-[calc(100vh-65px)] bg-slate-50 overflow-hidden">
       {/* Top Emergency Telemetry Status Ticker */}
-      <div className="border-b border-slate-800 bg-dark-900/90 backdrop-blur-md px-6 py-2.5 flex flex-wrap items-center justify-between gap-4 z-20">
+      <div className="border-b border-slate-200 bg-white/95 backdrop-blur-md px-6 py-2.5 flex flex-wrap items-center justify-between gap-4 z-20 shadow-xs">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="relative flex h-3 w-3">
+            <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
             </span>
-            <span className="font-extrabold text-white text-xs tracking-wider uppercase">
-              LIVE DISASTER HAZARD MAP
+            <span className="font-black text-slate-900 text-xs tracking-wider uppercase">
+              Live Disaster Hazard Map
             </span>
           </div>
-          <span className="hidden md:inline text-xs text-slate-500">•</span>
-          <span className="hidden md:inline text-xs text-slate-400">
-            Real-time verified hazard perimeters, road closure detours & emergency shelters
+          <span className="hidden md:inline text-xs text-slate-400">•</span>
+          <span className="hidden md:inline text-xs text-slate-600">
+            Real-time verified flood perimeters, road closures & emergency shelters
           </span>
         </div>
 
         {/* Quick KPI Badges */}
         <div className="flex items-center gap-3 text-xs">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 font-semibold">
+          <div className="badge-critical">
             <AlertTriangle className="w-3.5 h-3.5" />
             <span>{criticalCount} Critical Flood Zones</span>
           </div>
 
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-500/10 border border-orange-500/30 text-orange-400 font-semibold">
+          <div className="badge-high">
             <span>⛔ {totalClosedRoads} Closed Roads</span>
           </div>
 
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold">
+          <div className="hidden sm:flex items-center gap-1.5 badge-success">
             <Home className="w-3.5 h-3.5" />
             <span>{totalAvailableBeds} Available Beds</span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-[11px] text-slate-400 pl-2 border-l border-slate-800">
-            <Radio className={`w-3.5 h-3.5 ${isConnected ? 'text-emerald-400 animate-pulse' : 'text-slate-500'}`} />
-            <span className="hidden lg:inline">{isConnected ? 'Telematics Live' : 'Connecting...'}</span>
+          <div className="flex items-center gap-1.5 text-[11px] text-slate-500 pl-2 border-l border-slate-200">
+            <Radio className={`w-3.5 h-3.5 ${isConnected ? 'text-emerald-600' : 'text-slate-400'}`} />
+            <span className="hidden lg:inline font-medium">{isConnected ? 'Telematics Live' : 'Connecting...'}</span>
           </div>
         </div>
       </div>
@@ -198,13 +198,13 @@ export const PublicHazardSafeRouteMap: React.FC = () => {
         {/* Floating Top-Left Controls: Layer Toggles & Hazard Category Filter */}
         <div className="absolute top-4 left-4 z-[1000] flex flex-col gap-2 pointer-events-auto max-w-sm">
           {/* Layer Toggles Pill Bar */}
-          <div className="flex flex-wrap items-center gap-1.5 p-1.5 rounded-xl bg-dark-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-md text-xs">
+          <div className="flex flex-wrap items-center gap-1.5 p-1.5 rounded-xl bg-white/95 border border-slate-200 shadow-md backdrop-blur-md text-xs">
             <button
               onClick={() => setShowPerimeters(!showPerimeters)}
               className={`px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 ${
                 showPerimeters
-                  ? 'bg-brand-500/20 text-brand-400 border border-brand-500/30'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
               <span>Perimeters</span>
@@ -214,8 +214,8 @@ export const PublicHazardSafeRouteMap: React.FC = () => {
               onClick={() => setShowClosedRoads(!showClosedRoads)}
               className={`px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 ${
                 showClosedRoads
-                  ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-red-50 text-red-700 border border-red-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
               <span>Closed Roads</span>
@@ -225,8 +225,8 @@ export const PublicHazardSafeRouteMap: React.FC = () => {
               onClick={() => setShowShelters(!showShelters)}
               className={`px-2.5 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 ${
                 showShelters
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
               <span>Shelters</span>
@@ -234,7 +234,7 @@ export const PublicHazardSafeRouteMap: React.FC = () => {
           </div>
 
           {/* Hazard Category Filter Pills */}
-          <div className="flex flex-wrap items-center gap-1 p-1.5 rounded-xl bg-dark-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-md text-[11px]">
+          <div className="flex flex-wrap items-center gap-1 p-1.5 rounded-xl bg-white/95 border border-slate-200 shadow-md backdrop-blur-md text-[11px]">
             {[
               { id: 'ALL', label: 'All Hazards' },
               { id: 'FLOOD', label: '🌊 Floods' },
@@ -247,8 +247,8 @@ export const PublicHazardSafeRouteMap: React.FC = () => {
                 onClick={() => setFilterType(cat.id)}
                 className={`px-2 py-0.5 rounded-lg font-medium transition-colors ${
                   filterType === cat.id
-                    ? 'bg-cyan-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
                 {cat.label}

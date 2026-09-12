@@ -248,31 +248,31 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
   const completionPhoto = evidenceList.find((e) => e.evidence_type === 'COMPLETION_PHOTO')?.file_url;
 
   return (
-    <div className="flex flex-col h-full bg-dark-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
+    <div className="flex flex-col h-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
       {/* 1. Header Bar */}
-      <div className="p-4 border-b border-slate-800 bg-dark-850/80 flex items-center justify-between gap-3 flex-wrap">
+      <div className="p-4 border-b border-slate-200 bg-white flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2.5">
           <button
             onClick={onBack}
-            className="p-1.5 rounded-lg bg-dark-800 text-slate-400 hover:text-white border border-slate-700 transition-colors"
+            className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 transition-colors"
             title="Back to Triage Queue"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
                 {incident.incident_type?.replace('_', ' ')}
               </h3>
               <span
-                className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                   incident.status === 'CONFIRMED'
-                    ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                    ? 'bg-red-50 text-red-700 border border-red-200'
                     : incident.status === 'NEEDS_VERIFICATION'
-                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
+                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
                     : incident.status === 'RESOLVED'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                    : 'bg-slate-800 text-slate-300'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    : 'bg-slate-100 text-slate-600'
                 }`}
               >
                 {incident.status}
@@ -280,15 +280,15 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
               <span
                 className={`text-[10px] font-bold px-2 py-0.5 rounded ${
                   incident.severity === 'CRITICAL'
-                    ? 'bg-red-900/40 text-red-300 border border-red-700/50'
-                    : 'bg-slate-800 text-slate-400 border border-slate-700'
+                    ? 'bg-red-100 text-red-800 border border-red-200'
+                    : 'bg-slate-100 text-slate-600 border border-slate-200'
                 }`}
               >
                 {incident.severity}
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
-              <MapPin className="w-3 h-3 text-slate-500" />
+            <p className="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5">
+              <MapPin className="w-3 h-3 text-slate-400" />
               <span>
                 {incident.roads?.name || 'Local Corridor'} • {incident.wards?.name || 'Municipal Ward'}
               </span>
@@ -297,13 +297,13 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
         </div>
 
         {/* Action Tabs Selector */}
-        <div className="flex items-center gap-1 bg-dark-950 p-1 rounded-lg border border-slate-800 text-xs">
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
           <button
             onClick={() => setActiveTab('SCORECARD')}
             className={`px-3 py-1 rounded-md font-semibold transition-all ${
               activeTab === 'SCORECARD'
-                ? 'bg-brand-600 text-white shadow'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-brand-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             AI Scorecard
@@ -312,8 +312,8 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
             onClick={() => setActiveTab('DISPATCH')}
             className={`px-3 py-1 rounded-md font-semibold transition-all flex items-center gap-1 ${
               activeTab === 'DISPATCH'
-                ? 'bg-blue-600 text-white shadow'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Users className="w-3 h-3" />
@@ -323,8 +323,8 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
             onClick={() => setActiveTab('ROAD')}
             className={`px-3 py-1 rounded-md font-semibold transition-all flex items-center gap-1 ${
               activeTab === 'ROAD'
-                ? 'bg-amber-600 text-white shadow'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-amber-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Ban className="w-3 h-3" />
@@ -335,8 +335,8 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
               onClick={() => setActiveTab('RESOLUTION')}
               className={`px-3 py-1 rounded-md font-semibold transition-all flex items-center gap-1 ${
                 activeTab === 'RESOLUTION'
-                  ? 'bg-emerald-600 text-white shadow'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Camera className="w-3 h-3" />
@@ -348,9 +348,9 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
 
       {/* Status Messages */}
       {statusMessage && (
-        <div className="px-4 py-2 bg-brand-950/60 border-b border-brand-800/40 text-xs text-brand-300 flex items-center justify-between">
+        <div className="px-4 py-2 bg-brand-50 border-b border-brand-200 text-xs text-brand-800 flex items-center justify-between">
           <span>{statusMessage}</span>
-          <button onClick={() => setStatusMessage(null)} className="text-slate-400 hover:text-white">
+          <button onClick={() => setStatusMessage(null)} className="text-slate-400 hover:text-slate-700">
             ✕
           </button>
         </div>
@@ -364,29 +364,29 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
         {activeTab === 'SCORECARD' && (
           <div className="space-y-4">
             {/* Composite Confidence Banner */}
-            <div className="p-4 rounded-xl bg-gradient-to-r from-dark-800 via-dark-850 to-dark-800 border border-slate-700/80 shadow-md">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 shadow-sm">
               <div className="flex items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 font-bold uppercase tracking-wider">
-                    <Sparkles className="w-4 h-4 text-brand-400" />
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold uppercase tracking-wider">
+                    <Sparkles className="w-4 h-4 text-brand-600" />
                     <span>5-Signal Hybrid Verification Verdict</span>
                   </div>
-                  <h4 className="text-lg font-black text-white">
+                  <h4 className="text-lg font-bold text-slate-900">
                     {verdictObj?.verdict || incident.status}
                   </h4>
-                  <p className="text-xs text-slate-300">
-                    Confidence Score: <span className="font-mono font-bold text-white">{confidencePercent}%</span> •
-                    Threshold for Auto-Confirmation: <span className="font-mono text-emerald-400">&ge; 85%</span>
+                  <p className="text-xs text-slate-600">
+                    Confidence Score: <span className="font-mono font-bold text-slate-900">{confidencePercent}%</span> •
+                    Threshold for Auto-Confirmation: <span className="font-mono text-emerald-700">&ge; 85%</span>
                   </p>
                 </div>
 
                 {/* Score Dial / Bar */}
                 <div className="flex flex-col items-end gap-1">
-                  <div className="w-32 bg-dark-950 rounded-full h-3.5 border border-slate-700 overflow-hidden">
+                  <div className="w-32 bg-slate-200 rounded-full h-3.5 border border-slate-300 overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
                         Number(confidencePercent) >= 85
-                          ? 'bg-emerald-500'
+                          ? 'bg-emerald-600'
                           : Number(confidencePercent) >= 40
                           ? 'bg-amber-500'
                           : 'bg-red-500'
@@ -394,7 +394,7 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
                       style={{ width: `${confidencePercent}%` }}
                     ></div>
                   </div>
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[10px] text-slate-500">
                     {Number(confidencePercent) >= 85
                       ? 'High Confidence Match'
                       : 'Needs Officer Verification'}
@@ -405,28 +405,28 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
 
             {/* Citizen Incident Evidence Photo */}
             {citizenPhoto && (
-              <div className="p-3 rounded-xl bg-dark-850/80 border border-slate-800 space-y-2">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
                   <span className="flex items-center gap-1.5">
-                    <Camera className="w-3.5 h-3.5 text-brand-400" /> Citizen Report Photo
+                    <Camera className="w-3.5 h-3.5 text-brand-600" /> Citizen Report Photo
                   </span>
                   <a
                     href={citizenPhoto}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[10px] text-brand-400 hover:underline flex items-center gap-1"
+                    className="text-[10px] text-brand-600 hover:underline flex items-center gap-1"
                   >
                     <span>Full Resolution</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
-                <div className="relative rounded-lg overflow-hidden border border-slate-700/60 max-h-48 bg-black flex items-center justify-center">
+                <div className="relative rounded-lg overflow-hidden border border-slate-200 max-h-48 bg-slate-100 flex items-center justify-center">
                   <img
                     src={citizenPhoto}
                     alt="Citizen Incident"
                     className="object-cover w-full max-h-48"
                   />
-                  <div className="absolute bottom-2 left-2 bg-dark-950/80 backdrop-blur-md px-2 py-0.5 rounded text-[10px] text-slate-300">
+                  <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded text-[10px] text-slate-700 shadow-xs border border-slate-200">
                     AI Visual Inspection Processed
                   </div>
                 </div>
@@ -435,147 +435,147 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
 
             {/* Exploded 5 Signals Breakdown Cards */}
             <div className="space-y-2.5">
-              <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <h5 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Individual Signal Breakdown (All 5 Checks)
               </h5>
 
               {/* Signal 1: Image AI (YOLO) */}
-              <div className="p-3 rounded-xl bg-dark-850/60 border border-slate-800/80 space-y-1.5">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-white flex items-center gap-1.5">
-                    <Eye className="w-3.5 h-3.5 text-brand-400" />
+                  <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5 text-brand-600" />
                     <span>1. Image AI (Computer Vision YOLOv8)</span>
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-dark-800 text-slate-300 border border-slate-700">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
                     {imageSignal?.method === 'HEURISTIC_FALLBACK' ? 'Heuristic Fallback' : 'Deep Model (Port 5000)'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-xs text-slate-700 leading-relaxed">
                   {imageSignal?.result || 'Water level benchmark detected. Tire submerged (~40cm water depth).'}
                 </p>
-                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/50">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200">
                   <span>Category: {incident.incident_type}</span>
-                  <span className="font-mono text-emerald-400">Score: {imageSignal?.score ? (Number(imageSignal.score) * 100).toFixed(0) : '90'}%</span>
+                  <span className="font-mono text-emerald-700 font-bold">Score: {imageSignal?.score ? (Number(imageSignal.score) * 100).toFixed(0) : '90'}%</span>
                 </div>
               </div>
 
               {/* Signal 2: Weather Telemetry Correlation */}
-              <div className="p-3 rounded-xl bg-dark-850/60 border border-slate-800/80 space-y-1.5">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-white flex items-center gap-1.5">
-                    <CloudRain className="w-3.5 h-3.5 text-blue-400" />
+                  <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                    <CloudRain className="w-3.5 h-3.5 text-blue-600" />
                     <span>2. Weather & Hydrological Telemetry</span>
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-950/40 text-blue-300 border border-blue-800/40">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
                     System Correlation
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-xs text-slate-700 leading-relaxed">
                   {weatherSignal?.reason || 'Heavy precipitation confirmed: Rainfall 91.5mm (Threshold 50mm). River gauge 3.6m.'}
                 </p>
-                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/50">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200">
                   <span>Sensors: Rain Gauge + Canal Crest</span>
-                  <span className="font-mono text-emerald-400">Score: {weatherSignal?.score ? (Number(weatherSignal.score) * 100).toFixed(0) : '95'}%</span>
+                  <span className="font-mono text-emerald-700 font-bold">Score: {weatherSignal?.score ? (Number(weatherSignal.score) * 100).toFixed(0) : '95'}%</span>
                 </div>
               </div>
 
               {/* Signal 3: Spatio-Temporal Cluster (200m) */}
-              <div className="p-3 rounded-xl bg-dark-850/60 border border-slate-800/80 space-y-1.5">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-white flex items-center gap-1.5">
-                    <Radio className="w-3.5 h-3.5 text-purple-400" />
+                  <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                    <Radio className="w-3.5 h-3.5 text-purple-600" />
                     <span>3. Spatio-Temporal Cluster Density (200m / 3h)</span>
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-purple-950/40 text-purple-300 border border-purple-800/40">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
                     Spatial Density
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-xs text-slate-700 leading-relaxed">
                   {clusterSignal?.result || 'Correlated citizen reports detected within 200m radius in rolling window.'}
                 </p>
-                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/50">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200">
                   <span>Radius: 200m • Window: 3.0h</span>
-                  <span className="font-mono text-emerald-400">Score: {clusterSignal?.score ? (Number(clusterSignal.score) * 100).toFixed(0) : '85'}%</span>
+                  <span className="font-mono text-emerald-700 font-bold">Score: {clusterSignal?.score ? (Number(clusterSignal.score) * 100).toFixed(0) : '85'}%</span>
                 </div>
               </div>
 
               {/* Signal 4: Location & Scene Authenticity */}
-              <div className="p-3 rounded-xl bg-dark-850/60 border border-slate-800/80 space-y-1.5">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-white flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-emerald-600" />
                     <span>4. Location & Scene Authenticity</span>
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-300 border border-emerald-800/40">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
                     Geospatial Verified
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-xs text-slate-700 leading-relaxed">
                   {locationSignal?.reason || 'Report coordinates lie squarely inside registered municipal ward bounds. Outdoor flood terrain match.'}
                 </p>
-                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/50">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200">
                   <span>Ward: {incident.wards?.name}</span>
-                  <span className="font-mono text-emerald-400">Score: {locationSignal?.score ? (Number(locationSignal.score) * 100).toFixed(0) : '92'}%</span>
+                  <span className="font-mono text-emerald-700 font-bold">Score: {locationSignal?.score ? (Number(locationSignal.score) * 100).toFixed(0) : '92'}%</span>
                 </div>
               </div>
 
               {/* Signal 5: Risk Urgency AI */}
-              <div className="p-3 rounded-xl bg-dark-850/60 border border-slate-800/80 space-y-1.5">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-white flex items-center gap-1.5">
-                    <ShieldAlert className="w-3.5 h-3.5 text-red-400" />
+                  <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                    <ShieldAlert className="w-3.5 h-3.5 text-red-600" />
                     <span>5. Risk Urgency AI Check</span>
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-red-950/40 text-red-300 border border-red-800/40">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-red-50 text-red-700 border border-red-200">
                     Criticality Rating
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-xs text-slate-700 leading-relaxed">
                   {riskSignal?.reason || `Primary arterial road obstruction. Risk level ${incident.severity} assigned based on critical connectivity.`}
                 </p>
-                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/50">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200">
                   <span>Road Classification: Primary Arterial</span>
-                  <span className="font-mono text-red-400">Priority: {incident.severity}</span>
+                  <span className="font-mono text-red-600 font-bold">Priority: {incident.severity}</span>
                 </div>
               </div>
             </div>
 
             {/* Guided Manual Verification Override Controls */}
-            <div className="p-4 rounded-xl bg-dark-800 border border-slate-700/80 space-y-3 shadow-lg">
+            <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-3 shadow-sm">
               <div className="flex items-center justify-between">
-                <h5 className="text-xs font-bold text-white flex items-center gap-1.5 uppercase tracking-wide">
-                  <AlertOctagon className="w-4 h-4 text-amber-400" />
+                <h5 className="text-xs font-bold text-slate-900 flex items-center gap-1.5 uppercase tracking-wide">
+                  <AlertOctagon className="w-4 h-4 text-amber-600" />
                   <span>Manual Verification Override Controls</span>
                 </h5>
-                <span className="text-[10px] text-slate-400">Authorized Council Officer</span>
+                <span className="text-[10px] text-slate-500">Authorized Council Officer</span>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 Confirming promotes the hazard to <strong>CONFIRMED</strong>, enforces road closure on the tactical map, auto-creates the dispatch ticket, and transitions to field crew assignment.
               </p>
 
               {showRejectBox ? (
-                <div className="space-y-2 p-3 rounded-lg bg-dark-900 border border-red-500/30">
-                  <label className="text-xs font-semibold text-red-400">
+                <div className="space-y-2 p-3 rounded-lg bg-red-50/50 border border-red-200">
+                  <label className="text-xs font-semibold text-red-700">
                     Reason for Rejection / False Alarm:
                   </label>
                   <textarea
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
                     placeholder="E.g., duplicate report, expired puddle, invalid photo..."
-                    className="w-full bg-dark-850 border border-slate-700 rounded-lg p-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500"
+                    className="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500"
                     rows={2}
                   />
                   <div className="flex items-center justify-end gap-2">
                     <button
                       onClick={() => setShowRejectBox(false)}
-                      className="px-3 py-1 rounded bg-slate-800 text-xs text-slate-300 hover:text-white"
+                      className="px-3 py-1 rounded bg-slate-100 text-xs text-slate-700 hover:bg-slate-200 font-medium"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleRejectHazard}
                       disabled={isVerifying}
-                      className="px-3 py-1 rounded bg-red-600 hover:bg-red-500 text-xs font-bold text-white disabled:opacity-50"
+                      className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-xs font-bold text-white disabled:opacity-50"
                     >
                       {isVerifying ? 'Rejecting...' : 'Confirm Rejection'}
                     </button>
@@ -586,7 +586,7 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
                   <button
                     onClick={handleConfirmHazard}
                     disabled={isVerifying || incident.status === 'CONFIRMED'}
-                    className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                    className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>{incident.status === 'CONFIRMED' ? 'Already Confirmed' : 'Verify & Confirm Hazard'}</span>
@@ -595,7 +595,7 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
                   <button
                     onClick={() => setShowRejectBox(true)}
                     disabled={isVerifying || incident.status === 'REJECTED'}
-                    className="py-2.5 px-4 rounded-xl bg-dark-900 hover:bg-red-950/40 text-red-400 border border-red-500/30 font-bold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
+                    className="py-2.5 px-4 rounded-xl bg-slate-50 hover:bg-red-50 text-red-600 border border-slate-200 hover:border-red-300 font-bold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
                   >
                     <XCircle className="w-4 h-4" />
                     <span>Reject</span>
@@ -612,37 +612,37 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
         {activeTab === 'DISPATCH' && (
           <div className="space-y-4">
             {/* Active Ticket Status Card */}
-            <div className="p-3.5 rounded-xl bg-dark-850/80 border border-slate-800 space-y-2">
+            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-white flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-blue-400" />
+                <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-blue-600" />
                   <span>Council Response Ticket</span>
                 </span>
                 <span
                   className={`text-[10px] font-bold px-2 py-0.5 rounded ${
                     associatedTicket
-                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                      : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                      : 'bg-amber-50 text-amber-700 border border-amber-200'
                   }`}
                 >
                   {associatedTicket ? `Status: ${associatedTicket.status}` : 'Pending Dispatch'}
                 </span>
               </div>
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-slate-600">
                 {associatedTicket
                   ? `Ticket #${associatedTicket.id.substring(0, 8)} • Priority: ${associatedTicket.priority}`
                   : 'No field response crew is currently assigned to this hazard scene.'}
               </p>
               {associatedTicket?.field_crews?.crew_name && (
-                <div className="p-2 rounded bg-dark-900 border border-slate-700/60 text-xs text-sky-300 flex items-center justify-between">
+                <div className="p-2 rounded bg-sky-50 border border-sky-200 text-xs text-sky-800 flex items-center justify-between">
                   <span>Currently Assigned: {associatedTicket.field_crews.crew_name}</span>
-                  <span className="text-[10px] text-slate-400">Vector Visible on Map</span>
+                  <span className="text-[10px] text-slate-500">Vector Visible on Map</span>
                 </div>
               )}
             </div>
 
             {dispatchSuccessMsg && (
-              <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-xs text-emerald-300 flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
                 <span>{dispatchSuccessMsg}</span>
               </div>
@@ -651,7 +651,7 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
             {/* Field Crews Selector Sorted by Distance */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                <h5 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Available Field Crews (Ranked by Proximity)
                 </h5>
                 <span className="text-[10px] text-slate-500">Live Haversine GPS Distance</span>
@@ -661,7 +661,6 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
                 {sortedCrews.map((crew, idx) => {
                   const isSelected = selectedCrewId === crew.id;
                   const isRec = crew.id === recommendedCrew?.id;
-                  const isBusy = crew.availability === 'BUSY';
 
                   return (
                     <div
@@ -669,8 +668,8 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
                       onClick={() => setSelectedCrewId(crew.id)}
                       className={`p-3 rounded-xl border transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-blue-950/40 border-blue-500 shadow-md ring-1 ring-blue-500'
-                          : 'bg-dark-850/60 hover:bg-dark-800 border-slate-800'
+                          ? 'bg-blue-50 border-blue-400 shadow-sm ring-1 ring-blue-400'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -680,32 +679,32 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
                             name="crew-selection"
                             checked={isSelected}
                             onChange={() => setSelectedCrewId(crew.id)}
-                            className="text-blue-500 focus:ring-blue-400"
+                            className="text-blue-600 focus:ring-blue-500"
                           />
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-bold text-white">{crew.crew_name}</span>
+                              <span className="text-xs font-bold text-slate-900">{crew.crew_name}</span>
                               {isRec && (
-                                <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-emerald-500 text-dark-950">
+                                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-600 text-white">
                                   RECOMMENDED
                                 </span>
                               )}
                             </div>
-                            <p className="text-[10px] text-slate-400">
+                            <p className="text-[10px] text-slate-500">
                               Vehicle: {crew.vehicle_type || 'Rapid Response Van'} • Contact: {crew.contact_phone || '+94771234562'}
                             </p>
                           </div>
                         </div>
 
                         <div className="text-right">
-                          <div className="text-xs font-mono font-bold text-sky-400">
+                          <div className="text-xs font-mono font-bold text-sky-700">
                             {crew.distanceKm !== null ? `${crew.distanceKm.toFixed(1)} km` : 'GPS syncing'}
                           </div>
                           <span
                             className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
                               crew.availability === 'AVAILABLE'
-                                ? 'bg-emerald-500/20 text-emerald-400'
-                                : 'bg-orange-500/20 text-orange-400'
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                : 'bg-amber-50 text-amber-700 border border-amber-200'
                             }`}
                           >
                             {crew.availability}
@@ -720,22 +719,22 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
 
             {/* 2 km Soft Proximity Rule & Emergency Override Warning */}
             {isDistanceWarning && (
-              <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/50 space-y-2">
-                <div className="flex items-center gap-2 text-xs font-bold text-amber-400">
+              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 space-y-2 text-amber-900">
+                <div className="flex items-center gap-2 text-xs font-bold text-amber-800">
                   <AlertTriangle className="w-4 h-4" />
                   <span>Proximity Warning (Exceeds 2.0 km Soft Limit)</span>
                 </div>
-                <p className="text-[11px] text-amber-200/90 leading-relaxed">
+                <p className="text-[11px] text-amber-800 leading-relaxed">
                   The selected crew is <strong>{activeSelectedCrew?.distanceKm?.toFixed(1)} km</strong> away. In accordance with municipal protocol, multi-task dispatch across &gt; 2.0 km requires an explicit <strong>Emergency Override</strong>.
                 </p>
 
-                <div className="pt-2 border-t border-amber-800/40 space-y-2">
-                  <label className="flex items-center gap-2 text-xs text-white font-semibold cursor-pointer">
+                <div className="pt-2 border-t border-amber-200 space-y-2">
+                  <label className="flex items-center gap-2 text-xs text-slate-900 font-semibold cursor-pointer">
                     <input
                       type="checkbox"
                       checked={emergencyOverride}
                       onChange={(e) => setEmergencyOverride(e.target.checked)}
-                      className="rounded text-amber-500 focus:ring-amber-400"
+                      className="rounded text-amber-600 focus:ring-amber-500"
                     />
                     <span>Authorize Emergency Proximity Override</span>
                   </label>
@@ -746,7 +745,7 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
                       value={overrideJustification}
                       onChange={(e) => setOverrideJustification(e.target.value)}
                       placeholder="Mandatory justification notes (e.g., No closer crew available)..."
-                      className="w-full bg-dark-900 border border-amber-700/60 rounded-lg px-3 py-1.5 text-xs text-white placeholder-amber-400/50 focus:outline-none"
+                      className="w-full bg-white border border-amber-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 placeholder-amber-600/50 focus:outline-none"
                     />
                   )}
                 </div>
@@ -757,7 +756,7 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
             <button
               onClick={handleDispatchCrew}
               disabled={isDispatching || !selectedCrewId || (isDistanceWarning && (!emergencyOverride || !overrideJustification.trim()))}
-              className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs tracking-wide shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all disabled:opacity-50 border border-blue-400"
+              className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs tracking-wide shadow-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 border border-blue-500"
             >
               <Navigation className="w-4 h-4" />
               <span>
@@ -772,17 +771,17 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
         {/* ==================================================================== */}
         {activeTab === 'ROAD' && (
           <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-dark-850/80 border border-slate-800 space-y-3">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-white flex items-center gap-1.5 uppercase">
-                  <Ban className="w-4 h-4 text-red-400" />
+                <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5 uppercase">
+                  <Ban className="w-4 h-4 text-red-600" />
                   <span>Road Segment Infrastructure</span>
                 </span>
                 <span
                   className={`text-xs font-bold px-2.5 py-1 rounded-full ${
                     incident.roads?.is_closed
-                      ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                      : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      ? 'bg-red-50 text-red-700 border border-red-200'
+                      : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                   }`}
                 >
                   {incident.roads?.is_closed ? '🔴 CLOSED' : '🟢 OPEN'}
@@ -790,18 +789,18 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
               </div>
 
               <div className="space-y-1.5 text-xs">
-                <div className="font-semibold text-white text-sm">
+                <div className="font-bold text-slate-900 text-sm">
                   {incident.roads?.name || 'Local Street Segment'}
                 </div>
-                <p className="text-slate-400">
+                <p className="text-slate-500">
                   Ward: {incident.wards?.name || 'Assigned Municipal Ward'} • Road Type: Primary Arterial
                 </p>
-                <p className="text-slate-400">
+                <p className="text-slate-500">
                   Coordinates: {incident.latitude?.toFixed(5)}, {incident.longitude?.toFixed(5)}
                 </p>
               </div>
 
-              <div className="p-3 rounded-lg bg-dark-900 border border-slate-700/60 text-xs text-slate-300 leading-relaxed">
+              <div className="p-3 rounded-lg bg-white border border-slate-200 text-xs text-slate-600 leading-relaxed">
                 When marked closed, public safe detour routes immediately redirect civilian and emergency vehicles around this section. Closing turns the road marker red on both the Officer tactical map and Public Leaflet maps.
               </div>
 
@@ -810,8 +809,8 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
                 disabled={isTogglingRoad || (!incident.road_id && !incident.roads?.id)}
                 className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all disabled:opacity-50 ${
                   incident.roads?.is_closed
-                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/30'
-                    : 'bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30'
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
+                    : 'bg-red-600 hover:bg-red-700 text-white shadow-sm'
                 }`}
               >
                 <Ban className="w-4 h-4" />
@@ -832,47 +831,47 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
         {/* ==================================================================== */}
         {activeTab === 'RESOLUTION' && (
           <div className="space-y-4">
-            <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30 space-y-1.5">
-              <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
-                <CheckCircle2 className="w-4 h-4" />
+            <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs font-bold text-emerald-800">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>Closed-Loop Incident Resolution Audit (ADR-005)</span>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-emerald-800 leading-relaxed">
                 Incident was resolved with mandatory field crew photo proof before road segment was reopened on the public disaster map.
               </p>
             </div>
 
             {/* Side by Side Before vs After Comparison */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="p-3 rounded-xl bg-dark-850 border border-slate-800 space-y-2">
-                <span className="text-xs font-bold text-red-400 block">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                <span className="text-xs font-bold text-red-600 block">
                   1. Initial Citizen Hazard Report Photo
                 </span>
                 {citizenPhoto ? (
                   <img
                     src={citizenPhoto}
                     alt="Citizen Initial Hazard"
-                    className="w-full h-40 object-cover rounded-lg border border-slate-700"
+                    className="w-full h-40 object-cover rounded-lg border border-slate-200"
                   />
                 ) : (
-                  <div className="h-40 rounded-lg bg-dark-900 flex items-center justify-center text-xs text-slate-500">
+                  <div className="h-40 rounded-lg bg-slate-100 flex items-center justify-center text-xs text-slate-400">
                     No initial photo uploaded
                   </div>
                 )}
               </div>
 
-              <div className="p-3 rounded-xl bg-dark-850 border border-slate-800 space-y-2">
-                <span className="text-xs font-bold text-emerald-400 block">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                <span className="text-xs font-bold text-emerald-700 block">
                   2. Field Crew Resolution Proof Photo
                 </span>
                 {completionPhoto ? (
                   <img
                     src={completionPhoto}
                     alt="Crew Resolution Proof"
-                    className="w-full h-40 object-cover rounded-lg border border-emerald-500/50"
+                    className="w-full h-40 object-cover rounded-lg border border-emerald-200"
                   />
                 ) : (
-                  <div className="h-40 rounded-lg bg-dark-900 flex items-center justify-center text-xs text-slate-500">
+                  <div className="h-40 rounded-lg bg-slate-100 flex items-center justify-center text-xs text-slate-400">
                     Resolution photo logged on file
                   </div>
                 )}
