@@ -755,24 +755,25 @@ stateDiagram-v2
   - Eliminates premature heuristic fallbacks during hazard report intake; all citizen report photos are authoritatively evaluated by Gemini 3.5 Flash-Lite.
   - Council Officer Command Center displays accurate, model-derived forensic explanations and depth benchmarks.
   - Preserves zero-impact isolation of YOLOv8 background object detections for tactical UI display.
-
-### ADR-033: Streamlining Public Map UI by Decoupling Standalone Photo Scanner Portal
+### ADR-034: Resolving Public Hazard Map Container Height Collapse & Light Mode Alignment
 
 - **Date**: 2026-09-13
 - **Status**: Accepted
 - **Context**:
-  The public map page (`PublicHazardSafeRouteMap.tsx`) previously featured two parallel entry points for photo analysis: a standalone "AI Photo Scanner" modal (`CitizenPhotoScanPortal.tsx`) triggered via both a floating bottom action button and a top-ticker button, alongside the official "REPORT HAZARD ⚠️" workflow (`CitizenHazardReportModal.tsx`). During active disaster events, multiple competing calls-to-action created cognitive load and blurred the distinction between testing vision models and filing authoritative hazard reports.
+  On the public disaster map (`PublicHazardSafeRouteMap.tsx`), the live map canvas rendered as a completely dark/black box. Root cause analysis revealed that `<MapContainer>` in `PublicHazardMap.tsx` lacked an explicit inline style or minHeight, causing `.leaflet-container`'s computed height to collapse to `0px` (`computedHeight: "0px"`) within the flexbox hierarchy. Concurrently, the outer map wrapper retained legacy pre-ADR-022 dark-mode classes (`bg-dark-950 border-slate-700/60`), which exposed an empty 500px black container when Leaflet collapsed. Additionally, the floating `SafeRoutePlanner.tsx` component still retained obsolete dark-mode backgrounds and borders.
 - **Decision**:
-  1. **Public Map UI Decoupling**:
-     - Removed the floating bottom action button (`AI PHOTO SCANNER ⚡`) and the top telemetry ticker button (`Scan Photo with Gemini AI ⚡`) from `PublicHazardSafeRouteMap.tsx`.
-     - Centered the single, primary `REPORT HAZARD ⚠️` floating action button with its animated warning gradient.
-     - Unmounted `CitizenPhotoScanPortal` from the public map page, while retaining `CitizenPhotoScanPortal.tsx` in `web/src/components/incidents/` unmounted for administrative/staff testing.
-  2. **Consolidated Citizen Reporting Integrity**:
-     - All citizen photo uploads and multimodal AI verifications are consolidated into `CitizenHazardReportModal.tsx`, which retains its camera/file upload, optional inline confidence check, and automated Gemini 3.5 Flash-Lite verification upon report submission.
-     - Preserved backend scan endpoints (`/api/incidents/scan-photo`, `/predict/scan-upload`) with zero regressions.
+  1. **Leaflet Dimensions & Container Enforcements**:
+     - Added `style={{ height: '100%', minHeight: '520px', width: '100%' }}` directly to `<MapContainer>` in `PublicHazardMap.tsx`, unifying with `OfficerTacticalMap.tsx`.
+     - Added global CSS overrides `width: 100% !important; height: 100% !important;` to `.leaflet-container` in `index.css`.
+     - Appended `min-h-0` to the workspace container in `PublicHazardSafeRouteMap.tsx` to maintain strict flexbox bounds.
+  2. **ADR-022 Pure Light Mode Alignment**:
+     - Updated `PublicHazardMap.tsx` container from `bg-dark-950 border-slate-700/60 shadow-2xl` to `bg-slate-50 border border-slate-200 shadow-sm`.
+     - Refactored `SafeRoutePlanner.tsx` to clean light mode (`bg-white/95 border border-slate-200 shadow-xl`, `bg-slate-50` select inputs, `text-slate-900`, `bg-red-50 text-red-800` avoided road tags).
+     - Updated the reroute alert banner to crisp light mode (`bg-white/95 text-orange-800 border-orange-200`).
 - **Consequences**:
-  - Eliminates visual clutter on the public disaster map, focusing citizen interactions on safe detour navigation and direct emergency reporting.
-  - Retains 100% multimodal verification fidelity through the primary incident reporting pipeline.
+  - Eliminates the black box bug; Leaflet tiles, hazard buffer circles, closed road markers, and shelter pins render immediately and reliably.
+  - Complete aesthetic harmonization across the entire public citizen interface according to ADR-022.
+
 
 
 
