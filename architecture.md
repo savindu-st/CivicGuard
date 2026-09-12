@@ -512,4 +512,19 @@ stateDiagram-v2
   - Road safety invariant mathematically guaranteed: roads cannot reopen without verified resolution photos in `incident_evidence`.
   - All 7 containers build cleanly and reach healthy status deterministically.
 
+### ADR-027: Map Stacking Context Isolation & High-Elevation Modal Layering
 
+- **Date**: 2026-09-12
+- **Status**: Accepted
+- **Context**:
+  Leaflet DOM structure allocates high internal z-indexes across its rendering layers (`.leaflet-pane` = 400, `.leaflet-marker-pane` = 600, `.leaflet-popup-pane` = 700, `.leaflet-control` & `.leaflet-top`/`.leaflet-bottom` = 1000). When modals in the frontend application used Tailwind's default `z-50` (e.g. `FieldCrewPortal.tsx` resolution photo upload modal) and map containers lacked an isolated CSS stacking context, Leaflet map tiles, zoom controls, and marker pins bled through and overlapped the modal dialogs.
+- **Decision**:
+  1. **High-Elevation Modal Layering (`z-[2000]`)**:
+     - Standardized all modal overlays and backdrops across the frontend application to `z-[2000]` (unifying `FieldCrewPortal.tsx` completion, return, and SOS modals with `CitizenHazardReportModal`, `EmergencySuppliesModal`, and `NearestShelterMatcherModal`).
+     - Added `max-h-[90vh] overflow-y-auto` to modal dialog cards to ensure reliable scrolling and fit across mobile viewports and photo upload previews.
+  2. **Leaflet Map Stacking Context Isolation (`relative isolate z-0`)**:
+     - Enforced `relative isolate z-0` on all map container wrapper roots (`CrewNavigationMap.tsx`, `OfficerTacticalMap.tsx`, `PublicHazardMap.tsx`, `ShelterNetworkMap.tsx`).
+     - By leveraging CSS `isolation: isolate;` and `z-index: 0;`, all internal Leaflet layers (400–1000) are confined to the map's local stacking context, preventing any layer or control from escaping above sibling elements, sticky navigation headers (`z-50`), or modal dialogs.
+- **Consequences**:
+  - Completely prevents map tiles, markers, and controls from overlapping photo upload and task completion modal windows.
+  - Guarantees deterministic, predictable z-index hierarchy throughout the entire web application.

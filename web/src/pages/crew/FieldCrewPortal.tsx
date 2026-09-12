@@ -548,8 +548,8 @@ export const FieldCrewPortal: React.FC = () => {
 
       {/* --- MODAL 1: Photo-Verified Task Completion Modal --- */}
       {showCompleteModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+        <div className="fixed inset-0 z-[2000] bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                 <Camera className="w-4 h-4 text-emerald-600" /> Submit Resolution Photo Proof
@@ -645,8 +645,8 @@ export const FieldCrewPortal: React.FC = () => {
 
       {/* --- MODAL 2: Return Ticket Workflow Modal --- */}
       {showReturnModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+        <div className="fixed inset-0 z-[2000] bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 shadow-xl">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                 <RotateCcw className="w-4 h-4 text-amber-600" /> Return Response Order
@@ -694,8 +694,8 @@ export const FieldCrewPortal: React.FC = () => {
 
       {/* --- MODAL 3: Emergency SOS Panic Beacon Confirmation --- */}
       {showSosModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border-2 border-red-500 rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-xl">
+        <div className="fixed inset-0 z-[2000] bg-slate-950/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border-2 border-red-500 rounded-2xl max-w-sm w-full max-h-[90vh] overflow-y-auto p-6 text-center space-y-4 shadow-xl">
             <div className="w-14 h-14 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto text-red-600">
               <AlertOctagon className="w-8 h-8" />
             </div>
