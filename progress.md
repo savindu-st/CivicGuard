@@ -1,8 +1,8 @@
 # Civic Guard — Implementation Progress & Engineering Tracker
 
 > **Last Updated:** 2026-09-12  
-> **Current Phase:** Phase 3 — Operations Web Application & Field Ops (Active)  
-> **Overall Completion:** 95%  
+> **Current Phase:** Phase 3 — Operations Web Application & Field Ops (Completed)  
+> **Overall Completion:** 98%  
 > **Maintenance Policy:** This document is automatically updated by the AI pair programmer upon completing any feature, milestone, bugfix, or architectural change.
 
 ---
@@ -12,7 +12,7 @@
 | Subsystem | Health / Status | Progress (%) | Highlights / Next Focus |
 | :--- | :--- | :--- | :--- |
 | **Database & Migrations** | 🟢 Ready | 100% | 16 Supabase tables, Sri Lanka demo seed data & SOS distress calls seeded |
-| **Architecture & Specifications** | 🟢 Ready | 100% | `architecture.md`, `workflow.md`, and ADRs 001–020 defined |
+| **Architecture & Specifications** | 🟢 Ready | 100% | `architecture.md`, `workflow.md`, and ADRs 001–021 defined |
 | **API Gateway (Kong)** | 🟢 Configured | 95% | Declarative routing configured; all services mapped, proxied, and verified |
 | **Shared Library (`@civicguard/shared`)** | 🟢 Ready | 100% | Types, status constants, geo math, auth guard, parcel allocation & Supabase client built |
 | **Incident Service (`incident-service`)** | 🟢 Ready | 100% | Ingestion, 5-signal verification, corroboration, safe detour & road closure RPC |
@@ -20,7 +20,7 @@
 | **Notification Service (`notification-service`)**| 🟢 Ready | 100% | Socket.IO server, spatial/role rooms & broadcast RPC |
 | **Relief Service (`relief-service`)** | 🟢 Ready | 100% | SOS requests, atomic bed allocation, multi-resource parcel allocation & nearest shelter matching |
 | **AI Vision Service (`ai-service`)** | 🟢 Ready | 100% | Modular FastAPI microservice with YOLOv8, depth benchmarking, EXIF geofencing, spam filter & retuning loop |
-| **Operations Web Frontend (`web`)** | 🟢 In Progress | 90% | Council Officer Control Center, Field Crew Mobile Portal, and Relief Logistics Desk complete with Leaflet bed gauges, P1-P4 triage, headcount matcher, and supplies allocation |
+| **Operations Web Frontend (`web`)** | 🟢 Ready | 100% | Council Officer Control Center, Field Crew Mobile Portal, Relief Logistics Desk, and Public Hazard & Safe Route Map complete with Leaflet perimeters, GPS pin-drop, and safe evacuation corridors |
 
 
 ---
@@ -139,9 +139,9 @@
 - [x] Emergency supplies allocation modal.
 
 #### 3.4 Public Hazard & Safe Route Map
-- [ ] Interactive Leaflet/Mapbox viewer showing live hazard perimeters and closed road overlays.
-- [ ] Citizen hazard reporting modal with GPS pin-drop and photo upload.
-- [ ] Safe detour routing bypassing impassable road segments.
+- [x] Interactive Leaflet/Mapbox viewer showing live hazard perimeters and closed road overlays.
+- [x] Citizen hazard reporting modal with GPS pin-drop and photo upload.
+- [x] Safe detour routing bypassing impassable road segments.
 
 ---
 
@@ -155,8 +155,8 @@
 
 ## 3. Active Sprint & Immediate Next Tasks
 
-1. **Operations Web Frontend**: Build Live Public Leaflet Map (3.4) connecting to Kong Gateway.
-2. **End-to-End Integration Verification**: Validate closed-loop flows across Kong, microservices, and web frontend.
+1. **Closed-Loop Verification (Phase 4)**: Build automated end-to-end integration test runner simulating citizen report $\rightarrow$ AI triage $\rightarrow$ ticket dispatch $\rightarrow$ crew photo completion $\rightarrow$ road reopened.
+2. **Multi-Container Validation**: Verify complete Docker Compose stack and health checks.
 
 ---
 
@@ -164,6 +164,7 @@
 
 | Date | Author / Agent | Change Summary | Impacted Files |
 | :--- | :--- | :--- | :--- |
+| **2026-09-12** | Antigravity AI | Implemented Section 3.4 Public Hazard & Safe Route Map (ADR-021): Built dedicated public disaster resilience workspace (`PublicHazardSafeRouteMap.tsx`) mounted at `/map` and `/public`. Built high-performance dark-mode Leaflet hazard viewer (`PublicHazardMap.tsx`) with severity-scaled pulsing circular danger buffers (100m–350m: Red Critical, Orange High, Amber Medium/Low), closed road overlays with glowing red barrier badges (`⛔ CLOSED`), and emergency relief shelter pins with available bed telemetry. Built dual-mode citizen reporting modal (`CitizenHazardReportModal.tsx`) with HTML5 geolocation, interactive "Drop Pin on Map" click-to-pin coordinate picker, Colombo/Kandy hazard hotspot presets, 4-tier flood depth benchmark selector (`SURFACE_PUDDLE` to `SUBMERGED_VEHICLES`), photo evidence upload, and animated 5-signal AI verification progress stepper. Built safe evacuation corridor planner (`SafeRoutePlanner.tsx`) integrating with `POST /api/incidents/routes/safe-path`, a "One-Click Evacuate to Nearest Safe Shelter" action matching qualifying centers via `POST /api/relief/match-shelter`, and dynamic rerouting listening to real-time Socket.IO `road:closed` events. Implemented crowdsourced citizen corroboration voting (`Confirm 👍` / `Refute 👎`) adjusting confidence scores via `POST /api/incidents/:id/corroborate` (ADR-012). Updated `App.tsx` navigation, recorded ADR-021 in `architecture.md`, and marked Section 3.4 completed in `progress.md`. | `web/src/components/map/PublicHazardMap.tsx`, `web/src/components/incidents/CitizenHazardReportModal.tsx`, `web/src/components/routing/SafeRoutePlanner.tsx`, `web/src/pages/public/PublicHazardSafeRouteMap.tsx`, `web/src/App.tsx`, `architecture.md`, `progress.md` |
 | **2026-09-12** | Antigravity AI | Implemented Section 3.3 Relief Logistics Desk (ADR-020): Built dedicated operations workspace (`ReliefLogisticsDesk.tsx`) at `/relief` with dual-pane split-screen interface. Built interactive dark-mode Leaflet shelter map (`ShelterNetworkMap.tsx`) with live circular bed capacity gauges (green/amber/red), available bed badges, active SOS distress pins, and animated proximity vectors. Built urgency-prioritized SOS triage queue (`SosTriageQueue.tsx`) sorted P1–P4 with multi-criteria filters (urgency, help type, status, search). Implemented `NearestShelterMatcherModal.tsx` with household headcount validation ($N \ge 1$) and atomic bed reservation (ADR-011). Built `EmergencySuppliesModal.tsx` for multi-resource parcel allocations and center restocking. Enhanced backend `relief-service` with parcel allocation (`POST /api/relief/resources/allocate-parcel`), distress simulation (`POST /api/relief/simulate-sos`), and real-time socket events. Seeded demo SOS distress requests (`003_seed_relief_sos_requests.sql`). Updated `App.tsx`, `useSocket.ts`, `architecture.md`, and `progress.md`. | `backend/shared/*`, `backend/services/relief-service/*`, `database/seed/*`, `web/*`, `architecture.md`, `progress.md` |
 | **2026-09-12** | Antigravity AI | Resolved "API KEY REQUIRED" basemap watermark issue by introducing a centralized map provider configuration (`web/src/utils/mapConfig.ts`). Supports optional `VITE_CARTO_API_KEY`, `VITE_MAPBOX_TOKEN`, or `VITE_STADIA_API_KEY`, with an automatic out-of-the-box fallback to crisp, high-definition, watermark-free **Esri World Dark Gray Canvas** tiles requiring zero API keys or registration. Updated `OfficerTacticalMap.tsx` and `CrewNavigationMap.tsx` to consume dynamic map configuration. Updated `web/.env` and `.env.example`. Rebuilt and verified `web` Docker container. | `web/src/utils/mapConfig.ts`, `web/src/components/map/OfficerTacticalMap.tsx`, `web/src/components/crews/CrewNavigationMap.tsx`, `web/.env`, `.env.example`, `progress.md` |
 | **2026-09-12** | Antigravity AI | Implemented ADR-019: Real-Time Field Crew SOS Distress Interception & Tactical Operations Pinpoint. Fixed missing SOS event handling on the Council Officer Control Center by adding `'crew:sos'` to `useSocket` listeners and rendering a persistent pulsating red emergency distress banner with crew name, live GPS, timestamp, and instant "Locate Distress GPS" and "Acknowledge" actions. Enhanced `OfficerTacticalMap.tsx` with `createCrewSosIcon` (multi-layer animated ping halo with siren badge `🚨`) and `MapSosPanController` flying directly to the distress beacon. Updated `ticket-service` `triggerCrewSos` to sync GPS coordinates to Supabase `field_crews` and broadcast to both `['officers', 'public']` rooms. Verified end-to-end delivery through Kong Gateway on port 8000. | `backend/services/ticket-service/*`, `web/src/components/map/OfficerTacticalMap.tsx`, `web/src/pages/officer/CouncilOfficerControlCenter.tsx`, `architecture.md`, `progress.md` |
