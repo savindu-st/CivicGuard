@@ -10,10 +10,12 @@ import {
   UserCheck,
   Building2,
   ExternalLink,
+  Home,
 } from 'lucide-react';
 import { useAuthStore, RoleName } from './store/authStore';
 import { FieldCrewPortal } from './pages/crew/FieldCrewPortal';
 import { CouncilOfficerControlCenter } from './pages/officer/CouncilOfficerControlCenter';
+import { ReliefLogisticsDesk } from './pages/relief/ReliefLogisticsDesk';
 
 const OperationsOverview: React.FC = () => {
   return (
@@ -63,8 +65,38 @@ const OperationsOverview: React.FC = () => {
             <MapPin className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="mt-2 text-2xl font-bold text-white">650 Beds</div>
-          <div className="mt-1 text-xs text-emerald-400">518 Available</div>
+          <div className="mt-1 text-xs text-emerald-400 flex items-center justify-between">
+            <span>518 Available</span>
+            <Link to="/relief" className="underline hover:text-white flex items-center gap-0.5 text-emerald-300">
+              Open Logistics &rarr;
+            </Link>
+          </div>
         </div>
+      </div>
+
+      {/* Relief Logistics Desk Launch Banner */}
+      <div className="glass-panel p-6 bg-gradient-to-r from-emerald-950/40 via-dark-850 to-sky-950/30 border border-emerald-500/30 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="badge-success">HUMANITARIAN DISASTER RELIEF</span>
+            <span className="text-xs text-slate-400">• Section 3.3 Relief Logistics Desk</span>
+          </div>
+          <h2 className="text-lg font-extrabold text-white">
+            Emergency Shelter Network & SOS Help Request Triage
+          </h2>
+          <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+            P1–P4 operational urgency triage queue, interactive Leaflet shelter network map with live circular bed capacity gauges, one-click nearest shelter matcher with household headcount validation, and multi-resource emergency humanitarian supplies allocation.
+          </p>
+        </div>
+
+        <Link
+          to="/relief"
+          className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs tracking-wide shadow-lg shadow-emerald-600/30 flex items-center gap-2 flex-shrink-0 transition-all border border-emerald-400"
+        >
+          <Home className="w-4 h-4" />
+          <span>Launch Relief Desk</span>
+          <ExternalLink className="w-3.5 h-3.5" />
+        </Link>
       </div>
 
       {/* Council Officer Control Center Launch Banner */}
@@ -225,13 +257,24 @@ const NavigationHeader: React.FC = () => {
             <Navigation className="w-3.5 h-3.5" />
             <span>Field Crew Portal</span>
           </Link>
+          <Link
+            to="/relief"
+            className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
+              location.pathname === '/relief'
+                ? 'bg-emerald-600 text-white border border-emerald-400 shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Home className="w-3.5 h-3.5" />
+            <span>Relief Logistics Desk</span>
+          </Link>
         </nav>
       </div>
 
       {/* Persona Switcher Dropdown / Pills */}
       <div className="flex items-center gap-2 text-xs">
         <span className="text-slate-400 hidden lg:inline text-[11px] mr-1">Active Role:</span>
-        {(['FIELD_CREW', 'COUNCIL_OFFICER', 'CITIZEN'] as RoleName[]).map((role) => (
+        {(['FIELD_CREW', 'COUNCIL_OFFICER', 'RELIEF_COORDINATOR', 'CITIZEN'] as RoleName[]).map((role) => (
           <button
             key={role}
             onClick={() => switchPersona(role)}
@@ -242,11 +285,19 @@ const NavigationHeader: React.FC = () => {
                   ? 'bg-blue-600 text-white shadow-md border border-blue-400'
                   : role === 'COUNCIL_OFFICER'
                   ? 'bg-emerald-600 text-white shadow-md border border-emerald-400'
+                  : role === 'RELIEF_COORDINATOR'
+                  ? 'bg-teal-600 text-white shadow-md border border-teal-400'
                   : 'bg-purple-600 text-white shadow-md border border-purple-400'
                 : 'bg-dark-800 text-slate-400 border border-slate-700/80 hover:text-slate-200'
             }`}
           >
-            {role === 'FIELD_CREW' ? '👷 Field Crew' : role === 'COUNCIL_OFFICER' ? '🏛️ Officer' : '👤 Citizen'}
+            {role === 'FIELD_CREW'
+              ? '👷 Field Crew'
+              : role === 'COUNCIL_OFFICER'
+              ? '🏛️ Officer'
+              : role === 'RELIEF_COORDINATOR'
+              ? '🏠 Relief'
+              : '👤 Citizen'}
           </button>
         ))}
 
@@ -274,6 +325,7 @@ export const App: React.FC = () => {
           <Route path="/" element={<OperationsOverview />} />
           <Route path="/officer" element={<CouncilOfficerControlCenter />} />
           <Route path="/crew" element={<FieldCrewPortal />} />
+          <Route path="/relief" element={<ReliefLogisticsDesk />} />
           <Route path="*" element={<OperationsOverview />} />
         </Routes>
       </div>

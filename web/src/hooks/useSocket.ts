@@ -53,6 +53,10 @@ export function useSocket(options?: UseSocketOptions) {
       'crew:sos',
       'crew:location_updated',
       'crew:availability_changed',
+      'relief:sos_new',
+      'relief:updated',
+      'relief:shelter_updated',
+      'relief:resource_allocated',
     ];
 
     events.forEach((event) => {
