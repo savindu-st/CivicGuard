@@ -19,9 +19,16 @@
     "dev:ticket": "npm run dev --workspace=@civicguard/ticket-service",
     "dev:notification": "npm run dev --workspace=@civicguard/notification-service",
     "dev:relief": "npm run dev --workspace=@civicguard/relief-service",
-    "seed:auth": "tsx ../database/seed/004_provision_supabase_auth_users.ts"
+    "seed:auth": "tsx ../database/seed/004_provision_supabase_auth_users.ts",
+    "test:kong": "tsx scripts/test-kong-gateway.ts",
+    "test:weather": "tsx scripts/test-weather-burst.ts",
+    "test:e2e": "tsx scripts/test-e2e-closed-loop.ts",
+    "test:phase4": "tsx scripts/test-phase4-all.ts"
   },
   "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "pg": "^8.23.0",
+    "socket.io-client": "^4.8.3",
     "tsx": "^4.7.1"
   },
   "keywords": [

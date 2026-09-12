@@ -144,7 +144,7 @@ const OperationsOverview: React.FC = () => {
                 Council Officer Control Center
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Multi-ward live hazard triage grid, deep 5-signal AI verification scorecards (YOLOv8 vision, weather sensor correlation, 200m spatial clusters), proximity-ranked crew dispatch, and authoritative road closure controls.
+                Multi-ward live hazard triage grid, deep Tri-Signal AI verification scorecards (Gemini 3.5 Flash-Lite vision, weather sensor correlation, location authenticity), proximity-ranked crew dispatch, and authoritative road closure controls.
               </p>
 
               <div className="pt-2 flex flex-wrap gap-2 text-[11px] font-medium text-slate-600">
@@ -351,7 +351,7 @@ const OperationsOverview: React.FC = () => {
 
           <div className="space-y-2 text-xs">
             <div className="flex justify-between items-center p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="font-semibold text-slate-700">1. Image AI (YOLOv8 Vision)</span>
+              <span className="font-semibold text-slate-700">1. Image AI (Gemini 3.5 Flash-Lite &amp; YOLO Background)</span>
               <span className="badge-success">Operational</span>
             </div>
             <div className="flex justify-between items-center p-2.5 rounded-lg bg-slate-50 border border-slate-200">

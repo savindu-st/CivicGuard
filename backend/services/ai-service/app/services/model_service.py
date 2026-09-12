@@ -53,6 +53,70 @@ class ModelService:
         return cls._is_loaded and cls._yolo_model is not None
 
     @classmethod
+    def detect_objects_only(
+        cls,
+        image: Optional[Image.Image]
+    ) -> Dict[str, Any]:
+        """
+        Executes YOLOv8 purely as an auxiliary background spatial detector.
+        Extracts normalized bounding boxes and object tags for UI rendering.
+        Has ZERO effect on verification calculations or confidence scores.
+        """
+        if image is None:
+            return {
+                "detected_objects": [],
+                "detections": [],
+                "yolo_model_status": "LOADED" if cls.is_ready() else "NOT_LOADED",
+            }
+
+        detected_objects: List[str] = []
+        detections: List[Dict[str, Any]] = []
+
+        if cls.is_ready() and cls._yolo_model is not None:
+            try:
+                img_infer = image
+                if max(image.size) > 640:
+                    img_infer = image.copy()
+                    img_infer.thumbnail((640, 640))
+
+                results = cls._yolo_model(img_infer, verbose=False)
+                for r in results:
+                    for box in r.boxes:
+                        cls_id = int(box.cls[0].item())
+                        conf = float(box.conf[0].item())
+                        name = cls._yolo_model.names.get(cls_id, f"obj_{cls_id}")
+                        if name not in detected_objects:
+                            detected_objects.append(name)
+
+                        if hasattr(box, "xyxyn") and len(box.xyxyn) > 0:
+                            norm_box = [round(float(c), 4) for c in box.xyxyn[0].tolist()]
+                        else:
+                            w_img, h_img = img_infer.size
+                            xy = box.xyxy[0].tolist()
+                            norm_box = [
+                                round(xy[0] / w_img, 4),
+                                round(xy[1] / h_img, 4),
+                                round(xy[2] / w_img, 4),
+                                round(xy[3] / h_img, 4),
+                            ]
+
+                        detections.append({
+                            "class_name": name,
+                            "class_id": cls_id,
+                            "confidence": round(conf, 4),
+                            "box": norm_box,
+                        })
+            except Exception as e:
+                logger.warning(f"Background YOLO detection exception ({e}).")
+
+        detections.sort(key=lambda d: d.get("confidence", 0.0), reverse=True)
+        return {
+            "detected_objects": detected_objects,
+            "detections": detections,
+            "yolo_model_status": "LOADED" if cls.is_ready() else "NOT_LOADED",
+        }
+
+    @classmethod
     def analyze_hazard_image(
         cls,
         image: Optional[Image.Image],
@@ -71,8 +135,10 @@ class ModelService:
                 "confidence": 0.60,
                 "reason": "No valid image payload supplied with telemetry",
                 "detected_objects": [],
+                "detections": [],
                 "depth_benchmark": None,
                 "is_spam": False,
+                "yolo_model_status": "LOADED" if cls.is_ready() else "HEURISTIC_FALLBACK",
             }
 
         # 1. Spam / Meme / Irrelevant Indoor Photo Detection
@@ -84,11 +150,14 @@ class ModelService:
                 "confidence": 0.95,
                 "reason": f"Spam/Irrelevant media rejected: {spam_reason}",
                 "detected_objects": [],
+                "detections": [],
                 "depth_benchmark": None,
                 "is_spam": True,
+                "yolo_model_status": "LOADED" if cls.is_ready() else "HEURISTIC_FALLBACK",
             }
 
         detected_objects: List[str] = []
+        detections: List[Dict[str, Any]] = []
 
         # 2. YOLOv8 Inference (if loaded)
         if cls.is_ready() and cls._yolo_model is not None:
@@ -103,14 +172,39 @@ class ModelService:
                 for r in results:
                     for box in r.boxes:
                         cls_id = int(box.cls[0].item())
+                        conf = float(box.conf[0].item())
                         name = cls._yolo_model.names.get(cls_id, f"obj_{cls_id}")
                         if name not in detected_objects:
                             detected_objects.append(name)
+
+                        # Bounding box in normalized format [x1, y1, x2, y2]
+                        if hasattr(box, "xyxyn") and len(box.xyxyn) > 0:
+                            norm_box = [round(float(c), 4) for c in box.xyxyn[0].tolist()]
+                        else:
+                            # Fallback using width/height
+                            w_img, h_img = img_infer.size
+                            xy = box.xyxy[0].tolist()
+                            norm_box = [
+                                round(xy[0] / w_img, 4),
+                                round(xy[1] / h_img, 4),
+                                round(xy[2] / w_img, 4),
+                                round(xy[3] / h_img, 4),
+                            ]
+
+                        detections.append({
+                            "class_name": name,
+                            "class_id": cls_id,
+                            "confidence": round(conf, 4),
+                            "box": norm_box,
+                        })
             except Exception as e:
                 logger.warning(f"YOLO inference error ({e}). Continuing with classical heuristics.")
 
+        # Sort detections by confidence descending
+        detections.sort(key=lambda d: d.get("confidence", 0.0), reverse=True)
+
         # 3. Hydrological Surface & Obstacle Analysis
-        return cls._evaluate_hazard_heuristics(image, target_hazard, detected_objects)
+        return cls._evaluate_hazard_heuristics(image, target_hazard, detected_objects, detections)
 
     @classmethod
     def _detect_spam_or_irrelevant(cls, img: Image.Image) -> Tuple[bool, str]:
@@ -157,7 +251,8 @@ class ModelService:
         cls,
         img: Image.Image,
         target_hazard: str,
-        detected_objects: List[str]
+        detected_objects: List[str],
+        detections: Optional[List[Dict[str, Any]]] = None,
     ) -> Dict[str, Any]:
         """
         Calculates depth benchmark and hazard confirmation score.
@@ -165,6 +260,8 @@ class ModelService:
         hazard = target_hazard.upper()
         rgb = img.convert("RGB").resize((200, 200))
         np_img = np.array(rgb)
+        safe_detections = detections or []
+        model_status = "LOADED" if cls.is_ready() else "HEURISTIC_FALLBACK"
 
         # Analyze color channels for water reflectance & turbidity
         r = np_img[:, :, 0].astype(float)
@@ -180,6 +277,17 @@ class ModelService:
 
         has_vehicle = any(v in detected_objects for v in ["car", "truck", "bus", "motorcycle"])
         has_tree_obstacle = any(t in detected_objects for t in ["tree", "potted plant", "traffic light", "stop sign"])
+
+        # Auto-detect hazard type if not explicitly provided
+        if hazard in ["AUTO", "ALL", "DETECT"]:
+            if lower_half_water > 0.12 or water_ratio > 0.15:
+                hazard = "FLOOD"
+            elif has_tree_obstacle or (np.sum(g > r) / (200 * 200) > 0.25):
+                hazard = "FALLEN_TREE"
+            elif has_vehicle and len(safe_detections) > 0:
+                hazard = "FLOOD" if lower_half_water > 0.08 else "ROAD_DAMAGE"
+            else:
+                hazard = "FLOOD"
 
         if hazard == "FLOOD":
             # Flood Depth Benchmarking
@@ -211,8 +319,10 @@ class ModelService:
                 "confidence": conf,
                 "reason": reason,
                 "detected_objects": detected_objects,
+                "detections": safe_detections,
                 "depth_benchmark": depth,
                 "is_spam": False,
+                "yolo_model_status": model_status,
             }
 
         elif hazard == "FALLEN_TREE":
@@ -232,8 +342,10 @@ class ModelService:
                 "confidence": conf,
                 "reason": reason,
                 "detected_objects": detected_objects,
+                "detections": safe_detections,
                 "depth_benchmark": None,
                 "is_spam": False,
+                "yolo_model_status": model_status,
             }
 
         elif hazard in ["ROAD_DAMAGE", "LANDSLIDE"]:
@@ -246,8 +358,10 @@ class ModelService:
                 "confidence": conf,
                 "reason": reason,
                 "detected_objects": detected_objects,
+                "detections": safe_detections,
                 "depth_benchmark": None,
                 "is_spam": False,
+                "yolo_model_status": model_status,
             }
 
         else:
@@ -257,6 +371,8 @@ class ModelService:
                 "confidence": 0.85,
                 "reason": f"Visual features corroborate reported {hazard}",
                 "detected_objects": detected_objects,
+                "detections": safe_detections,
                 "depth_benchmark": None,
                 "is_spam": False,
+                "yolo_model_status": model_status,
             }

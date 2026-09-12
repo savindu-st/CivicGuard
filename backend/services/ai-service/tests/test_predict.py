@@ -128,3 +128,40 @@ def test_feedback_lifecycle():
     export_res = client.get("/feedback/export")
     assert export_res.status_code == 200
     assert len(export_res.json()) >= 1
+
+def test_detect_endpoint_json():
+    asset_path = os.path.normpath(
+        os.path.join(os.path.dirname(__file__), "..", "test_assets", "sample_flood_deep.jpg")
+    )
+    payload = {
+        "photo_url": asset_path,
+        "hazard_type": "FLOOD"
+    }
+    res = client.post("/predict/detect", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "success"
+    assert data["overall_confidence"] >= 0.70
+    assert "Verified Flood" in data["hazard_classification"]
+    assert "depth_benchmark" in data
+    assert "detections" in data
+    assert "yolo_model_status" in data
+    assert data["inference_time_ms"] > 0
+
+def test_scan_upload_endpoint():
+    asset_path = os.path.normpath(
+        os.path.join(os.path.dirname(__file__), "..", "test_assets", "sample_flood_deep.jpg")
+    )
+    with open(asset_path, "rb") as f:
+        res = client.post(
+            "/predict/scan-upload",
+            files={"photo": ("sample.jpg", f, "image/jpeg")},
+            data={"hazard_type": "AUTO"}
+        )
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "success"
+    assert data["overall_confidence"] >= 0.70
+    assert "Verified Flood" in data["hazard_classification"]
+    assert isinstance(data["detections"], list)
+

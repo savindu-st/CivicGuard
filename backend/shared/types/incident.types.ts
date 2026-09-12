@@ -23,7 +23,7 @@ export type EvidenceType = 'REPORT_PHOTO' | 'VERIFICATION_PHOTO' | 'COMPLETION_P
 
 export type AnalysisType = 'WEATHER' | 'CLUSTER' | 'IMAGE' | 'LOCATION' | 'RISK';
 
-export type AnalysisMethod = 'SYSTEM' | 'AI' | 'HEURISTIC_FALLBACK';
+export type AnalysisMethod = 'SYSTEM' | 'AI' | 'AI_GEMINI' | 'HEURISTIC_FALLBACK';
 
 export type VerdictDecision = 'CONFIRMED' | 'NEEDS_VERIFICATION' | 'REJECTED';
 

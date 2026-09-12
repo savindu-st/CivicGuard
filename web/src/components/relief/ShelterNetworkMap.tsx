@@ -195,7 +195,7 @@ export const ShelterNetworkMap: React.FC<ShelterNetworkMapProps> = ({
   }
 
   return (
-    <div className="relative w-full h-full min-h-[480px] rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm flex flex-col">
+    <div className="relative isolate z-0 w-full h-full min-h-[480px] rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm flex flex-col">
       {/* Top Map Status Overlay Header */}
       <div className="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-200 shadow-sm flex items-center gap-3">
         <div className="flex items-center gap-2">

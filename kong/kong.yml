@@ -37,6 +37,15 @@ services:
           - /api/relief
         strip_path: false
 
+  # AI Vision Service Route (/api/ai -> ai-service:5000)
+  - name: ai-service
+    url: http://ai-service:5000
+    routes:
+      - name: ai-routes
+        paths:
+          - /api/ai
+        strip_path: true
+
 plugins:
   - name: cors
     config:

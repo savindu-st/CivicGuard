@@ -14,7 +14,7 @@ class ImageService:
     Enforces a strict 1500ms network timeout and 5MB size cap.
     """
     MAX_BYTES = 5 * 1024 * 1024  # 5MB
-    TIMEOUT_SECONDS = 1.5         # 1500ms SLA
+    TIMEOUT_SECONDS = 8.0         # 8000ms SLA for remote storage downloads
 
     _cache: dict[str, Tuple[Image.Image, bytes]] = {}
     _cache_limit: int = 100

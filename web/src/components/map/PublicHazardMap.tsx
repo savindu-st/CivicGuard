@@ -226,7 +226,7 @@ export const PublicHazardMap: React.FC<PublicHazardMapProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full min-h-[500px] overflow-hidden rounded-2xl border border-slate-700/60 bg-dark-950 shadow-2xl">
+    <div className="relative isolate z-0 w-full h-full min-h-[500px] overflow-hidden rounded-2xl border border-slate-700/60 bg-dark-950 shadow-2xl">
       {/* Pin-Drop Active Banner Mode */}
       {isPinDropMode && (
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] px-4 py-2 rounded-xl bg-red-600/95 text-white border border-red-400 shadow-2xl backdrop-blur-md flex items-center gap-2.5 text-xs font-bold animate-bounce pointer-events-auto">

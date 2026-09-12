@@ -258,15 +258,15 @@ export const PublicHazardSafeRouteMap: React.FC = () => {
         </div>
 
         {/* Floating Bottom Action Bar: Report Hazard FAB */}
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[1000] flex items-center gap-3 pointer-events-auto">
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[1000] flex items-center justify-center pointer-events-auto">
           <button
             onClick={() => {
               setIsPinDropMode(false);
               setIsReportModalOpen(true);
             }}
-            className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-extrabold text-sm tracking-wide shadow-2xl shadow-red-600/40 flex items-center gap-2.5 border border-red-400 transition-all transform hover:scale-105"
+            className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-extrabold text-sm tracking-wide shadow-2xl shadow-red-600/40 flex items-center gap-2 border border-red-400 transition-all transform hover:scale-105"
           >
-            <AlertTriangle className="w-5 h-5 animate-pulse" />
+            <AlertTriangle className="w-4 h-4 animate-pulse" />
             <span>REPORT HAZARD ⚠️</span>
           </button>
         </div>

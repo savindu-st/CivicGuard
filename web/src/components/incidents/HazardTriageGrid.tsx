@@ -277,7 +277,7 @@ export const HazardTriageGrid: React.FC<HazardTriageGridProps> = ({
                       <span>AI Score:</span>
                       <span
                         className={`font-mono font-bold ${
-                          Number(confidenceScore) >= 85
+                          Number(confidenceScore) >= 75
                             ? 'text-emerald-700'
                             : Number(confidenceScore) >= 40
                             ? 'text-amber-700'
