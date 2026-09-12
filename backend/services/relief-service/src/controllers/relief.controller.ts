@@ -172,4 +172,31 @@ export class ReliefController {
       sendError(res, err.message, 400);
     }
   };
+
+  allocateMultiResources = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { help_request_id, allocations } = req.body;
+      if (!help_request_id || !allocations || !Array.isArray(allocations)) {
+        sendError(res, 'help_request_id and allocations array are required', 400);
+        return;
+      }
+      const userId = (req as any).user?.userId;
+      const allocated = await this.resourceService.allocateMultiResources(
+        { help_request_id, allocations },
+        userId
+      );
+      sendSuccess(res, { allocations: allocated }, 'Multi-resource parcel allocated successfully');
+    } catch (err: any) {
+      sendError(res, err.message, 400);
+    }
+  };
+
+  simulateSos = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const request = await this.helpService.simulateSosDistress(req.body);
+      sendSuccess(res, request, 'Emergency SOS distress call simulated successfully', 201);
+    } catch (err: any) {
+      sendError(res, err.message, 500);
+    }
+  };
 }

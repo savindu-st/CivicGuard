@@ -325,6 +325,20 @@ flowchart TB
   4. **Tactical Map Distress Beacon**: Implement `createCrewSosIcon` in `OfficerTacticalMap.tsx` with a multi-layered pulsating radar ripple and emergency siren marker (`🚨`), accompanied by `MapSosPanController` that automatically flies the Leaflet map to the crew's coordinates at zoom level 16.
 - **Consequences**: Zero latency between crew distress and dispatcher awareness; immediate visual pinpointing on the dark-mode Leaflet tactical map; seamless coordination with incoming military and DMC backup units.
 
+### ADR-020: Unified Relief Logistics Desk with Urgency-Ranked Triage, Spatial Bed Capacity Telemetry, and Atomic Resource Allocation
+- **Date**: 2026-09-12
+- **Status**: Accepted
+- **Context**: Displaced populations during severe flood events (e.g. Kelani river overflows and Kandy canal backflow) require coordinated humanitarian response. Shelter bed tracking suffered from race conditions without atomic allocation, family units faced the risk of involuntary separation when capacity was checked naively, and coordinators lacked real-time spatial correlation between active SOS distress calls and available warehouse supplies (food rations, clean water, medical kits, and bedding).
+- **Decision**:
+  1. **Dedicated Operations Workspace (`/relief`)**: Establish a dedicated command center for the `RELIEF_COORDINATOR` persona (ADR-010) featuring a dual-pane split-screen interface:
+     - **Left Pane (50%)**: Interactive Leaflet dark-mode map (`ShelterNetworkMap.tsx`) rendering circular live bed capacity gauges (green <60%, amber 60–85%, red >85% / <10 beds) and active citizen SOS distress pins with pulsating halos.
+     - **Right Pane (50%)**: Urgency-prioritized triage queue (`SosTriageQueue.tsx`) sorted primarily by P1–P4 operational urgency and secondarily by FIFO timestamp.
+  2. **Automated Lifecycle Transitions**: Reserving shelter beds or allocating warehouse supplies automatically advances an SOS request from `PENDING` to `ASSIGNED`, leaving final closure (`COMPLETED` or `CANCELLED`) to manual audit verification with resolution notes.
+  3. **Household Headcount Validation (ADR-011)**: The Nearest Shelter Matcher evaluates candidate centers by Haversine distance with explicit headcount capacity verification ($N \ge 1$), pre-selecting the closest shelter with 100% capacity while displaying remaining bed projections (`available_beds - people_count`) and executing atomic SQL reservations (`current_occupancy = current_occupancy + $1 WHERE capacity - current_occupancy >= $1`).
+  4. **Multi-Resource Parcel Distribution**: Expose `POST /api/relief/resources/allocate-parcel` allowing coordinators to allocate tailored humanitarian parcels (dry food packs, bottled water, first aid kits, cots) in a single transaction, automatically decrementing shelter warehouse stock and broadcasting socket events.
+  5. **Dynamic Proximity Vectors & High-Priority Distress Interception**: Selecting an SOS request renders an animated dashed proximity vector connecting the citizen to the nearest qualifying shelter with live distance and travel ETA. Incoming P1 calls trigger a persistent pulsating red emergency banner with one-click "Pinpoint Distress GPS" camera navigation.
+- **Consequences**: Zero involuntary family separation; elimination of shelter bed over-allocation; instantaneous spatial awareness for humanitarian relief coordinators; seamless end-to-end integration across Kong Gateway, microservices, and web frontend.
+
 ---
 
 ## 5. Database Schema & Data Models Overview
