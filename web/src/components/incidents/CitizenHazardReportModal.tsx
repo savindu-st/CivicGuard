@@ -165,29 +165,29 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-dark-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl bg-dark-900 border border-slate-700/80 shadow-2xl flex flex-col">
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl bg-white border border-slate-200 shadow-2xl flex flex-col text-slate-900">
         {/* Modal Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between p-5 border-b border-slate-800 bg-dark-900/95 backdrop-blur-sm">
+        <div className="sticky top-0 z-10 flex items-center justify-between p-5 border-b border-slate-200 bg-white/95 backdrop-blur-sm">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400">
-              <AlertTriangle className="w-5 h-5 animate-pulse" />
+            <div className="p-2 rounded-xl bg-red-50 border border-red-200 text-red-600 shadow-xs">
+              <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 Report Emergency Hazard
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30">
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                   PUBLIC PORTAL
                 </span>
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 font-medium">
                 Submissions are verified instantly by 5-signal AI & environmental sensors
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-dark-800 transition-colors"
+            className="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -195,13 +195,13 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
 
         {/* 5-Signal AI Verification Progress Overlay */}
         {isSubmitting && (
-          <div className="absolute inset-0 z-50 bg-dark-950/95 backdrop-blur-md p-6 flex flex-col items-center justify-center space-y-6">
+          <div className="absolute inset-0 z-50 bg-white/98 backdrop-blur-md p-6 flex flex-col items-center justify-center space-y-6 text-slate-900">
             <div className="text-center space-y-2">
-              <div className="inline-flex p-3 rounded-2xl bg-brand-500/10 border border-brand-500/30 text-brand-400 animate-spin">
+              <div className="inline-flex p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 animate-spin">
                 <Loader2 className="w-8 h-8" />
               </div>
-              <h3 className="text-lg font-extrabold text-white">5-Signal AI Verification Pipeline</h3>
-              <p className="text-xs text-slate-400 max-w-sm">
+              <h3 className="text-lg font-black text-slate-900">5-Signal AI Verification Pipeline</h3>
+              <p className="text-xs text-slate-600 max-w-sm">
                 Evaluating photo evidence, sensor telemetry, spatial clusters, and risk urgency index
               </p>
             </div>
@@ -210,12 +210,12 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
               <div
                 className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
                   submissionStep >= 1
-                    ? 'bg-dark-800/80 border-emerald-500/40 text-emerald-400 shadow-md'
-                    : 'bg-dark-900/50 border-slate-800 text-slate-500'
+                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-xs font-semibold'
+                    : 'bg-slate-50 border-slate-200 text-slate-500'
                 }`}
               >
                 <span className="flex items-center gap-2 font-medium">
-                  {submissionStep >= 1 ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Loader2 className="w-4 h-4 animate-spin" />}
+                  {submissionStep >= 1 ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Loader2 className="w-4 h-4 animate-spin" />}
                   1. YOLOv8 Multimodal Vision Analysis
                 </span>
                 <span className="text-[10px] font-bold uppercase">{submissionStep >= 1 ? 'Passed' : 'Analyzing'}</span>
@@ -224,12 +224,12 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
               <div
                 className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
                   submissionStep >= 2
-                    ? 'bg-dark-800/80 border-emerald-500/40 text-emerald-400 shadow-md'
-                    : 'bg-dark-900/50 border-slate-800 text-slate-500'
+                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-xs font-semibold'
+                    : 'bg-slate-50 border-slate-200 text-slate-500'
                 }`}
               >
                 <span className="flex items-center gap-2 font-medium">
-                  {submissionStep >= 2 ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Loader2 className="w-4 h-4 animate-spin" />}
+                  {submissionStep >= 2 ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Loader2 className="w-4 h-4 animate-spin" />}
                   2. Weather & River Sensor Correlation
                 </span>
                 <span className="text-[10px] font-bold uppercase">{submissionStep >= 2 ? 'Correlated' : 'Checking'}</span>
@@ -238,12 +238,12 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
               <div
                 className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
                   submissionStep >= 3
-                    ? 'bg-dark-800/80 border-emerald-500/40 text-emerald-400 shadow-md'
-                    : 'bg-dark-900/50 border-slate-800 text-slate-500'
+                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-xs font-semibold'
+                    : 'bg-slate-50 border-slate-200 text-slate-500'
                 }`}
               >
                 <span className="flex items-center gap-2 font-medium">
-                  {submissionStep >= 3 ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Loader2 className="w-4 h-4 animate-spin" />}
+                  {submissionStep >= 3 ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Loader2 className="w-4 h-4 animate-spin" />}
                   3. Spatio-Temporal Cluster (200m) Check
                 </span>
                 <span className="text-[10px] font-bold uppercase">{submissionStep >= 3 ? 'Indexed' : 'Matching'}</span>
@@ -252,12 +252,12 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
               <div
                 className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
                   submissionStep >= 4
-                    ? 'bg-dark-800/80 border-emerald-500/40 text-emerald-400 shadow-md'
-                    : 'bg-dark-900/50 border-slate-800 text-slate-500'
+                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-xs font-semibold'
+                    : 'bg-slate-50 border-slate-200 text-slate-500'
                 }`}
               >
                 <span className="flex items-center gap-2 font-medium">
-                  {submissionStep >= 4 ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Loader2 className="w-4 h-4 animate-spin" />}
+                  {submissionStep >= 4 ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Loader2 className="w-4 h-4 animate-spin" />}
                   4. Location Authenticity & Territorial Geofence
                 </span>
                 <span className="text-[10px] font-bold uppercase">{submissionStep >= 4 ? 'Verified' : 'Validating'}</span>
@@ -266,12 +266,12 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
               <div
                 className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
                   submissionStep >= 5
-                    ? 'bg-dark-800/80 border-emerald-500/40 text-emerald-400 shadow-md'
-                    : 'bg-dark-900/50 border-slate-800 text-slate-500'
+                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-xs font-semibold'
+                    : 'bg-slate-50 border-slate-200 text-slate-500'
                 }`}
               >
                 <span className="flex items-center gap-2 font-medium">
-                  {submissionStep >= 5 ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Loader2 className="w-4 h-4 animate-spin" />}
+                  {submissionStep >= 5 ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Loader2 className="w-4 h-4 animate-spin" />}
                   5. Risk Urgency Index & Council Ticket Dispatch
                 </span>
                 <span className="text-[10px] font-bold uppercase">{submissionStep >= 5 ? 'Confirmed' : 'Computing'}</span>
@@ -283,7 +283,7 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
         {/* Modal Form Content */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6 text-xs">
           {errorMessage && (
-            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 flex items-center gap-2 text-xs">
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 flex items-center gap-2 text-xs">
               <AlertTriangle className="w-4 h-4 flex-shrink-0" />
               <span>{errorMessage}</span>
             </div>
@@ -292,11 +292,11 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
           {/* Section 1: GPS Location & Pin Drop */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="font-bold text-slate-200 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
-                <MapPin className="w-3.5 h-3.5 text-red-400" />
+              <label className="font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+                <MapPin className="w-3.5 h-3.5 text-red-500" />
                 <span>1. Incident Coordinates & Location</span>
               </label>
-              <div className="text-[11px] font-mono text-emerald-400">
+              <div className="text-[11px] font-mono text-emerald-700 font-semibold">
                 GPS: {activeLat.toFixed(5)}, {activeLon.toFixed(5)}
               </div>
             </div>
@@ -306,9 +306,9 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
                 type="button"
                 onClick={handleUseDeviceLocation}
                 disabled={isLocating}
-                className="p-3 rounded-xl bg-dark-800 hover:bg-dark-750 border border-slate-700 text-white font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
+                className="p-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-semibold flex items-center justify-center gap-2 transition-all shadow-xs"
               >
-                {isLocating ? <Loader2 className="w-4 h-4 animate-spin text-emerald-400" /> : <Compass className="w-4 h-4 text-emerald-400" />}
+                {isLocating ? <Loader2 className="w-4 h-4 animate-spin text-emerald-600" /> : <Compass className="w-4 h-4 text-emerald-600" />}
                 <span>Use Current Device GPS</span>
               </button>
 
@@ -318,7 +318,7 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
                   onEnablePinDropMode();
                   onClose();
                 }}
-                className="p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
+                className="p-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-semibold flex items-center justify-center gap-2 transition-all shadow-xs"
               >
                 <MapPin className="w-4 h-4" />
                 <span>Drop Pin on Live Map</span>
@@ -327,7 +327,7 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
 
             {/* Danger Zone Presets */}
             <div className="space-y-1.5 pt-1">
-              <div className="text-[10px] text-slate-400">Quick Danger Zone Presets:</div>
+              <div className="text-[10px] text-slate-500">Quick Danger Zone Presets:</div>
               <div className="flex flex-wrap gap-1.5">
                 {SRI_LANKA_PRESETS.map((p) => (
                   <button
@@ -337,7 +337,7 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
                       setManualLat(String(p.lat));
                       setManualLon(String(p.lon));
                     }}
-                    className="px-2.5 py-1 rounded-lg bg-dark-800 hover:bg-dark-700 text-slate-300 border border-slate-700/80 text-[11px] transition-colors"
+                    className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-[11px] transition-colors"
                   >
                     📍 {p.name}
                   </button>
@@ -348,8 +348,8 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
 
           {/* Section 2: Hazard Type Taxonomy */}
           <div className="space-y-3">
-            <label className="font-bold text-slate-200 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+            <label className="font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
               <span>2. Hazard Category</span>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -368,11 +368,11 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
                     onClick={() => setIncidentType(item.id)}
                     className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all text-center ${
                       isSelected
-                        ? 'bg-brand-500/20 border-brand-500 text-white font-bold shadow-lg'
-                        : 'bg-dark-800/80 border-slate-700 text-slate-400 hover:text-slate-200'
+                        ? 'bg-emerald-50 border-emerald-500 text-emerald-800 font-bold shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                     }`}
                   >
-                    <Icon className={`w-5 h-5 ${isSelected ? 'text-brand-400' : 'text-slate-400'}`} />
+                    <Icon className={`w-5 h-5 ${isSelected ? 'text-emerald-600' : 'text-slate-500'}`} />
                     <span>{item.label}</span>
                   </button>
                 );
@@ -382,8 +382,8 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
 
           {/* Section 3: Water Depth Benchmark / Severity */}
           <div className="space-y-3">
-            <label className="font-bold text-slate-200 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
-              <Waves className="w-3.5 h-3.5 text-sky-400" />
+            <label className="font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+              <Waves className="w-3.5 h-3.5 text-blue-500" />
               <span>3. Severity & Water Depth Benchmark (ADR-017)</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -396,21 +396,21 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
                     onClick={() => setDepthBenchmark(d.id)}
                     className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
                       isSelected
-                        ? 'bg-sky-500/20 border-sky-400 text-white shadow-md'
-                        : 'bg-dark-800/60 border-slate-700 text-slate-400 hover:text-slate-200'
+                        ? 'bg-blue-50 border-blue-400 text-blue-900 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     <div>
                       <div className="font-bold text-xs">{d.label}</div>
-                      <div className="text-[10px] text-slate-400">{d.desc}</div>
+                      <div className="text-[10px] text-slate-500">{d.desc}</div>
                     </div>
                     <span
                       className={`text-[9px] font-extrabold px-2 py-0.5 rounded ${
                         d.severity === 'CRITICAL'
-                          ? 'bg-red-500/20 text-red-400'
+                          ? 'bg-red-50 text-red-700 border border-red-200'
                           : d.severity === 'HIGH'
-                          ? 'bg-orange-500/20 text-orange-400'
-                          : 'bg-amber-500/20 text-amber-400'
+                          ? 'bg-orange-50 text-orange-700 border border-orange-200'
+                          : 'bg-amber-50 text-amber-800 border border-amber-200'
                       }`}
                     >
                       {d.severity}
@@ -423,14 +423,14 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
 
           {/* Section 4: Photo Proof Capture */}
           <div className="space-y-3">
-            <label className="font-bold text-slate-200 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
-              <Camera className="w-3.5 h-3.5 text-emerald-400" />
+            <label className="font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+              <Camera className="w-3.5 h-3.5 text-emerald-600" />
               <span>4. Photo Evidence (Required for YOLO AI Verification)</span>
             </label>
             <div className="flex flex-col sm:flex-row items-center gap-4">
-              <label className="w-full sm:w-1/2 flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-slate-700 hover:border-emerald-500/60 bg-dark-800/40 hover:bg-dark-800/80 cursor-pointer transition-all">
+              <label className="w-full sm:w-1/2 flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-slate-50 hover:bg-white cursor-pointer transition-all">
                 <Upload className="w-6 h-6 text-slate-400 mb-1" />
-                <span className="font-semibold text-slate-300">Upload or Capture Photo</span>
+                <span className="font-semibold text-slate-700">Upload or Capture Photo</span>
                 <span className="text-[10px] text-slate-500">JPG, PNG, WebP up to 10MB</span>
                 <input
                   type="file"
@@ -442,7 +442,7 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
               </label>
 
               {photoPreview ? (
-                <div className="relative w-full sm:w-1/2 aspect-video rounded-xl overflow-hidden border border-emerald-500/40 shadow-lg">
+                <div className="relative w-full sm:w-1/2 aspect-video rounded-xl overflow-hidden border border-emerald-300 shadow-md">
                   <img src={photoPreview} alt="Selected preview" className="w-full h-full object-cover" />
                   <button
                     type="button"
@@ -450,16 +450,16 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
                       setSelectedPhoto(null);
                       setPhotoPreview(null);
                     }}
-                    className="absolute top-1.5 right-1.5 p-1 rounded-full bg-dark-950/80 text-white hover:bg-red-600 transition-colors"
+                    className="absolute top-1.5 right-1.5 p-1 rounded-full bg-slate-900/80 text-white hover:bg-red-600 transition-colors"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
-                  <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-500/40 text-[9px] font-bold backdrop-blur-sm">
+                  <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded bg-white/90 text-emerald-700 font-bold border border-emerald-200 text-[9px] shadow-xs">
                     Ready for AI Inference
                   </span>
                 </div>
               ) : (
-                <div className="w-full sm:w-1/2 p-4 rounded-xl bg-dark-850/60 border border-slate-800 text-[11px] text-slate-400 flex items-center gap-2">
+                <div className="w-full sm:w-1/2 p-4 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-slate-500 flex-shrink-0" />
                   <span>Images are scanned for flood depth and verified against spoofed overseas memes.</span>
                 </div>
@@ -469,7 +469,7 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
 
           {/* Section 5: Description */}
           <div className="space-y-1.5">
-            <label className="font-bold text-slate-200 uppercase tracking-wider text-[11px]">
+            <label className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
               5. Incident Observations (Optional)
             </label>
             <textarea
@@ -477,24 +477,24 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g. Canal overflowed near church; water entering ground floor shops, power line dangling in water..."
               rows={2}
-              className="w-full p-3 rounded-xl bg-dark-800 border border-slate-700 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-brand-500"
+              className="w-full p-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-xs"
             />
           </div>
 
           {/* Submit Action */}
-          <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-3">
+          <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-dark-800 hover:bg-dark-700 text-slate-300 font-semibold transition-colors"
+              className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold transition-colors shadow-xs"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold shadow-lg shadow-red-600/30 flex items-center gap-2 transition-all"
+              className="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold shadow-xs flex items-center gap-2 transition-all"
             >
-              <AlertTriangle className="w-4 h-4" />
+              <AlertTriangle className="w-4 h-4 text-amber-400" />
               <span>Submit & Run AI Verification</span>
             </button>
           </div>

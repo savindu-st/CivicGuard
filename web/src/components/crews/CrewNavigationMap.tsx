@@ -21,8 +21,8 @@ const crewIcon = L.divIcon({
   className: 'crew-pin',
   html: `
     <div style="position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-      <div style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background: rgba(34, 197, 94, 0.4); animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
-      <div style="width: 22px; height: 22px; border-radius: 50%; background: #22c55e; border: 3px solid #0f172a; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">
+      <div style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background: rgba(5, 150, 105, 0.3); animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+      <div style="width: 22px; height: 22px; border-radius: 50%; background: #059669; border: 2.5px solid #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.18); display: flex; align-items: center; justify-content: center;">
         <span style="width: 6px; height: 6px; border-radius: 50%; background: white;"></span>
       </div>
     </div>
@@ -35,7 +35,7 @@ const incidentIcon = L.divIcon({
   className: 'incident-pin',
   html: `
     <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-      <div style="width: 26px; height: 26px; border-radius: 50%; background: #ef4444; border: 3px solid #0f172a; box-shadow: 0 4px 10px rgba(239,68,68,0.6); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 13px;">
+      <div style="width: 26px; height: 26px; border-radius: 50%; background: #dc2626; border: 2.5px solid #ffffff; box-shadow: 0 2px 8px rgba(220,38,38,0.35); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 13px;">
         !
       </div>
     </div>
@@ -47,7 +47,7 @@ const incidentIcon = L.divIcon({
 const closedRoadIcon = L.divIcon({
   className: 'closed-road-pin',
   html: `
-    <div style="width: 24px; height: 24px; border-radius: 4px; background: #dc2626; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 800;">
+    <div style="width: 24px; height: 24px; border-radius: 4px; background: #dc2626; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 800;">
       ✕
     </div>
   `,
@@ -138,24 +138,24 @@ export const CrewNavigationMap: React.FC<CrewNavMapProps> = ({
     : [[crewLat, crewLon]];
 
   return (
-    <div className="relative w-full h-[360px] md:h-[420px] rounded-xl overflow-hidden border border-slate-700/70 shadow-2xl bg-dark-950">
+    <div className="relative w-full h-[360px] md:h-[420px] rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-100">
       {/* Route Info Overlay Banner */}
       <div className="absolute top-3 left-3 right-3 z-[1000] flex flex-wrap gap-2 items-center justify-between pointer-events-none">
         <div className="flex items-center gap-2 pointer-events-auto">
           {isRerouted ? (
-            <div className="px-3 py-1.5 rounded-lg bg-orange-500/90 text-white backdrop-blur-md shadow-lg flex items-center gap-1.5 text-xs font-semibold animate-pulse">
+            <div className="px-3 py-1.5 rounded-lg bg-amber-500 text-white backdrop-blur-md shadow-sm flex items-center gap-1.5 text-xs font-semibold">
               <AlertTriangle className="w-3.5 h-3.5" />
               <span>Safe Detour Active</span>
             </div>
           ) : (
-            <div className="px-3 py-1.5 rounded-lg bg-dark-900/90 text-emerald-400 border border-emerald-500/30 backdrop-blur-md shadow-lg flex items-center gap-1.5 text-xs font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5" />
+            <div className="px-3 py-1.5 rounded-lg bg-white/95 text-emerald-700 border border-emerald-200 backdrop-blur-md shadow-sm flex items-center gap-1.5 text-xs font-semibold">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span>Clear Passage ({routeDistanceKm ? `${routeDistanceKm.toFixed(1)} km` : 'Direct'})</span>
             </div>
           )}
 
           {rerouteAlert && (
-            <div className="hidden sm:flex px-3 py-1.5 rounded-lg bg-dark-900/90 text-slate-300 border border-slate-700 backdrop-blur-md text-[11px]">
+            <div className="hidden sm:flex px-3 py-1.5 rounded-lg bg-white/95 text-slate-700 border border-slate-200 backdrop-blur-md text-[11px] shadow-sm">
               {rerouteAlert}
             </div>
           )}
@@ -164,10 +164,10 @@ export const CrewNavigationMap: React.FC<CrewNavMapProps> = ({
         <button
           onClick={fetchSafeDetour}
           disabled={isCalculatingRoute}
-          className="pointer-events-auto p-2 rounded-lg bg-dark-900/90 text-slate-300 hover:text-white border border-slate-700 shadow-md backdrop-blur-md hover:bg-dark-800 text-xs flex items-center gap-1"
+          className="pointer-events-auto p-2 rounded-lg bg-white/95 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-sm backdrop-blur-md hover:bg-slate-50 text-xs flex items-center gap-1"
           title="Recalculate Safe Detour"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${isCalculatingRoute ? 'animate-spin text-brand-400' : ''}`} />
+          <RefreshCw className={`w-3.5 h-3.5 ${isCalculatingRoute ? 'animate-spin text-brand-600' : ''}`} />
           <span className="hidden xs:inline">Recalculate</span>
         </button>
       </div>
@@ -190,10 +190,10 @@ export const CrewNavigationMap: React.FC<CrewNavMapProps> = ({
         <Marker position={[crewLat, crewLon]} icon={crewIcon}>
           <Popup>
             <div className="p-1 text-xs">
-              <div className="font-bold text-emerald-400 flex items-center gap-1">
+              <div className="font-bold text-emerald-700 flex items-center gap-1">
                 <Navigation className="w-3 h-3" /> {crewName}
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">
+              <p className="text-[11px] text-slate-500 mt-1">
                 Coordinates: {crewLat.toFixed(5)}, {crewLon.toFixed(5)}
               </p>
             </div>
@@ -205,9 +205,9 @@ export const CrewNavigationMap: React.FC<CrewNavMapProps> = ({
           <Marker position={[targetLat, targetLon]} icon={incidentIcon}>
             <Popup>
               <div className="p-1 text-xs">
-                <div className="font-bold text-red-400">{hazardType.replace(/_/g, ' ')}</div>
-                <p className="text-[11px] text-slate-300 font-medium mt-0.5">{targetTitle}</p>
-                <p className="text-[10px] text-slate-400 mt-1">Resolution photo required upon clearance</p>
+                <div className="font-bold text-red-600">{hazardType.replace(/_/g, ' ')}</div>
+                <p className="text-[11px] text-slate-800 font-medium mt-0.5">{targetTitle}</p>
+                <p className="text-[10px] text-slate-500 mt-1">Resolution photo required upon clearance</p>
               </div>
             </Popup>
           </Marker>
@@ -219,8 +219,8 @@ export const CrewNavigationMap: React.FC<CrewNavMapProps> = ({
             <Popup>
               <div className="p-1 text-xs">
                 <span className="badge-critical text-[10px]">ROAD CLOSED</span>
-                <p className="font-semibold text-white mt-1">{road.name}</p>
-                <p className="text-[10px] text-slate-400">Detour route navigated around this segment</p>
+                <p className="font-semibold text-slate-900 mt-1">{road.name}</p>
+                <p className="text-[10px] text-slate-500">Detour route navigated around this segment</p>
               </div>
             </Popup>
           </Marker>
@@ -231,7 +231,7 @@ export const CrewNavigationMap: React.FC<CrewNavMapProps> = ({
           <Polyline
             positions={routeCoordinates}
             pathOptions={{
-              color: isRerouted ? '#f97316' : '#22c55e',
+              color: isRerouted ? '#f59e0b' : '#059669',
               weight: 5,
               opacity: 0.85,
               dashArray: isRerouted ? '8, 8' : undefined,

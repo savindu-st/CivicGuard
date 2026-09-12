@@ -351,6 +351,19 @@ flowchart TB
   5. **Crowdsourced Corroboration Loop (ADR-012)**: Embed "Confirm 👍" and "Refute 👎" voting controls on public hazard cards to dynamically adjust confidence scores and auto-promote to `CONFIRMED` when threshold $\ge 0.85$ is reached.
 - **Consequences**: Zero barrier to access for vulnerable populations; proactive protection against vehicle inundation; rapid crowdsourced intelligence for municipal dispatchers; complete closed-loop integration across Kong Gateway, backend microservices, and the frontend web client.
 
+### ADR-022: Pure Light Mode Design System, Dedicated Role-Based Authentication Gateway, and Clean Information Architecture
+- **Date**: 2026-09-12
+- **Status**: Accepted
+- **Context**: The previous user interface relied heavily on dark-mode styling (`bg-dark-950`, neon glowing borders, dense stacked banners) that caused cognitive fatigue, visual clutter, and poor contrast on field devices under direct daylight. Navigation was fragmented with 4 persona buttons in the top navbar instead of an authenticated flow, and the operations overview presented massive stacked billboards.
+- **Decision**:
+  1. **Pure Light Mode Palette & Surface Architecture**: Standardize on a crisp, professional, high-contrast light design system. Base page backgrounds use `bg-slate-50`, cards use pure `bg-white` with refined micro-borders (`border-slate-200`) and subtle elevation shadows (`shadow-sm`), primary text uses `text-slate-900`, secondary labels use `text-slate-600`, and interactive buttons employ clean blue/emerald/rose accents.
+  2. **Dedicated Role Gateway (`/login`)**: Replace the cluttered top-bar persona buttons with a dedicated, organized login gateway featuring 4 interactive persona cards (Council Officer, Field Crew Lead, Relief Coordinator, Citizen Reporter) with credentials preview, role badges, and direct portal redirection.
+  3. **Streamlined Navigation & User Profile Header**: Render a unified header featuring an active user profile badge (`Kasun Perera • Council Officer`), a "Switch Role" action navigating to `/login`, and role-tailored navigation links filtered to the active persona.
+  4. **2x2 Command Portals Hub (`App.tsx`)**: Replace stacked landing billboards with an executive KPI ribbon, a 2x2 grid of role portal cards with live metrics, and a split 2-column live briefing feed (Recent Verified Hazards & 5-Signal AI Pipeline Health).
+  5. **Esri World Light Gray Canvas Basemap**: Transition the primary map tile provider in `mapConfig.ts` to Esri World Light Gray Canvas (`Canvas/World_Light_Gray_Base/MapServer`), ensuring crisp, watermark-free daytime cartography with white-centered pins, high-contrast borders, and emerald green (`#059669`) safe detour polylines.
+  6. **De-cluttered Operational Workspaces**: Overhaul all four operations workspaces (`CouncilOfficerControlCenter`, `FieldCrewPortal`, `ReliefLogisticsDesk`, `PublicHazardSafeRouteMap`) and their 15+ sub-components (triage grids, inspectors, modal dialogues, road managers, bed gauges, supply drawers) with clean white panels, subtle borders, and subdued high-priority distress alerts.
+- **Consequences**: Dramatic reduction in cognitive overload; optimal daytime legibility for field crews and emergency coordinators; clean persona role-switching workflow; unified design language across all civic operations modules.
+
 ---
 
 ## 5. Database Schema & Data Models Overview

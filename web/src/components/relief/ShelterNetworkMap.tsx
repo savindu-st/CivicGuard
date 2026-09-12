@@ -39,19 +39,16 @@ const createShelterGaugeIcon = (shelter: any, isSelected: boolean) => {
   const percent = Math.round(ratio * 100);
 
   // Determine color based on saturation threshold
-  let color = '#10b981'; // Emerald (< 60%)
-  let statusLabel = 'AVAILABLE';
+  let color = '#059669'; // Emerald (< 60%)
   if (percent >= 85 || availableBeds < 10) {
-    color = '#ef4444'; // Red (Critical saturation)
-    statusLabel = 'CRITICAL';
+    color = '#dc2626'; // Red (Critical saturation)
   } else if (percent >= 60) {
-    color = '#f59e0b'; // Amber (Moderate / filling up)
-    statusLabel = 'FILLING';
+    color = '#d97706'; // Amber (Moderate / filling up)
   }
 
   const selectedRing = isSelected
-    ? `box-shadow: 0 0 0 4px #38bdf8, 0 0 25px rgba(56, 189, 248, 0.9); transform: scale(1.18);`
-    : `box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);`;
+    ? `box-shadow: 0 0 0 4px #0284c7, 0 0 15px rgba(2, 132, 199, 0.4); transform: scale(1.18);`
+    : `box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);`;
 
   return L.divIcon({
     className: 'shelter-gauge-icon',
@@ -61,8 +58,8 @@ const createShelterGaugeIcon = (shelter: any, isSelected: boolean) => {
         <svg style="position: absolute; width: 44px; height: 44px; transform: rotate(-90deg);" viewBox="0 0 36 36">
           <path
             d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            fill="#0f172a"
-            stroke="#334155"
+            fill="#ffffff"
+            stroke="#e2e8f0"
             stroke-width="3.5"
           />
           <path
@@ -76,12 +73,12 @@ const createShelterGaugeIcon = (shelter: any, isSelected: boolean) => {
 
         <!-- Center Badge Content -->
         <div style="z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-          <span style="font-size: 13px; font-weight: 900; color: #ffffff; line-height: 1;">${availableBeds}</span>
+          <span style="font-size: 13px; font-weight: 900; color: #0f172a; line-height: 1;">${availableBeds}</span>
           <span style="font-size: 8px; font-weight: 700; color: ${color}; text-transform: uppercase; letter-spacing: -0.5px;">BEDS</span>
         </div>
 
         <!-- Mini Top Indicator Tag -->
-        <div style="position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: #020617; border: 1px solid ${color}; border-radius: 4px; padding: 0 4px; font-size: 8px; font-weight: 800; color: #f8fafc; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+        <div style="position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: #ffffff; border: 1px solid ${color}; border-radius: 4px; padding: 0 4px; font-size: 8px; font-weight: 800; color: #0f172a; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.15);">
           ${percent}%
         </div>
       </div>
@@ -96,16 +93,16 @@ const createShelterGaugeIcon = (shelter: any, isSelected: boolean) => {
 const createSosDistressIcon = (req: any, isSelected: boolean) => {
   const isP1 = req.urgency === 'CRITICAL' || req.urgency === 'P1';
   const isP2 = req.urgency === 'HIGH' || req.urgency === 'P2';
-  const color = isP1 ? '#ef4444' : isP2 ? '#f97316' : '#38bdf8';
+  const color = isP1 ? '#dc2626' : isP2 ? '#ea580c' : '#0284c7';
   const symbol = isP1 ? '🚨' : isP2 ? '⚠️' : '🆘';
 
   const pulseRing = isP1
-    ? `<div style="position: absolute; width: 42px; height: 42px; border-radius: 50%; background: #ef4444; opacity: 0.4; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>`
+    ? `<div style="position: absolute; width: 42px; height: 42px; border-radius: 50%; background: #ef4444; opacity: 0.3; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>`
     : '';
 
   const selectedBorder = isSelected
-    ? 'border: 3px solid #38bdf8; box-shadow: 0 0 20px rgba(56, 189, 248, 0.9); transform: scale(1.2);'
-    : 'border: 2px solid #ffffff; box-shadow: 0 4px 8px rgba(0,0,0,0.6);';
+    ? 'border: 3px solid #0284c7; box-shadow: 0 0 15px rgba(2, 132, 199, 0.5); transform: scale(1.2);'
+    : 'border: 2px solid #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.2);';
 
   return L.divIcon({
     className: 'sos-distress-icon',
@@ -115,7 +112,7 @@ const createSosDistressIcon = (req: any, isSelected: boolean) => {
         <div style="position: relative; z-index: 2; width: 30px; height: 30px; border-radius: 50%; background: ${color}; display: flex; align-items: center; justify-content: center; ${selectedBorder} transition: all 0.2s ease;">
           <span style="font-size: 13px;">${symbol}</span>
         </div>
-        <div style="position: absolute; top: -6px; right: -6px; z-index: 3; background: #0f172a; border: 1px solid #475569; border-radius: 8px; padding: 0 3px; font-size: 8px; font-weight: 800; color: #ffffff;">
+        <div style="position: absolute; top: -6px; right: -6px; z-index: 3; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 3px; font-size: 8px; font-weight: 800; color: #0f172a; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
           ${req.people_count || 1}P
         </div>
       </div>
@@ -198,40 +195,40 @@ export const ShelterNetworkMap: React.FC<ShelterNetworkMapProps> = ({
   }
 
   return (
-    <div className="relative w-full h-full min-h-[480px] rounded-xl overflow-hidden border border-slate-800 bg-dark-950 flex flex-col">
+    <div className="relative w-full h-full min-h-[480px] rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm flex flex-col">
       {/* Top Map Status Overlay Header */}
-      <div className="absolute top-3 left-3 z-[1000] bg-dark-900/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-700/80 shadow-2xl flex items-center gap-3">
+      <div className="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-200 shadow-sm flex items-center gap-3">
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></div>
-          <span className="text-xs font-bold text-white uppercase tracking-wider">
+          <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
             Shelter Network Telemetry
           </span>
         </div>
-        <span className="text-slate-600">|</span>
+        <span className="text-slate-300">|</span>
         <div className="flex items-center gap-3 text-xs">
-          <span className="text-slate-300 flex items-center gap-1">
-            <Home className="w-3.5 h-3.5 text-emerald-400" />
-            <strong className="text-white">{shelters.length}</strong> Shelters
+          <span className="text-slate-600 flex items-center gap-1">
+            <Home className="w-3.5 h-3.5 text-emerald-600" />
+            <strong className="text-slate-900">{shelters.length}</strong> Shelters
           </span>
-          <span className="text-slate-300 flex items-center gap-1">
-            <AlertOctagon className="w-3.5 h-3.5 text-red-400" />
-            <strong className="text-white">{requests.filter((r) => r.status === 'PENDING').length}</strong> Active SOS
+          <span className="text-slate-600 flex items-center gap-1">
+            <AlertOctagon className="w-3.5 h-3.5 text-red-600" />
+            <strong className="text-slate-900">{requests.filter((r) => r.status === 'PENDING').length}</strong> Active SOS
           </span>
         </div>
       </div>
 
       {/* Map Proximity Vector Indicator Banner */}
       {proximityVectorLine && selectedRequest && nearestShelterName && (
-        <div className="absolute top-3 right-3 z-[1000] bg-dark-900/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-sky-500/50 shadow-2xl flex items-center gap-2.5 text-xs text-sky-200">
-          <Navigation className="w-4 h-4 text-sky-400 animate-bounce" />
+        <div className="absolute top-3 right-3 z-[1000] bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-sky-300 shadow-sm flex items-center gap-2.5 text-xs text-sky-900">
+          <Navigation className="w-4 h-4 text-sky-600" />
           <div>
-            <div className="font-bold text-white flex items-center gap-1.5">
+            <div className="font-bold text-slate-900 flex items-center gap-1.5">
               <span>Proximity Route Vector Active</span>
-              <span className="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono text-[10px] border border-sky-500/30">
+              <span className="px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 font-mono text-[10px] border border-sky-200">
                 {vectorDistanceKm} km
               </span>
             </div>
-            <p className="text-[11px] text-slate-300">
+            <p className="text-[11px] text-slate-600">
               Matched to <strong>{nearestShelterName}</strong> (~{Math.round((vectorDistanceKm! / 30) * 60) + 5} min travel)
             </p>
           </div>
@@ -253,7 +250,7 @@ export const ShelterNetworkMap: React.FC<ShelterNetworkMapProps> = ({
           <Polyline
             positions={proximityVectorLine}
             pathOptions={{
-              color: '#38bdf8',
+              color: '#0284c7',
               weight: 3.5,
               dashArray: '8, 8',
               opacity: 0.9,
@@ -283,39 +280,39 @@ export const ShelterNetworkMap: React.FC<ShelterNetworkMapProps> = ({
               }}
             >
               <Popup className="shelter-map-popup">
-                <div className="p-2 space-y-3 min-w-[260px] text-slate-100">
+                <div className="p-2 space-y-3 min-w-[260px] text-slate-800">
                   {/* Header */}
                   <div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1">
                         <Home className="w-3 h-3" />
                         <span>Emergency Shelter Center</span>
                       </span>
                       <span
-                        className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                           percent >= 85
-                            ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                            ? 'bg-red-50 text-red-700 border border-red-200'
                             : percent >= 60
-                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                            : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                            : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                         }`}
                       >
                         {percent}% Occupied
                       </span>
                     </div>
-                    <h3 className="text-sm font-bold text-white mt-1">{shelter.name}</h3>
-                    <p className="text-[11px] text-slate-400">{shelter.address || shelter.ward_name || 'Colombo Sector'}</p>
+                    <h3 className="text-sm font-bold text-slate-900 mt-1">{shelter.name}</h3>
+                    <p className="text-[11px] text-slate-500">{shelter.address || shelter.ward_name || 'Colombo Sector'}</p>
                   </div>
 
                   {/* Bed Capacity Gauge Bar */}
-                  <div className="p-2.5 rounded-lg bg-dark-900 border border-slate-800 space-y-1.5">
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-slate-400">Available Bed Capacity:</span>
-                      <strong className="text-white">
+                      <span className="text-slate-500">Available Bed Capacity:</span>
+                      <strong className="text-slate-900">
                         {availableBeds} / {capacity} Beds
                       </strong>
                     </div>
-                    <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                    <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all ${
                           percent >= 85 ? 'bg-red-500' : percent >= 60 ? 'bg-amber-500' : 'bg-emerald-500'
@@ -325,20 +322,20 @@ export const ShelterNetworkMap: React.FC<ShelterNetworkMapProps> = ({
                     </div>
 
                     {/* Inline Manual Occupancy Adjuster */}
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-800/80 text-[11px]">
-                      <span className="text-slate-400">Manual Headcount:</span>
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-200 text-[11px]">
+                      <span className="text-slate-500">Manual Headcount:</span>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => onUpdateOccupancy(shelter.id, Math.max(0, occupancy - 1))}
-                          className="p-1 rounded bg-dark-800 hover:bg-dark-700 text-slate-300 hover:text-white border border-slate-700"
+                          className="p-1 rounded bg-white hover:bg-slate-100 text-slate-700 border border-slate-300"
                           title="Decrement Occupancy (-1)"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="font-mono font-bold text-white px-1">{occupancy}</span>
+                        <span className="font-mono font-bold text-slate-900 px-1">{occupancy}</span>
                         <button
                           onClick={() => onUpdateOccupancy(shelter.id, Math.min(capacity, occupancy + 1))}
-                          className="p-1 rounded bg-dark-800 hover:bg-dark-700 text-slate-300 hover:text-white border border-slate-700"
+                          className="p-1 rounded bg-white hover:bg-slate-100 text-slate-700 border border-slate-300"
                           title="Increment Occupancy (+1)"
                         >
                           <Plus className="w-3 h-3" />
@@ -349,21 +346,21 @@ export const ShelterNetworkMap: React.FC<ShelterNetworkMapProps> = ({
 
                   {/* Warehouse Resources at this Center */}
                   <div className="space-y-1">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                      <Package className="w-3 h-3 text-brand-400" />
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                      <Package className="w-3 h-3 text-brand-600" />
                       <span>On-Site Emergency Inventory</span>
                     </span>
                     {shelterRes.length === 0 ? (
-                      <p className="text-[10px] text-slate-500 italic">No warehouse stock currently registered.</p>
+                      <p className="text-[10px] text-slate-400 italic">No warehouse stock currently registered.</p>
                     ) : (
                       <div className="grid grid-cols-2 gap-1.5 text-[10px]">
                         {shelterRes.slice(0, 4).map((r) => (
                           <div
                             key={r.id}
-                            className="p-1.5 rounded bg-dark-950/80 border border-slate-800 flex justify-between items-center"
+                            className="p-1.5 rounded bg-white border border-slate-200 flex justify-between items-center"
                           >
-                            <span className="text-slate-300 truncate">{r.resource_name}</span>
-                            <strong className="text-brand-400 ml-1">
+                            <span className="text-slate-700 truncate">{r.resource_name}</span>
+                            <strong className="text-brand-600 ml-1">
                               {r.quantity} {r.unit}
                             </strong>
                           </div>
@@ -376,7 +373,7 @@ export const ShelterNetworkMap: React.FC<ShelterNetworkMapProps> = ({
                   {onOpenSuppliesForShelter && (
                     <button
                       onClick={() => onOpenSuppliesForShelter(shelter)}
-                      className="w-full py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow transition-all border border-emerald-400"
+                      className="w-full py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all border border-emerald-500"
                     >
                       <Package className="w-3.5 h-3.5" />
                       <span>Manage Warehouse Supplies</span>
@@ -403,33 +400,33 @@ export const ShelterNetworkMap: React.FC<ShelterNetworkMapProps> = ({
               }}
             >
               <Popup className="sos-map-popup">
-                <div className="p-2 space-y-2 min-w-[220px] text-slate-100">
+                <div className="p-2 space-y-2 min-w-[220px] text-slate-800">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-extrabold uppercase text-red-400 flex items-center gap-1">
+                    <span className="text-[10px] font-bold uppercase text-red-600 flex items-center gap-1">
                       <AlertOctagon className="w-3 h-3" />
                       <span>SOS Distress Call</span>
                     </span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30">
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200">
                       {req.urgency}
                     </span>
                   </div>
 
-                  <p className="text-xs text-slate-200 font-medium leading-relaxed">
+                  <p className="text-xs text-slate-700 font-normal leading-relaxed">
                     {req.description || 'Emergency SOS assistance required.'}
                   </p>
 
-                  <div className="flex justify-between items-center text-[11px] text-slate-400 pt-1 border-t border-slate-800">
+                  <div className="flex justify-between items-center text-[11px] text-slate-500 pt-1 border-t border-slate-200">
                     <span className="flex items-center gap-1">
-                      <Users className="w-3 h-3 text-brand-400" />
+                      <Users className="w-3 h-3 text-brand-600" />
                       <span>{req.people_count} {req.people_count === 1 ? 'Person' : 'People'}</span>
                     </span>
-                    <span className="font-semibold text-slate-300">{req.help_type}</span>
+                    <span className="font-semibold text-slate-700">{req.help_type}</span>
                   </div>
 
                   {onOpenMatcherWithRequest && (
                     <button
                       onClick={() => onOpenMatcherWithRequest(req)}
-                      className="w-full py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow transition-all border border-sky-400 mt-1"
+                      className="w-full py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all border border-sky-500 mt-1"
                     >
                       <Home className="w-3.5 h-3.5" />
                       <span>Find Nearest Qualified Shelter</span>
@@ -443,9 +440,9 @@ export const ShelterNetworkMap: React.FC<ShelterNetworkMapProps> = ({
       </MapContainer>
 
       {/* Map Bottom-Right Legend */}
-      <div className="absolute bottom-3 right-3 z-[1000] bg-dark-900/90 backdrop-blur-md px-3 py-2 rounded-xl border border-slate-800 text-[10px] space-y-1.5 text-slate-300 shadow-xl">
-        <div className="font-bold text-white uppercase tracking-wider flex items-center gap-1">
-          <Layers className="w-3 h-3 text-brand-400" />
+      <div className="absolute bottom-3 right-3 z-[1000] bg-white/95 backdrop-blur-md px-3 py-2 rounded-xl border border-slate-200 text-[10px] space-y-1.5 text-slate-700 shadow-sm">
+        <div className="font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1">
+          <Layers className="w-3 h-3 text-brand-600" />
           <span>Shelter Occupancy Gauges</span>
         </div>
         <div className="flex items-center gap-2">
@@ -460,9 +457,9 @@ export const ShelterNetworkMap: React.FC<ShelterNetworkMapProps> = ({
           <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
           <span>&gt; 85% (Critical Saturation)</span>
         </div>
-        <div className="flex items-center gap-2 pt-1 border-t border-slate-800">
-          <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
-          <span>🚨 Active SOS Pinpoint</span>
+        <div className="flex items-center gap-2 pt-1 border-t border-slate-200">
+          <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+          <span>Active SOS Pinpoint</span>
         </div>
       </div>
     </div>

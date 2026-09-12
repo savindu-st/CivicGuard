@@ -136,29 +136,29 @@ export const NearestShelterMatcherModal: React.FC<NearestShelterMatcherModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-[2000] bg-dark-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-dark-900 border border-slate-700 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-[2000] bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-800 bg-dark-850 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-100 bg-white flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400">
+            <div className="p-2 rounded-xl bg-sky-50 border border-sky-200 text-sky-600">
               <Home className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-white flex items-center gap-2">
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <span>Nearest Shelter Matcher & Capacity Validation</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-500/20 text-brand-400 border border-brand-500/30">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-50 text-brand-700 border border-brand-200">
                   ADR-011 ATOMIC
                 </span>
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 Proximity-ranked disaster shelter matching with household headcount verification
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 text-slate-400 hover:text-white border border-slate-700 transition-colors"
+            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 border border-slate-200 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -167,19 +167,19 @@ export const NearestShelterMatcherModal: React.FC<NearestShelterMatcherModalProp
         {/* Modal Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-5">
           {/* Target SOS Distress Call Summary */}
-          <div className="p-4 rounded-xl bg-dark-850/80 border border-slate-800 space-y-2">
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400 font-semibold uppercase tracking-wider flex items-center gap-1.5">
+              <span className="text-slate-500 font-semibold uppercase tracking-wider flex items-center gap-1.5">
                 <span>Distress Incident Details</span>
               </span>
               <span className="badge-critical font-bold text-[10px]">
                 {request.urgency} • {request.help_type}
               </span>
             </div>
-            <p className="text-xs text-slate-200 font-medium leading-relaxed">
+            <p className="text-xs text-slate-800 font-normal leading-relaxed">
               {request.description || 'Citizen emergency shelter request.'}
             </p>
-            <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400 pt-1 border-t border-slate-800/80">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 pt-1 border-t border-slate-200">
               <span>👤 {request.users?.name || request.user_name || 'Citizen'}</span>
               <span className="font-mono text-[10px]">
                 GPS: {Number(request.latitude).toFixed(4)}, {Number(request.longitude).toFixed(4)}
@@ -188,24 +188,24 @@ export const NearestShelterMatcherModal: React.FC<NearestShelterMatcherModalProp
           </div>
 
           {/* Household Headcount Validation Input */}
-          <div className="p-4 rounded-xl bg-dark-850/60 border border-slate-800 space-y-2.5">
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-xs font-bold text-white flex items-center gap-1.5">
-                  <Users className="w-4 h-4 text-brand-400" />
+                <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-brand-600" />
                   <span>Household Headcount Validation</span>
                 </label>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-slate-500">
                   Total family members requiring emergency beds (infants, children, elderly)
                 </p>
               </div>
 
               {/* Headcount Number Controls */}
-              <div className="flex items-center gap-2 bg-dark-950 px-3 py-1.5 rounded-xl border border-slate-700">
+              <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-300">
                 <button
                   type="button"
                   onClick={() => setHeadcount(Math.max(1, headcount - 1))}
-                  className="p-1 rounded bg-dark-800 hover:bg-dark-700 text-slate-300 hover:text-white"
+                  className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
                   title="Decrease family count"
                 >
                   <Minus className="w-3.5 h-3.5" />
@@ -216,17 +216,17 @@ export const NearestShelterMatcherModal: React.FC<NearestShelterMatcherModalProp
                   max="100"
                   value={headcount}
                   onChange={(e) => setHeadcount(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-12 text-center bg-transparent font-extrabold text-sm text-white focus:outline-none"
+                  className="w-12 text-center bg-transparent font-bold text-sm text-slate-900 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setHeadcount(headcount + 1)}
-                  className="p-1 rounded bg-dark-800 hover:bg-dark-700 text-slate-300 hover:text-white"
+                  className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
                   title="Increase family count"
                 >
                   <Plus className="w-3.5 h-3.5" />
                 </button>
-                <span className="text-[11px] text-slate-400 font-semibold pl-1 border-l border-slate-800">
+                <span className="text-[11px] text-slate-500 font-semibold pl-1 border-l border-slate-200">
                   {headcount === 1 ? 'Person' : 'People'}
                 </span>
               </div>
@@ -235,8 +235,8 @@ export const NearestShelterMatcherModal: React.FC<NearestShelterMatcherModalProp
 
           {/* Error Banner */}
           {errorMessage && (
-            <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/50 text-xs text-red-200 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -244,11 +244,11 @@ export const NearestShelterMatcherModal: React.FC<NearestShelterMatcherModalProp
           {/* Ranked Proximity Candidates List */}
           <div className="space-y-2.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-extrabold text-white uppercase tracking-wider flex items-center gap-1.5">
-                <Navigation className="w-3.5 h-3.5 text-sky-400" />
+              <span className="font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <Navigation className="w-3.5 h-3.5 text-sky-600" />
                 <span>Candidate Shelters Ranked by Proximity ({candidates.length})</span>
               </span>
-              <span className="text-slate-400 text-[11px]">Selecting closest with full capacity</span>
+              <span className="text-slate-500 text-[11px]">Selecting closest with full capacity</span>
             </div>
 
             <div className="space-y-2">
@@ -262,40 +262,40 @@ export const NearestShelterMatcherModal: React.FC<NearestShelterMatcherModalProp
                     onClick={() => setSelectedShelterId(candidate.id)}
                     className={`p-3.5 rounded-xl border transition-all cursor-pointer relative ${
                       isSelected
-                        ? 'bg-dark-800 border-sky-500 shadow-md shadow-sky-950/40'
-                        : 'bg-dark-850/60 border-slate-800 hover:border-slate-700'
+                        ? 'bg-sky-50/50 border-sky-400 shadow-xs'
+                        : 'bg-slate-50 border-slate-200 hover:border-slate-300'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       {/* Left: Info */}
                       <div className="space-y-1 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                            <span className="w-5 h-5 rounded-full bg-dark-900 border border-slate-700 flex items-center justify-center text-[10px] font-mono text-slate-300">
+                          <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                            <span className="w-5 h-5 rounded-full bg-white border border-slate-300 flex items-center justify-center text-[10px] font-mono text-slate-700">
                               #{idx + 1}
                             </span>
                             <span>{candidate.name}</span>
                           </span>
                           {idx === 0 && (
-                            <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded bg-brand-500/20 text-brand-300 border border-brand-500/30">
+                            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-brand-50 text-brand-700 border border-brand-200">
                               CLOSEST
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-400">
+                        <p className="text-[11px] text-slate-500">
                           {candidate.address || candidate.wards?.name || 'Sector'}
                         </p>
 
                         {/* Headcount Capacity Validation Check Banner */}
                         <div className="pt-1.5 flex items-center gap-2">
                           {candidate.hasCapacity ? (
-                            <div className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1.5">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                            <div className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1.5">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                               <span>Passes Headcount Check: {candidate.availableBeds} beds available ({candidate.remainingBedsAfter} remaining after placement)</span>
                             </div>
                           ) : (
-                            <div className="text-[11px] text-red-400 font-semibold flex items-center gap-1.5">
-                              <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
+                            <div className="text-[11px] text-red-700 font-semibold flex items-center gap-1.5">
+                              <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
                               <span>Insufficient Beds: Only {candidate.availableBeds} beds available for {headcount} members</span>
                             </div>
                           )}
@@ -304,15 +304,15 @@ export const NearestShelterMatcherModal: React.FC<NearestShelterMatcherModalProp
 
                       {/* Right: Distance & Live Gauge */}
                       <div className="text-right space-y-1 flex-shrink-0">
-                        <div className="font-extrabold text-sm text-white font-mono flex items-center justify-end gap-1">
-                          <Navigation className="w-3.5 h-3.5 text-sky-400" />
+                        <div className="font-bold text-sm text-slate-900 font-mono flex items-center justify-end gap-1">
+                          <Navigation className="w-3.5 h-3.5 text-sky-600" />
                           <span>{candidate.distanceKm} km</span>
                         </div>
-                        <div className="text-[10px] text-slate-400 flex items-center justify-end gap-1">
-                          <Clock className="w-3 h-3 text-slate-500" />
+                        <div className="text-[10px] text-slate-500 flex items-center justify-end gap-1">
+                          <Clock className="w-3 h-3 text-slate-400" />
                           <span>~{candidate.travelMinutes} mins</span>
                         </div>
-                        <div className="text-[10px] text-slate-400 font-mono">
+                        <div className="text-[10px] text-slate-500 font-mono">
                           {candidate.current_occupancy} / {candidate.capacity} Occupied ({percent}%)
                         </div>
                       </div>
@@ -325,12 +325,12 @@ export const NearestShelterMatcherModal: React.FC<NearestShelterMatcherModalProp
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 border-t border-slate-800 bg-dark-850 flex items-center justify-between gap-4">
-          <div className="text-xs text-slate-400">
+        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-4">
+          <div className="text-xs text-slate-500">
             {activeCandidate ? (
               <span>
-                Target: <strong className="text-white">{activeCandidate.name}</strong> •{' '}
-                <strong className={activeCandidate.hasCapacity ? 'text-emerald-400' : 'text-red-400'}>
+                Target: <strong className="text-slate-900">{activeCandidate.name}</strong> •{' '}
+                <strong className={activeCandidate.hasCapacity ? 'text-emerald-700' : 'text-red-700'}>
                   {activeCandidate.hasCapacity ? 'Valid Capacity' : 'Exceeds Capacity'}
                 </strong>
               </span>
@@ -342,17 +342,17 @@ export const NearestShelterMatcherModal: React.FC<NearestShelterMatcherModalProp
           <div className="flex items-center gap-2.5">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-dark-800 hover:bg-dark-700 text-slate-300 font-semibold text-xs border border-slate-700 transition-colors"
+              className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-semibold text-xs border border-slate-300 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirmReservation}
               disabled={isSubmitting || !activeCandidate || !activeCandidate.hasCapacity}
-              className={`px-5 py-2.5 rounded-xl font-bold text-xs tracking-wide shadow-lg flex items-center gap-2 transition-all ${
+              className={`px-5 py-2.5 rounded-xl font-bold text-xs tracking-wide shadow-sm flex items-center gap-2 transition-all ${
                 !activeCandidate || !activeCandidate.hasCapacity
-                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-                  : 'bg-sky-600 hover:bg-sky-500 text-white shadow-sky-600/30 border border-sky-400'
+                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300'
+                  : 'bg-sky-600 hover:bg-sky-700 text-white border border-sky-500'
               }`}
             >
               {isSubmitting ? (

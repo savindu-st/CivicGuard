@@ -133,25 +133,25 @@ export const CouncilOfficerControlCenter: React.FC = () => {
   const selectedIncident = incidents.find((i) => i.id === selectedIncidentId);
 
   return (
-    <div className="flex-1 flex flex-col min-h-screen bg-dark-950 text-slate-100">
+    <div className="flex-1 flex flex-col min-h-screen bg-slate-50 text-slate-900">
       {/* 1. Top KPI Command Ribbon */}
-      <div className="border-b border-slate-800 bg-dark-900/90 backdrop-blur-md px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div className="border-b border-slate-200 bg-white/95 backdrop-blur-md px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
         {/* Left: Branding & Role info */}
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-brand-500/10 border border-brand-500/30 text-brand-400">
+          <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700">
             <ShieldAlert className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-black text-white tracking-wide uppercase">
+              <h1 className="text-sm font-black text-slate-900 tracking-wide uppercase">
                 Council Officer Control Center
               </h1>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                <Radio className="w-2.5 h-2.5 animate-pulse" />
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                <Radio className="w-2.5 h-2.5" />
                 <span>LIVE COMMAND</span>
               </span>
             </div>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-500 font-medium">
               Ward Triage • 5-Signal AI Verification • Tactical Crew Dispatch • Road Closures
             </p>
           </div>
@@ -160,48 +160,48 @@ export const CouncilOfficerControlCenter: React.FC = () => {
         {/* Center: Live KPI Counters */}
         <div className="hidden lg:flex items-center gap-6">
           <div className="flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
             <div>
-              <div className="text-[10px] text-slate-400 font-semibold uppercase">Active Hazards</div>
-              <div className="text-sm font-extrabold text-white">{activeHazardsCount} Verified</div>
+              <div className="text-[10px] text-slate-500 font-semibold uppercase">Active Hazards</div>
+              <div className="text-sm font-black text-slate-900">{activeHazardsCount} Verified</div>
             </div>
           </div>
 
-          <div className="h-6 w-px bg-slate-800"></div>
+          <div className="h-6 w-px bg-slate-200"></div>
 
           <div className="flex items-center gap-2.5">
-            <div className="p-1 rounded bg-amber-500/20 text-amber-400">
+            <div className="p-1 rounded bg-amber-50 text-amber-600 border border-amber-200">
               <Activity className="w-3.5 h-3.5" />
             </div>
             <div>
-              <div className="text-[10px] text-slate-400 font-semibold uppercase">Review Queue</div>
-              <div className="text-sm font-extrabold text-amber-400">
+              <div className="text-[10px] text-slate-500 font-semibold uppercase">Review Queue</div>
+              <div className="text-sm font-black text-amber-700">
                 {needsVerificationCount} Needs Action
               </div>
             </div>
           </div>
 
-          <div className="h-6 w-px bg-slate-800"></div>
+          <div className="h-6 w-px bg-slate-200"></div>
 
           <div className="flex items-center gap-2.5">
-            <div className="p-1 rounded bg-red-500/20 text-red-400">
+            <div className="p-1 rounded bg-red-50 text-red-600 border border-red-200">
               <Ban className="w-3.5 h-3.5" />
             </div>
             <div>
-              <div className="text-[10px] text-slate-400 font-semibold uppercase">Closed Roads</div>
-              <div className="text-sm font-extrabold text-white">{closedRoadsCount} Segments</div>
+              <div className="text-[10px] text-slate-500 font-semibold uppercase">Closed Roads</div>
+              <div className="text-sm font-black text-slate-900">{closedRoadsCount} Segments</div>
             </div>
           </div>
 
-          <div className="h-6 w-px bg-slate-800"></div>
+          <div className="h-6 w-px bg-slate-200"></div>
 
           <div className="flex items-center gap-2.5">
-            <div className="p-1 rounded bg-blue-500/20 text-blue-400">
+            <div className="p-1 rounded bg-blue-50 text-blue-600 border border-blue-200">
               <Users className="w-3.5 h-3.5" />
             </div>
             <div>
-              <div className="text-[10px] text-slate-400 font-semibold uppercase">Deployed Crews</div>
-              <div className="text-sm font-extrabold text-white">
+              <div className="text-[10px] text-slate-500 font-semibold uppercase">Deployed Crews</div>
+              <div className="text-sm font-black text-slate-900">
                 {activeCrewsCount} / {crews.length} Active
               </div>
             </div>
@@ -210,23 +210,23 @@ export const CouncilOfficerControlCenter: React.FC = () => {
 
         {/* Right: Sub-View Toggles & Refresh */}
         <div className="flex items-center gap-2 text-xs">
-          <div className="bg-dark-850 p-1 rounded-lg border border-slate-800 flex items-center gap-1">
+          <div className="bg-slate-100 p-1 rounded-xl border border-slate-200 flex items-center gap-1">
             <button
               onClick={() => setViewMode('TRIAGE')}
-              className={`px-3 py-1 rounded-md font-semibold transition-all ${
+              className={`px-3 py-1 rounded-lg font-semibold transition-all ${
                 viewMode === 'TRIAGE'
-                  ? 'bg-brand-600 text-white shadow'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Hazard Triage & Map
             </button>
             <button
               onClick={() => setViewMode('ROADS')}
-              className={`px-3 py-1 rounded-md font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1 rounded-lg font-semibold transition-all flex items-center gap-1.5 ${
                 viewMode === 'ROADS'
-                  ? 'bg-brand-600 text-white shadow'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Ban className="w-3 h-3" />
@@ -236,7 +236,7 @@ export const CouncilOfficerControlCenter: React.FC = () => {
 
           <button
             onClick={fetchOperationsData}
-            className="p-1.5 rounded-lg bg-dark-850 hover:bg-dark-800 text-slate-400 hover:text-white border border-slate-800 transition-colors"
+            className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200 transition-colors shadow-xs"
             title="Refresh All Data"
           >
             <RefreshCw className="w-4 h-4" />
@@ -244,27 +244,27 @@ export const CouncilOfficerControlCenter: React.FC = () => {
         </div>
       </div>
 
-      {/* Critical Emergency SOS Distress Banner */}
+      {/* Critical Emergency SOS Distress Banner - Clean High-Priority Alert Card */}
       {activeSosAlert && (
-        <div className="bg-red-950/95 border-b-2 border-red-500 px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-2xl animate-pulse z-20">
+        <div className="bg-white border-l-4 border-l-red-600 border-b border-slate-200 px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-md z-20">
           <div className="flex items-center gap-3.5">
-            <div className="p-2.5 rounded-xl bg-red-600 text-white shadow-lg shadow-red-600/50 flex items-center justify-center animate-bounce">
+            <div className="p-2.5 rounded-xl bg-red-50 text-red-600 border border-red-200 flex items-center justify-center shadow-xs">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black px-2 py-0.5 rounded bg-red-600 text-white uppercase tracking-wider">
+                <span className="text-[10px] font-black px-2 py-0.5 rounded bg-red-100 text-red-800 uppercase tracking-wider border border-red-200">
                   DISTRESS PANIC BEACON ACTIVE
                 </span>
-                <span className="text-[11px] text-red-300 font-semibold">
+                <span className="text-[11px] text-slate-500 font-semibold">
                   {new Date(activeSosAlert.timestamp).toLocaleTimeString()}
                 </span>
               </div>
-              <h2 className="text-sm font-extrabold text-white mt-0.5">
+              <h2 className="text-sm font-extrabold text-slate-900 mt-0.5">
                 {activeSosAlert.crew_name || 'Field Response Unit'} — {activeSosAlert.message}
               </h2>
-              <p className="text-xs text-red-200">
-                Distress GPS: <span className="font-mono font-bold text-white">{Number(activeSosAlert.latitude).toFixed(5)}, {Number(activeSosAlert.longitude).toFixed(5)}</span> • Immediate rescue backup required!
+              <p className="text-xs text-slate-600">
+                Distress GPS: <span className="font-mono font-bold text-slate-900">{Number(activeSosAlert.latitude).toFixed(5)}, {Number(activeSosAlert.longitude).toFixed(5)}</span> • Immediate rescue backup required!
               </p>
             </div>
           </div>
@@ -275,14 +275,14 @@ export const CouncilOfficerControlCenter: React.FC = () => {
                 setSelectedIncidentId(null);
                 setActiveSosAlert({ ...activeSosAlert, focusTrigger: Date.now() });
               }}
-              className="px-4 py-2 rounded-xl bg-white text-red-700 hover:bg-red-50 font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5"
             >
-              <Navigation className="w-4 h-4 text-red-600" />
+              <Navigation className="w-4 h-4" />
               <span>Locate Distress GPS</span>
             </button>
             <button
               onClick={() => setActiveSosAlert(null)}
-              className="px-3.5 py-2 rounded-xl bg-red-900/60 hover:bg-red-900 text-red-200 hover:text-white border border-red-500/40 font-semibold text-xs transition-colors"
+              className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-semibold text-xs transition-colors shadow-xs"
             >
               Acknowledge & Dismiss
             </button>
@@ -292,14 +292,14 @@ export const CouncilOfficerControlCenter: React.FC = () => {
 
       {/* Real-time Alert Toast Notification */}
       {liveAlertToast && (
-        <div className="bg-gradient-to-r from-brand-600 via-blue-600 to-indigo-600 px-6 py-2 text-xs text-white font-bold flex items-center justify-between shadow-lg animate-fadeIn">
+        <div className="bg-slate-900 border-l-4 border-l-emerald-500 px-6 py-2.5 text-xs text-white font-bold flex items-center justify-between shadow-md">
           <div className="flex items-center gap-2">
-            <Radio className="w-4 h-4 animate-ping" />
+            <Radio className="w-4 h-4 text-emerald-400" />
             <span>{liveAlertToast}</span>
           </div>
           <button
             onClick={() => setLiveAlertToast(null)}
-            className="text-white/80 hover:text-white text-xs underline"
+            className="text-slate-400 hover:text-white text-xs underline"
           >
             Dismiss
           </button>

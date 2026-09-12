@@ -72,15 +72,15 @@ const createHazardIcon = (type: string, severity: string, isSelected: boolean) =
   }
 
   const selectedBorder = isSelected
-    ? 'box-shadow: 0 0 0 4px #38bdf8, 0 0 25px rgba(56, 189, 248, 0.9); transform: scale(1.18);'
-    : 'box-shadow: 0 4px 12px rgba(0,0,0,0.6);';
+    ? 'box-shadow: 0 0 0 3px #0284c7, 0 0 15px rgba(2, 132, 199, 0.4); transform: scale(1.15);'
+    : 'box-shadow: 0 2px 8px rgba(0,0,0,0.15);';
 
   return L.divIcon({
     className: 'public-hazard-pin',
     html: `
       <div style="position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
-        <div style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background: ${ringColor}; opacity: 0.35; ${pulseAnim}"></div>
-        <div style="width: 28px; height: 28px; border-radius: 50%; background: #0f172a; border: 2.5px solid ${ringColor}; ${selectedBorder} display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s;">
+        <div style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background: ${ringColor}; opacity: 0.25; ${pulseAnim}"></div>
+        <div style="width: 28px; height: 28px; border-radius: 50%; background: #ffffff; border: 2.5px solid ${ringColor}; ${selectedBorder} display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s;">
           ${icon}
         </div>
       </div>
@@ -96,7 +96,7 @@ const createClosedRoadIcon = () => {
     className: 'public-closed-road-pin',
     html: `
       <div style="position: relative; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
-        <div style="width: 24px; height: 24px; border-radius: 6px; background: #dc2626; border: 2px solid #ffffff; box-shadow: 0 4px 10px rgba(220, 38, 38, 0.7); display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 11px;">
+        <div style="width: 24px; height: 24px; border-radius: 6px; background: #ef4444; border: 2px solid #ffffff; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 11px;">
           ⛔
         </div>
       </div>
@@ -116,7 +116,7 @@ const createShelterIcon = (availableBeds: number) => {
     className: 'public-shelter-pin',
     html: `
       <div style="position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-        <div style="width: 26px; height: 26px; border-radius: 8px; background: #0f172a; border: 2px solid ${color}; box-shadow: 0 4px 12px rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; color: ${color}; font-size: 11px;">
+        <div style="width: 26px; height: 26px; border-radius: 8px; background: #ffffff; border: 2px solid ${color}; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; flex-direction: column; align-items: center; justify-content: center; color: ${color}; font-size: 11px;">
           <span style="font-size: 12px; line-height: 1;">🏠</span>
         </div>
       </div>
@@ -270,14 +270,14 @@ export const PublicHazardMap: React.FC<PublicHazardMapProps> = ({
           >
             <Popup>
               <div className="p-2 space-y-1 text-xs">
-                <div className="font-bold text-white flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-red-400" />
+                <div className="font-bold text-slate-900 flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-red-500" />
                   <span>Report Location Selected</span>
                 </div>
-                <div className="text-slate-300 font-mono text-[11px]">
+                <div className="text-slate-600 font-mono text-[11px]">
                   {pinDropLocation.latitude.toFixed(5)}, {pinDropLocation.longitude.toFixed(5)}
                 </div>
-                <div className="text-[10px] text-emerald-400">Ready to submit in hazard report form</div>
+                <div className="text-[10px] text-emerald-600 font-semibold">Ready to submit in hazard report form</div>
               </div>
             </Popup>
           </Marker>
@@ -316,18 +316,18 @@ export const PublicHazardMap: React.FC<PublicHazardMapProps> = ({
               >
                 <Popup>
                   <div className="p-2.5 max-w-[260px] space-y-2 text-xs">
-                    <div className="flex items-center justify-between gap-2 border-b border-slate-700/60 pb-1.5">
-                      <span className="font-bold text-white flex items-center gap-1.5 text-sm">
+                    <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-1.5">
+                      <span className="font-bold text-slate-900 flex items-center gap-1.5 text-sm">
                         <span>{hazardMeta.icon}</span>
                         <span>{hazardMeta.label}</span>
                       </span>
                       <span
                         className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
                           hazard.severity === 'CRITICAL'
-                            ? 'bg-red-500/20 text-red-400 border border-red-500/40'
+                            ? 'bg-red-50 text-red-700 border border-red-200'
                             : hazard.severity === 'HIGH'
-                            ? 'bg-orange-500/20 text-orange-400 border border-orange-500/40'
-                            : 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                            ? 'bg-orange-50 text-orange-700 border border-orange-200'
+                            : 'bg-amber-50 text-amber-800 border border-amber-200'
                         }`}
                       >
                         {hazard.severity}
@@ -335,55 +335,55 @@ export const PublicHazardMap: React.FC<PublicHazardMapProps> = ({
                     </div>
 
                     {hazard.evidence_url && (
-                      <div className="relative rounded-lg overflow-hidden border border-slate-700 aspect-video bg-dark-900">
+                      <div className="relative rounded-lg overflow-hidden border border-slate-200 aspect-video bg-slate-100">
                         <img
                           src={hazard.evidence_url}
                           alt="Citizen evidence proof"
                           className="w-full h-full object-cover"
                         />
-                        <span className="absolute bottom-1 right-1 text-[9px] px-1.5 py-0.5 rounded bg-dark-950/80 text-slate-300 backdrop-blur-sm">
+                        <span className="absolute bottom-1 right-1 text-[9px] px-1.5 py-0.5 rounded bg-white/90 text-slate-700 font-semibold shadow-xs">
                           Verified Photo
                         </span>
                       </div>
                     )}
 
-                    <div className="space-y-1 text-slate-300 text-[11px]">
+                    <div className="space-y-1 text-slate-600 text-[11px]">
                       {hazard.road_name && (
                         <div>
-                          <span className="text-slate-400">Road:</span>{' '}
-                          <span className="font-semibold text-white">{hazard.road_name}</span>
+                          <span className="text-slate-500">Road:</span>{' '}
+                          <span className="font-bold text-slate-900">{hazard.road_name}</span>
                         </div>
                       )}
                       {hazard.ward_name && (
                         <div>
-                          <span className="text-slate-400">Ward:</span>{' '}
-                          <span className="text-slate-200">{hazard.ward_name}</span>
+                          <span className="text-slate-500">Ward:</span>{' '}
+                          <span className="text-slate-700">{hazard.ward_name}</span>
                         </div>
                       )}
                       <div>
-                        <span className="text-slate-400">Status:</span>{' '}
-                        <span className="font-bold text-emerald-400">{hazard.status}</span>
+                        <span className="text-slate-500">Status:</span>{' '}
+                        <span className="font-bold text-emerald-600">{hazard.status}</span>
                       </div>
                     </div>
 
                     {/* Community Corroboration Action (ADR-012) */}
                     {onCorroborate && (
-                      <div className="pt-2 border-t border-slate-700/60 space-y-1.5">
-                        <div className="text-[10px] text-slate-400 font-medium flex items-center justify-between">
+                      <div className="pt-2 border-t border-slate-200 space-y-1.5">
+                        <div className="text-[10px] text-slate-500 font-medium flex items-center justify-between">
                           <span>Citizen Corroboration:</span>
-                          <span className="text-emerald-400 font-bold">Community Vote</span>
+                          <span className="text-emerald-700 font-bold">Community Vote</span>
                         </div>
                         <div className="grid grid-cols-2 gap-1.5">
                           <button
                             onClick={() => onCorroborate(hazard.id, 'CONFIRM')}
-                            className="py-1 px-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 font-semibold text-[10px] flex items-center justify-center gap-1 transition-colors"
+                            className="py-1 px-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-semibold text-[10px] flex items-center justify-center gap-1 transition-colors shadow-xs"
                           >
                             <ThumbsUp className="w-3 h-3" />
                             <span>Confirm</span>
                           </button>
                           <button
                             onClick={() => onCorroborate(hazard.id, 'REFUTE')}
-                            className="py-1 px-2 rounded-lg bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/40 font-semibold text-[10px] flex items-center justify-center gap-1 transition-colors"
+                            className="py-1 px-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-semibold text-[10px] flex items-center justify-center gap-1 transition-colors shadow-xs"
                           >
                             <ThumbsDown className="w-3 h-3" />
                             <span>Refute</span>
@@ -406,24 +406,24 @@ export const PublicHazardMap: React.FC<PublicHazardMapProps> = ({
                 center={[road.latitude, road.longitude]}
                 radius={80}
                 pathOptions={{
-                  color: '#dc2626',
-                  fillColor: '#dc2626',
-                  fillOpacity: 0.35,
+                  color: '#ef4444',
+                  fillColor: '#ef4444',
+                  fillOpacity: 0.3,
                   weight: 2,
                 }}
               />
               <Marker position={[road.latitude, road.longitude]} icon={createClosedRoadIcon()}>
                 <Popup>
                   <div className="p-2 space-y-1.5 text-xs max-w-[220px]">
-                    <div className="flex items-center gap-1.5 text-red-400 font-extrabold">
+                    <div className="flex items-center gap-1.5 text-red-600 font-black">
                       <AlertTriangle className="w-4 h-4" />
                       <span>ROAD CLOSED</span>
                     </div>
-                    <div className="font-bold text-white text-sm">{road.name}</div>
+                    <div className="font-bold text-slate-900 text-sm">{road.name}</div>
                     {road.wards?.name && (
-                      <div className="text-[11px] text-slate-400">{road.wards.name}</div>
+                      <div className="text-[11px] text-slate-500">{road.wards.name}</div>
                     )}
-                    <div className="p-1.5 rounded bg-red-950/40 border border-red-800/40 text-[10px] text-red-300 leading-snug">
+                    <div className="p-1.5 rounded bg-red-50 border border-red-200 text-[10px] text-red-700 leading-snug">
                       Closed by Municipal Council due to active flooding / debris. Detour routing enforced.
                     </div>
                   </div>
@@ -444,15 +444,15 @@ export const PublicHazardMap: React.FC<PublicHazardMapProps> = ({
               >
                 <Popup>
                   <div className="p-2 space-y-1.5 text-xs max-w-[240px]">
-                    <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
+                    <div className="flex items-center gap-1.5 text-emerald-600 font-bold">
                       <Home className="w-3.5 h-3.5" />
                       <span>Emergency Relief Shelter</span>
                     </div>
-                    <div className="font-bold text-white text-sm">{shelter.name}</div>
-                    <div className="text-[11px] text-slate-300">{shelter.address}</div>
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-700/60 text-[11px]">
-                      <span className="text-slate-400">Available Beds:</span>
-                      <span className="font-extrabold text-emerald-400">
+                    <div className="font-bold text-slate-900 text-sm">{shelter.name}</div>
+                    <div className="text-[11px] text-slate-600">{shelter.address}</div>
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-200 text-[11px]">
+                      <span className="text-slate-500">Available Beds:</span>
+                      <span className="font-extrabold text-emerald-700">
                         {availableBeds} / {shelter.capacity}
                       </span>
                     </div>
@@ -469,16 +469,16 @@ export const PublicHazardMap: React.FC<PublicHazardMapProps> = ({
             <Polyline
               positions={routeCoordinates}
               pathOptions={{
-                color: '#06b6d4',
+                color: '#10b981',
                 weight: 8,
-                opacity: 0.35,
+                opacity: 0.3,
               }}
             />
             {/* Core Route Line */}
             <Polyline
               positions={routeCoordinates}
               pathOptions={{
-                color: '#22d3ee',
+                color: '#059669',
                 weight: 4,
                 opacity: 0.95,
               }}

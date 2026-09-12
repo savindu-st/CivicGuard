@@ -47,27 +47,27 @@ export const RoadClosureManager: React.FC<RoadClosureManagerProps> = ({
   return (
     <div className="flex flex-col h-full space-y-4">
       {/* Header & Stats */}
-      <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-dark-850 border border-slate-800">
+      <div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
         <div>
-          <h4 className="text-sm font-bold text-white flex items-center gap-2">
-            <Ban className="w-4 h-4 text-red-400" />
+          <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <Ban className="w-4 h-4 text-red-600" />
             <span>Municipal Road Infrastructure Network</span>
           </h4>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Authoritative municipal road closures and flood detour management
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <span className="text-xs text-slate-400">Enforced Closures:</span>
-            <div className="text-sm font-bold text-red-400">{closedCount} Roads Closed</div>
+            <span className="text-xs text-slate-500">Enforced Closures:</span>
+            <div className="text-sm font-bold text-red-600">{closedCount} Roads Closed</div>
           </div>
         </div>
       </div>
 
       {errorMsg && (
-        <div className="p-2.5 rounded-lg bg-red-950/40 border border-red-500/40 text-xs text-red-300">
+        <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-700">
           {errorMsg}
         </div>
       )}
@@ -80,7 +80,7 @@ export const RoadClosureManager: React.FC<RoadClosureManagerProps> = ({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search road network by name or municipal ward..."
-          className="w-full bg-dark-850 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 shadow-inner"
+          className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-500 shadow-sm"
         />
       </div>
 
@@ -96,35 +96,35 @@ export const RoadClosureManager: React.FC<RoadClosureManagerProps> = ({
               key={road.id}
               className={`p-3.5 rounded-xl border transition-all ${
                 isClosed
-                  ? 'bg-red-950/20 border-red-500/40'
-                  : 'bg-dark-850/60 border-slate-800/80 hover:bg-dark-800/80'
+                  ? 'bg-red-50/40 border-red-200'
+                  : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
               }`}
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-white">{road.name}</span>
+                    <span className="text-xs font-bold text-slate-900">{road.name}</span>
                     <span
-                      className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full ${
+                      className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                         isClosed
-                          ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                          : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                          ? 'bg-red-50 text-red-700 border border-red-200'
+                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                       }`}
                     >
                       {isClosed ? '🔴 CLOSED' : '🟢 OPEN'}
                     </span>
-                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
                       {road.road_type}
                     </span>
                   </div>
 
-                  <div className="text-[11px] text-slate-400 flex items-center gap-2">
+                  <div className="text-[11px] text-slate-500 flex items-center gap-2">
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-slate-500" />
+                      <MapPin className="w-3 h-3 text-slate-400" />
                       <span>{road.ward_name || road.wards?.name || 'Assigned Ward'}</span>
                     </span>
                     {activeIncidents.length > 0 && (
-                      <span className="text-amber-400 font-semibold">
+                      <span className="text-amber-600 font-semibold">
                         • {activeIncidents.length} active hazard{activeIncidents.length > 1 ? 's' : ''} blocking
                       </span>
                     )}
@@ -135,7 +135,7 @@ export const RoadClosureManager: React.FC<RoadClosureManagerProps> = ({
                   {onSelectRoadOnMap && (
                     <button
                       onClick={() => onSelectRoadOnMap(road)}
-                      className="px-2.5 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 text-slate-300 text-xs font-medium border border-slate-700 transition-colors"
+                      className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-medium border border-slate-300 transition-colors"
                       title="View on Map"
                     >
                       View on Map
@@ -147,8 +147,8 @@ export const RoadClosureManager: React.FC<RoadClosureManagerProps> = ({
                     disabled={isToggling}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 disabled:opacity-50 ${
                       isClosed
-                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-600/30'
-                        : 'bg-red-600 hover:bg-red-500 text-white shadow-md shadow-red-600/30'
+                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
+                        : 'bg-red-600 hover:bg-red-700 text-white shadow-sm'
                     }`}
                   >
                     {isToggling ? (

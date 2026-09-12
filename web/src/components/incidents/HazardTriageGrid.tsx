@@ -89,12 +89,12 @@ export const HazardTriageGrid: React.FC<HazardTriageGridProps> = ({
           onClick={() => onSelectWard(null)}
           className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
             selectedWardId === null
-              ? 'bg-brand-600 text-white shadow-md border border-brand-400'
-              : 'bg-dark-850 text-slate-400 hover:text-white border border-slate-700/60'
+              ? 'bg-slate-900 text-white shadow-xs'
+              : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
           }`}
         >
           <span>All Wards</span>
-          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-dark-900/60 text-slate-300">
+          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-700 font-bold">
             {totalIncidents}
           </span>
         </button>
@@ -108,13 +108,13 @@ export const HazardTriageGrid: React.FC<HazardTriageGridProps> = ({
               onClick={() => onSelectWard(ward.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                 isSelected
-                  ? 'bg-brand-600 text-white shadow-md border border-brand-400'
-                  : 'bg-dark-850 text-slate-400 hover:text-white border border-slate-700/60'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
               }`}
             >
               <span>{ward.name.replace('Ward ', 'W-')}</span>
               {count > 0 && (
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-dark-900/60 text-slate-300 font-bold">
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-700 font-bold">
                   {count}
                 </span>
               )}
@@ -124,7 +124,7 @@ export const HazardTriageGrid: React.FC<HazardTriageGridProps> = ({
       </div>
 
       {/* 2. Status Segmented Tabs */}
-      <div className="flex items-center justify-between gap-2 flex-wrap border-b border-slate-800 pb-3">
+      <div className="flex items-center justify-between gap-2 flex-wrap border-b border-slate-200 pb-3">
         <div className="flex items-center gap-1 overflow-x-auto">
           {[
             { id: 'ALL', label: 'All', count: totalIncidents },
@@ -132,7 +132,7 @@ export const HazardTriageGrid: React.FC<HazardTriageGridProps> = ({
               id: 'NEEDS_VERIFICATION',
               label: 'Review Queue',
               count: needsVerificationCount,
-              badgeClass: 'bg-amber-500 text-dark-950 font-extrabold animate-pulse',
+              badgeClass: 'bg-amber-100 text-amber-800 font-extrabold border border-amber-200',
             },
             { id: 'CONFIRMED', label: 'Confirmed', count: confirmedCount },
             { id: 'IN_PROGRESS', label: 'In Action', count: inProgressCount },
@@ -143,15 +143,15 @@ export const HazardTriageGrid: React.FC<HazardTriageGridProps> = ({
               onClick={() => onSelectStatus(tab.id)}
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 selectedStatus === tab.id
-                  ? 'bg-dark-800 text-white font-bold border border-slate-700'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-slate-900 text-white font-bold shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <span>{tab.label}</span>
               {tab.count !== undefined && (
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    tab.badgeClass || 'bg-slate-800 text-slate-300'
+                    tab.badgeClass || 'bg-slate-100 text-slate-600 font-bold'
                   }`}
                 >
                   {tab.count}
@@ -163,11 +163,11 @@ export const HazardTriageGrid: React.FC<HazardTriageGridProps> = ({
 
         {/* Severity Filter Dropdown */}
         <div className="flex items-center gap-2">
-          <Filter className="w-3.5 h-3.5 text-slate-400" />
+          <Filter className="w-3.5 h-3.5 text-slate-500" />
           <select
             value={selectedSeverity}
             onChange={(e) => onSeverityChange(e.target.value)}
-            className="bg-dark-800 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1 focus:outline-none focus:border-brand-500"
+            className="bg-white border border-slate-300 text-slate-700 text-xs rounded-lg px-2.5 py-1 focus:outline-none focus:border-emerald-500 shadow-xs"
           >
             <option value="ALL">All Severities</option>
             <option value="CRITICAL">Critical</option>
@@ -186,16 +186,16 @@ export const HazardTriageGrid: React.FC<HazardTriageGridProps> = ({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search by street name, hazard type, or description..."
-          className="w-full bg-dark-850/90 border border-slate-700/70 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors shadow-inner"
+          className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors shadow-xs"
         />
       </div>
 
       {/* 4. Triage Grid Incident Cards List */}
       <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 scrollbar-thin">
         {filteredIncidents.length === 0 ? (
-          <div className="py-12 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl bg-dark-900/40">
-            <CheckCircle2 className="w-8 h-8 mx-auto text-slate-600 mb-2" />
-            <p className="font-semibold text-slate-400">No hazard reports match your current filters</p>
+          <div className="py-12 text-center text-slate-500 text-xs border border-dashed border-slate-300 rounded-xl bg-slate-50">
+            <CheckCircle2 className="w-8 h-8 mx-auto text-slate-400 mb-2" />
+            <p className="font-semibold text-slate-700">No hazard reports match your current filters</p>
             <p className="text-[11px] text-slate-500 mt-1">
               Select another ward or clear status filters to view historical reports
             </p>
@@ -220,8 +220,8 @@ export const HazardTriageGrid: React.FC<HazardTriageGridProps> = ({
                 onClick={() => onSelectIncident(incident.id)}
                 className={`p-3.5 rounded-xl border transition-all cursor-pointer relative ${
                   isSelected
-                    ? 'bg-dark-800/95 border-brand-500 shadow-lg shadow-brand-500/10 ring-1 ring-brand-500'
-                    : 'glass-panel glass-panel-hover border-slate-800/80 bg-dark-850/60'
+                    ? 'bg-emerald-50/60 border-emerald-500 shadow-md ring-1 ring-emerald-500'
+                    : 'bg-white border-slate-200/90 shadow-xs hover:border-slate-300 hover:shadow-sm'
                 }`}
               >
                 {/* Top Row: Type, Status, Urgency */}
@@ -230,26 +230,26 @@ export const HazardTriageGrid: React.FC<HazardTriageGridProps> = ({
                     <span
                       className={`p-1.5 rounded-lg text-xs font-bold ${
                         incident.severity === 'CRITICAL'
-                          ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                          ? 'bg-red-50 text-red-700 border border-red-200'
                           : incident.severity === 'HIGH'
-                          ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                          ? 'bg-orange-50 text-orange-700 border border-orange-200'
                           : incident.severity === 'MEDIUM'
-                          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                          : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                          ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                          : 'bg-blue-50 text-blue-700 border border-blue-200'
                       }`}
                     >
                       <ShieldAlert className="w-4 h-4" />
                     </span>
                     <div>
-                      <h4 className="text-xs font-bold text-white uppercase tracking-wide flex items-center gap-1.5">
+                      <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
                         <span>{incident.incident_type?.replace('_', ' ')}</span>
                         {incident.severity === 'CRITICAL' && (
-                          <span className="text-[10px] text-red-400 font-extrabold animate-pulse">
+                          <span className="text-[10px] text-red-600 font-extrabold">
                             CRITICAL
                           </span>
                         )}
                       </h4>
-                      <p className="text-[10px] text-slate-400">
+                      <p className="text-[10px] text-slate-500 font-medium">
                         {incident.wards?.name || 'Municipal Sector'}
                       </p>
                     </div>
@@ -260,28 +260,28 @@ export const HazardTriageGrid: React.FC<HazardTriageGridProps> = ({
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                         incident.status === 'CONFIRMED'
-                          ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                          ? 'bg-red-50 text-red-700 border border-red-200'
                           : incident.status === 'NEEDS_VERIFICATION'
-                          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
+                          ? 'bg-amber-50 text-amber-800 border border-amber-200'
                           : incident.status === 'RESOLVED'
-                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                          : 'bg-slate-800 text-slate-300 border border-slate-700'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : 'bg-slate-100 text-slate-700 border border-slate-200'
                       }`}
                     >
                       {incident.status === 'NEEDS_VERIFICATION' ? 'Review Required' : incident.status}
                     </span>
 
                     {/* AI Confidence Gauge Badge */}
-                    <div className="flex items-center gap-1 text-[10px] text-slate-400">
-                      <Sparkles className="w-3 h-3 text-brand-400" />
+                    <div className="flex items-center gap-1 text-[10px] text-slate-500">
+                      <Sparkles className="w-3 h-3 text-emerald-600" />
                       <span>AI Score:</span>
                       <span
                         className={`font-mono font-bold ${
                           Number(confidenceScore) >= 85
-                            ? 'text-emerald-400'
+                            ? 'text-emerald-700'
                             : Number(confidenceScore) >= 40
-                            ? 'text-amber-400'
-                            : 'text-red-400'
+                            ? 'text-amber-700'
+                            : 'text-red-700'
                         }`}
                       >
                         {confidenceScore}%
@@ -292,28 +292,28 @@ export const HazardTriageGrid: React.FC<HazardTriageGridProps> = ({
 
                 {/* Middle: Road Location & Description */}
                 <div className="mt-2.5 space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-200 font-semibold">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                  <div className="flex items-center gap-1.5 text-xs text-slate-800 font-bold">
+                    <MapPin className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
                     <span className="truncate">{incident.roads?.name || incident.description || 'Reported Location'}</span>
                   </div>
                   {incident.description && incident.description !== incident.roads?.name && (
-                    <p className="text-[11px] text-slate-400 line-clamp-2 pl-5 leading-relaxed">
+                    <p className="text-[11px] text-slate-600 line-clamp-2 pl-5 leading-relaxed">
                       {incident.description}
                     </p>
                   )}
                 </div>
 
                 {/* Bottom Badges & Action Prompt */}
-                <div className="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px]">
+                <div className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-[10px]">
                   <div className="flex items-center gap-2">
                     {/* Road Closure Tag */}
                     {isRoadClosed ? (
-                      <span className="inline-flex items-center gap-1 text-red-400 font-semibold bg-red-950/40 border border-red-800/50 px-2 py-0.5 rounded">
+                      <span className="inline-flex items-center gap-1 text-red-700 font-semibold bg-red-50 border border-red-200 px-2 py-0.5 rounded">
                         <Ban className="w-2.5 h-2.5" />
                         <span>Road Closed</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-emerald-400/80 font-medium bg-emerald-950/20 border border-emerald-900/40 px-2 py-0.5 rounded">
+                      <span className="inline-flex items-center gap-1 text-emerald-700 font-medium bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
                         <span>Road Open</span>
                       </span>
                     )}
@@ -332,7 +332,7 @@ export const HazardTriageGrid: React.FC<HazardTriageGridProps> = ({
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1 text-brand-400 font-semibold group-hover:text-brand-300">
+                  <div className="flex items-center gap-1 text-slate-900 font-bold hover:text-emerald-700">
                     <span>Inspect</span>
                     <ChevronRight className="w-3 h-3" />
                   </div>
