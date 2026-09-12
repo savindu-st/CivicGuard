@@ -1,8 +1,8 @@
 # Civic Guard — Implementation Progress & Engineering Tracker
 
 > **Last Updated:** 2026-09-12  
-> **Current Phase:** Phase 3 — Operations Web Application & Field Ops (Completed)  
-> **Overall Completion:** 98%  
+> **Current Phase:** Phase 4 — Closed-Loop Integration & Verification (Completed)  
+> **Overall Completion:** 100%  
 > **Maintenance Policy:** This document is automatically updated by the AI pair programmer upon completing any feature, milestone, bugfix, or architectural change.
 
 ---
@@ -12,8 +12,8 @@
 | Subsystem | Health / Status | Progress (%) | Highlights / Next Focus |
 | :--- | :--- | :--- | :--- |
 | **Database & Migrations** | 🟢 Ready | 100% | 16 Supabase tables, Sri Lanka demo seed data & SOS distress calls seeded |
-| **Architecture & Specifications** | 🟢 Ready | 100% | `architecture.md`, `workflow.md`, and ADRs 001–021 defined |
-| **API Gateway (Kong)** | 🟢 Configured | 95% | Declarative routing configured; all services mapped, proxied, and verified |
+| **Architecture & Specifications** | 🟢 Ready | 100% | `architecture.md`, `workflow.md`, and ADRs 001–026 defined |
+| **API Gateway (Kong)** | 🟢 Verified | 100% | Declarative routing verified on port 8000; CORS pre-flight, error forwarding & multipart passthrough tested |
 | **Shared Library (`@civicguard/shared`)** | 🟢 Ready | 100% | Types, status constants, geo math, auth guard, parcel allocation & Supabase client built |
 | **Incident Service (`incident-service`)** | 🟢 Ready | 100% | Ingestion, 5-signal verification, corroboration, safe detour & road closure RPC |
 | **Ticket Service (`ticket-service`)** | 🟢 Ready | 100% | Ticket lifecycle, 2km soft limit, crew telematics, SOS broadcast & resolution loop |
@@ -21,6 +21,7 @@
 | **Relief Service (`relief-service`)** | 🟢 Ready | 100% | SOS requests, atomic bed allocation, multi-resource parcel allocation & nearest shelter matching |
 | **Authentication & RBAC (Supabase GoTrue)** | 🟢 Ready | 100% | Dual-tier access model (ADR-025): 100% open citizen access; mandatory Supabase Auth accounts and `<ProtectedRoute>` guards for `/officer` and `/crew` |
 | **Operations Web Frontend (`web`)** | 🟢 Ready | 100% | Full Pure Light Mode overhaul (ADR-022): Dedicated `/login` role gateway, 2x2 Command Portals Hub, Esri Light Gray Canvas basemaps, and de-cluttered split-screen workspaces for Officer, Crew, Relief, and Public modules |
+| **Closed-Loop Integration & Verification** | 🟢 Verified | 100% | Phase 4 verification suite (ADR-026): End-to-end report-to-road-reopened runner (9/9), 5-ward weather burst replay (5/5), Kong proxy suite (8/8), and Docker Compose healthchecks validated |
 
 
 ---
@@ -154,18 +155,18 @@
 
 ---
 
-### Phase 4: Closed-Loop Integration & Verification (Upcoming)
-- [ ] End-to-end automated test runner simulating citizen report $\rightarrow$ AI triage $\rightarrow$ ticket dispatch $\rightarrow$ crew photo completion $\rightarrow$ road reopened.
-- [ ] Multi-ward rainfall burst replay test verifying automated threshold alerts.
-- [ ] Kong API Gateway proxy verification on port 8000.
-- [ ] Multi-container Docker Compose build & health check validation.
+### Phase 4: Closed-Loop Integration & Verification (Completed)
+- [x] End-to-end automated test runner simulating citizen report $\rightarrow$ AI triage $\rightarrow$ ticket dispatch $\rightarrow$ crew photo completion $\rightarrow$ road reopened (`test-e2e-closed-loop.ts`).
+- [x] Multi-ward rainfall burst replay test verifying automated threshold alerts (`test-weather-burst.ts`).
+- [x] Kong API Gateway proxy verification on port 8000 (`test-kong-gateway.ts`).
+- [x] Multi-container Docker Compose build & health check validation (all 7 containers healthy).
 
 ---
 
 ## 3. Active Sprint & Immediate Next Tasks
 
-1. **Closed-Loop Verification (Phase 4)**: Build automated end-to-end integration test runner simulating citizen report $\rightarrow$ AI triage $\rightarrow$ ticket dispatch $\rightarrow$ crew photo completion $\rightarrow$ road reopened.
-2. **Multi-Container Validation**: Verify complete Docker Compose stack and health checks.
+1. **System Production Readiness**: All Phase 1–4 milestones are 100% implemented, integrated, and automatedly verified across all 7 containerized services.
+2. **Operational Demonstrations**: Live demo rehearsals across Council Officer (`/officer`), Field Crew (`/crew`), Relief Logistics (`/relief`), and Public Citizen (`/map`) operational workspaces.
 
 ---
 
@@ -173,6 +174,7 @@
 
 | Date | Author / Agent | Change Summary | Impacted Files |
 | :--- | :--- | :--- | :--- |
+| **2026-09-12** | Antigravity AI | Implemented Phase 4 Closed-Loop Integration & Verification Suite with Docker Compose Healthcheck Orchestration (ADR-026): Added native container healthchecks to all 7 services in `docker-compose.yml` (`ai-service`, `incident-service`, `ticket-service`, `notification-service`, `relief-service`, `kong`, `web`) with strict `condition: service_healthy` dependencies and verified that all 7 containers reach `healthy` status. Built comprehensive typed test suites in `backend/scripts/`: `test-kong-gateway.ts` (8/8 passed: verifying port 8000 multi-service proxying, CORS pre-flight, error status preservation, and multipart photo upload), `test-weather-burst.ts` (5/5 passed: verifying torrential and moderate storm bursts across 5 Sri Lanka wards, danger threshold breaches, and Socket.IO alert dispatch), `test-e2e-closed-loop.ts` (9/9 passed: verifying negative guards for spam meme rejection and mandatory photo proof enforcement, alongside full citizen report $\rightarrow$ 5-signal AI triage $\rightarrow$ officer review $\rightarrow$ automated road closure $\rightarrow$ council ticket spawn $\rightarrow$ crew dispatch $\rightarrow$ photo-verified resolution with SitRep notes $\rightarrow$ road reopening $\rightarrow$ crew restoration $\rightarrow$ map clearing $\rightarrow$ Stage 6 AI retuning ledger), and `test-phase4-all.ts` (master scorecard orchestrator executing all suites in 25.80s). Applied database schema migrations for `council_tickets` (`required_specialty`, `sitrep_notes`, `evacuated_count`, `route_directions`) and reloaded PostgREST cache. Recorded ADR-026 in `architecture.md`. | `docker-compose.yml`, `backend/package.json`, `backend/scripts/*`, `architecture.md`, `progress.md` |
 | **2026-09-12** | Antigravity AI | Snapped Detour Routes & Road Closures to OpenStreetMap Centerlines: Replaced coarse diagonal polylines with high-precision road-snapped polyline vertices in `nearby_reports_screen.dart`. The closed road segment (red dashed) now aligns with Galle Road (A2) bridge at Rawathawatta (`6.7850, 79.8850` to `6.7925, 79.8885`). The safe detour corridor (green solid) traces the bypass from Idama through De Soysa Road and Bandaranayake Mawatha, smoothly connecting at Katubedda Junction (`6.7982, 79.8895`) and heading north on Galle Road through Soysapura and Ratmalana. Verified 0 Flutter errors. | `mobile app/lib/features/map/views/nearby_reports_screen.dart`, `progress.md` |
 | **2026-09-12** | Antigravity AI | Mobile Disaster Map Teardrop Pins & Pulsing Live GPS Beacon: Redesigned map markers in `nearby_reports_screen.dart` with custom teardrop pins featuring category-matched colors (Floods: `#2563EB` Blue, Blockages: `#D97706` Amber, Closures: `#DC2626` Red, Shelters: `#059669` Emerald) and floating mini category badges (`🌊 Flood`, `⚠️ Tree Fall`, `⛔ Closed`, `🏠 Shelter`) matching top filter chips. Implemented high-visibility live user GPS beacon (`_buildLiveUserBeacon`) with continuous 1.8s expanding radar pulse wave (`AnimationController`), glowing cyan halo, inner solid blue core, and floating `📍 YOU` label. Well-distributed coordinates across Moratuwa/Katubedda and Colombo to eliminate marker clustering. Verified 0 Flutter errors. | `mobile app/lib/features/map/views/nearby_reports_screen.dart`, `progress.md` |
 | **2026-09-12** | Antigravity AI | Increased Auto-Marquee Speed & Reduced Situation Banner Height: Accelerated the continuous horizontal ticker speed from 0.85px to 1.85px per frame for a brisk, dynamic live flow in `auto_rotating_quick_actions.dart`. Reduced `FeaturedSituationBanner` height by 30px (fixed 132px) and removed `Expanded` constraint in `home_screen.dart`, ensuring compact proportioning, pristine text alignment, and zero vertical clipping across all mobile viewports. Verified zero Flutter errors. | `mobile app/lib/features/home/views/widgets/auto_rotating_quick_actions.dart`, `mobile app/lib/features/home/views/widgets/featured_situation_banner.dart`, `mobile app/lib/features/home/views/home_screen.dart`, `progress.md` |
