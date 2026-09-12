@@ -13,6 +13,11 @@ router.get('/', controller.getIncidents);
 router.get('/map/hazards', controller.getHazardMap);
 router.post('/routes/safe-path', controller.getSafePath);
 
+// --- Ward & Road Infrastructure Management ---
+router.get('/wards', controller.getWards);
+router.get('/roads', controller.getRoads);
+router.patch('/roads/:id/closure', controller.toggleRoadClosure);
+
 // --- Telemetry & Simulation ---
 router.post('/telemetry', controller.ingestTelemetry);
 router.post('/telemetry/simulate', controller.simulateTelemetry);

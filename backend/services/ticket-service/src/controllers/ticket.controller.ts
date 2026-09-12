@@ -22,12 +22,13 @@ export class TicketController {
 
   getTickets = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { status, priority, crew_id, officer_id, limit, offset } = req.query;
+      const { status, priority, crew_id, officer_id, incident_id, limit, offset } = req.query;
       const result = await this.ticketService.getTickets({
         status: status as any,
         priority: priority as any,
         crew_id: crew_id as any,
         officer_id: officer_id as any,
+        incident_id: incident_id as any,
         limit: limit ? Number(limit) : undefined,
         offset: offset ? Number(offset) : undefined,
       });

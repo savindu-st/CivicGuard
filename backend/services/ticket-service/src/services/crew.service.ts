@@ -139,10 +139,12 @@ export class CrewService {
     longitude: number,
     message: string
   ): Promise<CrewSosPayload> {
+    // Update crew's latest coordinates in DB
     const { data: crew } = await this.supabase
       .from('field_crews')
-      .select('id, crew_name')
+      .update({ latitude, longitude })
       .eq('id', crewId)
+      .select('id, crew_name')
       .single();
 
     const sosPayload: CrewSosPayload = {
@@ -156,12 +158,12 @@ export class CrewService {
 
     logger.warn(`🚨 CREW SOS TRIGGERED by ${crewId}: ${sosPayload.message}`);
 
-    // High-priority broadcast to council officers
+    // High-priority broadcast to council officers and public emergency channel
     try {
       await axios.post(
         `${config.notificationServiceUrl}/api/notifications/broadcast`,
         {
-          rooms: ['officers'],
+          rooms: ['officers', 'public'],
           event: 'crew:sos',
           payload: sosPayload,
         },

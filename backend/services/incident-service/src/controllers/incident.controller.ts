@@ -353,6 +353,9 @@ export class IncidentController {
   /**
    * Manual Officer verification override.
    */
+  /**
+   * Manual Officer verification override.
+   */
   manualVerify = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
@@ -366,12 +369,73 @@ export class IncidentController {
       const status = decision === 'CONFIRM' ? 'CONFIRMED' : 'REJECTED';
       const severity = urgency || 'HIGH';
 
-      await this.supabase.from('incidents').update({ status, severity }).eq('id', id);
+      await this.supabase.from('incidents').update({ status, severity, updated_at: new Date().toISOString() }).eq('id', id);
 
       const { data: inc } = await this.supabase.from('incidents').select('*, roads(*)').eq('id', id).single();
 
-      if (decision === 'CONFIRM' && inc?.road_id) {
-        await this.supabase.from('roads').update({ is_closed: true }).eq('id', inc.road_id);
+      if (decision === 'CONFIRM') {
+        // Auto-close associated road
+        if (inc?.road_id) {
+          await this.supabase.from('roads').update({ is_closed: true }).eq('id', inc.road_id);
+          logger.info(`Road closed automatically on manual verification: ${inc.roads?.name || inc.road_id}`);
+        }
+
+        // Auto-spawn council ticket if not already present
+        try {
+          await axios.post(
+            `${config.ticketServiceUrl}/api/tickets`,
+            {
+              incident_id: id,
+              priority: severity,
+              description: `OFFICER VERIFIED: Confirmed ${inc?.incident_type || 'Hazard'} on ${inc?.roads?.name || 'Road'}. Severity: ${severity}`,
+            },
+            { timeout: 3000 }
+          );
+          logger.info(`Council ticket auto-spawned for manually verified incident ${id}`);
+        } catch (ticketErr: any) {
+          logger.warn(`Ticket auto-creation note: ${ticketErr.message}`);
+        }
+
+        // Broadcast to officers, public, and ward rooms
+        try {
+          await axios.post(
+            `${config.notificationServiceUrl}/api/notifications/broadcast`,
+            {
+              rooms: ['public', 'officers', ...(inc?.ward_id ? [`ward:${inc.ward_id}`] : [])],
+              event: 'hazard:updated',
+              payload: {
+                incident_id: id,
+                incident_type: inc?.incident_type,
+                status: 'CONFIRMED',
+                severity,
+                latitude: inc?.latitude,
+                longitude: inc?.longitude,
+                ward_id: inc?.ward_id,
+                road_id: inc?.road_id,
+                road_closed: Boolean(inc?.road_id),
+              },
+            },
+            { timeout: 3000 }
+          );
+        } catch (notifErr: any) {
+          logger.warn(`Could not broadcast hazard:updated: ${notifErr.message}`);
+        }
+      } else {
+        // Broadcast rejection
+        try {
+          await axios.post(
+            `${config.notificationServiceUrl}/api/notifications/broadcast`,
+            {
+              rooms: ['officers'],
+              event: 'hazard:updated',
+              payload: {
+                incident_id: id,
+                status: 'REJECTED',
+              },
+            },
+            { timeout: 3000 }
+          );
+        } catch {}
       }
 
       sendSuccess(res, { incident_id: id, status, severity }, 'Manual verification applied');
@@ -492,6 +556,153 @@ export class IncidentController {
       const { intensity = 'TORRENTIAL' } = req.body;
       const results = await this.weatherSimulator.simulateStormBurst(intensity);
       sendSuccess(res, { simulated_wards: results }, 'Simulated storm burst executed successfully');
+    } catch (err: any) {
+      sendError(res, err.message, 500);
+    }
+  };
+
+  /**
+   * Fetch all municipal wards with live active incident counts.
+   */
+  getWards = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { data: wards, error } = await this.supabase
+        .from('wards')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) {
+        sendError(res, error.message, 500);
+        return;
+      }
+
+      // Aggregate active incidents per ward
+      const { data: activeIncidents } = await this.supabase
+        .from('incidents')
+        .select('ward_id, status')
+        .in('status', ['REPORTED', 'ANALYZING', 'NEEDS_VERIFICATION', 'CONFIRMED', 'IN_PROGRESS']);
+
+      const countMap: Record<string, number> = {};
+      (activeIncidents || []).forEach((inc: any) => {
+        if (inc.ward_id) {
+          countMap[inc.ward_id] = (countMap[inc.ward_id] || 0) + 1;
+        }
+      });
+
+      const enrichedWards = (wards || []).map((w: any) => ({
+        ...w,
+        active_incident_count: countMap[w.id] || 0,
+      }));
+
+      sendSuccess(res, { wards: enrichedWards });
+    } catch (err: any) {
+      sendError(res, err.message, 500);
+    }
+  };
+
+  /**
+   * Fetch monitored road network with closure status and active blocking hazards.
+   */
+  getRoads = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { ward_id, is_closed } = req.query;
+
+      let query = this.supabase
+        .from('roads')
+        .select('*, wards(name)')
+        .order('name', { ascending: true });
+
+      if (ward_id) query = query.eq('ward_id', ward_id as string);
+      if (is_closed !== undefined) query = query.eq('is_closed', is_closed === 'true');
+
+      const { data: roads, error } = await query;
+      if (error) {
+        sendError(res, error.message, 500);
+        return;
+      }
+
+      // Query active hazards linked to roads
+      const { data: activeHazards } = await this.supabase
+        .from('incidents')
+        .select('id, incident_type, severity, status, road_id, description')
+        .in('status', ['CONFIRMED', 'IN_PROGRESS', 'NEEDS_VERIFICATION'])
+        .not('road_id', 'is', null);
+
+      const hazardMap: Record<string, any[]> = {};
+      (activeHazards || []).forEach((inc: any) => {
+        if (inc.road_id) {
+          if (!hazardMap[inc.road_id]) hazardMap[inc.road_id] = [];
+          hazardMap[inc.road_id].push(inc);
+        }
+      });
+
+      const enrichedRoads = (roads || []).map((r: any) => ({
+        ...r,
+        ward_name: r.wards?.name,
+        active_incidents: hazardMap[r.id] || [],
+      }));
+
+      sendSuccess(res, { roads: enrichedRoads });
+    } catch (err: any) {
+      sendError(res, err.message, 500);
+    }
+  };
+
+  /**
+   * Authoritative manual road closure / reopening toggle (Council Officer Control).
+   */
+  toggleRoadClosure = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { is_closed } = req.body;
+
+      if (is_closed === undefined) {
+        sendError(res, 'is_closed (boolean) is required in request body', 400);
+        return;
+      }
+
+      const { data: updatedRoad, error } = await this.supabase
+        .from('roads')
+        .update({ is_closed: Boolean(is_closed), updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .select('*, wards(name)')
+        .single();
+
+      if (error || !updatedRoad) {
+        sendError(res, `Failed to update road closure: ${error?.message || 'Road not found'}`, 404);
+        return;
+      }
+
+      // Broadcast real-time road closure event
+      const eventName = updatedRoad.is_closed ? 'road:closed' : 'road:reopened';
+      try {
+        await axios.post(
+          `${config.notificationServiceUrl}/api/notifications/broadcast`,
+          {
+            rooms: ['public', 'officers', ...(updatedRoad.ward_id ? [`ward:${updatedRoad.ward_id}`] : [])],
+            event: eventName,
+            payload: {
+              road_id: updatedRoad.id,
+              road_name: updatedRoad.name,
+              ward_id: updatedRoad.ward_id,
+              ward_name: updatedRoad.wards?.name,
+              is_closed: updatedRoad.is_closed,
+              latitude: updatedRoad.latitude,
+              longitude: updatedRoad.longitude,
+              timestamp: new Date().toISOString(),
+            },
+          },
+          { timeout: 3000 }
+        );
+      } catch (notifErr: any) {
+        logger.warn(`Could not broadcast ${eventName}: ${notifErr.message}`);
+      }
+
+      sendSuccess(
+        res,
+        updatedRoad,
+        `Road ${updatedRoad.name} is now ${updatedRoad.is_closed ? 'CLOSED' : 'OPEN'}`
+      );
     } catch (err: any) {
       sendError(res, err.message, 500);
     }

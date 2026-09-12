@@ -2,7 +2,7 @@
 
 > **Last Updated:** 2026-09-12  
 > **Current Phase:** Phase 3 — Operations Web Application & Field Ops (Active)  
-> **Overall Completion:** 85%  
+> **Overall Completion:** 92%  
 > **Maintenance Policy:** This document is automatically updated by the AI pair programmer upon completing any feature, milestone, bugfix, or architectural change.
 
 ---
@@ -12,15 +12,15 @@
 | Subsystem | Health / Status | Progress (%) | Highlights / Next Focus |
 | :--- | :--- | :--- | :--- |
 | **Database & Migrations** | 🟢 Ready | 100% | 16 Supabase tables & Sri Lanka demo seed data created |
-| **Architecture & Specifications** | 🟢 Ready | 100% | `architecture.md`, `workflow.md`, and ADRs 001–017 defined |
+| **Architecture & Specifications** | 🟢 Ready | 100% | `architecture.md`, `workflow.md`, and ADRs 001–018 defined |
 | **API Gateway (Kong)** | 🟢 Configured | 90% | Declarative routing configured; services mapped and verified |
 | **Shared Library (`@civicguard/shared`)** | 🟢 Ready | 100% | Types, status constants, geo math, auth guard & Supabase client built |
-| **Incident Service (`incident-service`)** | 🟢 Ready | 100% | Ingestion, 5-signal verification, corroboration, safe detour & telemetry |
+| **Incident Service (`incident-service`)** | 🟢 Ready | 100% | Ingestion, 5-signal verification, corroboration, safe detour & road closure RPC |
 | **Ticket Service (`ticket-service`)** | 🟢 Ready | 100% | Ticket lifecycle, 2km soft limit, crew telematics, SOS broadcast & resolution loop |
 | **Notification Service (`notification-service`)**| 🟢 Ready | 100% | Socket.IO server, spatial/role rooms & broadcast RPC |
 | **Relief Service (`relief-service`)** | 🟢 Ready | 100% | SOS requests, atomic bed allocation & nearest shelter matching |
 | **AI Vision Service (`ai-service`)** | 🟢 Ready | 100% | Modular FastAPI microservice with YOLOv8, depth benchmarking, EXIF geofencing, spam filter & retuning loop |
-| **Operations Web Frontend (`web`)** | 🟢 In Progress | 65% | Field Crew Mobile Portal complete with Leaflet detour map, photo proof upload, SOS beacon & offline sync |
+| **Operations Web Frontend (`web`)** | 🟢 In Progress | 80% | Council Officer Control Center & Field Crew Mobile Portal complete with Leaflet maps, 5-signal AI triage & offline sync |
 
 
 ---
@@ -118,11 +118,11 @@
 ### Phase 3: Operations Web Application (Upcoming)
 
 #### 3.1 Council Officer Control Center
-- [ ] Ward-by-ward live hazard triage grid.
-- [ ] AI verification scorecard breakdown (all 5 signals visible).
-- [ ] Manual verification override controls.
-- [ ] One-click crew dispatch and ticket management.
-- [ ] Manual road closure / reopening toggle.
+- [x] Ward-by-ward live hazard triage grid.
+- [x] AI verification scorecard breakdown (all 5 signals visible).
+- [x] Manual verification override controls.
+- [x] One-click crew dispatch and ticket management.
+- [x] Manual road closure / reopening toggle.
 
 #### 3.2 Field Crew Mobile Portal
 - [x] Assigned job task list with real-time push alerts.
@@ -155,7 +155,7 @@
 
 ## 3. Active Sprint & Immediate Next Tasks
 
-1. **Operations Web Frontend**: Build Officer Control Dashboard, Relief Desk, and Live Public Leaflet Map connecting to Kong Gateway.
+1. **Operations Web Frontend**: Build Relief Logistics Desk (3.3) and Live Public Leaflet Map (3.4) connecting to Kong Gateway.
 2. **End-to-End Integration Verification**: Validate closed-loop flows across Kong, microservices, and web frontend.
 
 ---
@@ -164,6 +164,9 @@
 
 | Date | Author / Agent | Change Summary | Impacted Files |
 | :--- | :--- | :--- | :--- |
+| **2026-09-12** | Antigravity AI | Resolved "API KEY REQUIRED" basemap watermark issue by introducing a centralized map provider configuration (`web/src/utils/mapConfig.ts`). Supports optional `VITE_CARTO_API_KEY`, `VITE_MAPBOX_TOKEN`, or `VITE_STADIA_API_KEY`, with an automatic out-of-the-box fallback to crisp, high-definition, watermark-free **Esri World Dark Gray Canvas** tiles requiring zero API keys or registration. Updated `OfficerTacticalMap.tsx` and `CrewNavigationMap.tsx` to consume dynamic map configuration. Updated `web/.env` and `.env.example`. Rebuilt and verified `web` Docker container. | `web/src/utils/mapConfig.ts`, `web/src/components/map/OfficerTacticalMap.tsx`, `web/src/components/crews/CrewNavigationMap.tsx`, `web/.env`, `.env.example`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Implemented ADR-019: Real-Time Field Crew SOS Distress Interception & Tactical Operations Pinpoint. Fixed missing SOS event handling on the Council Officer Control Center by adding `'crew:sos'` to `useSocket` listeners and rendering a persistent pulsating red emergency distress banner with crew name, live GPS, timestamp, and instant "Locate Distress GPS" and "Acknowledge" actions. Enhanced `OfficerTacticalMap.tsx` with `createCrewSosIcon` (multi-layer animated ping halo with siren badge `🚨`) and `MapSosPanController` flying directly to the distress beacon. Updated `ticket-service` `triggerCrewSos` to sync GPS coordinates to Supabase `field_crews` and broadcast to both `['officers', 'public']` rooms. Verified end-to-end delivery through Kong Gateway on port 8000. | `backend/services/ticket-service/*`, `web/src/components/map/OfficerTacticalMap.tsx`, `web/src/pages/officer/CouncilOfficerControlCenter.tsx`, `architecture.md`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Implemented Section 3.1: Council Officer Control Center (ADR-018): built split-screen tactical command workspace (`CouncilOfficerControlCenter.tsx`) with dark-mode Leaflet tactical map (`OfficerTacticalMap.tsx`) rendering flood perimeters, closed roads, crew beacons, and animated dashed dispatch vectors. Built `HazardTriageGrid.tsx` with ward filter pills, review queue pulsing badges, and AI confidence gauges. Built deep 5-signal `IncidentCommandInspector.tsx` with exploded YOLOv8 vision, weather sensor correlation, 200m spatial clusters, scene authenticity, and risk priority checks. Added guided automated verification chain (auto-close road + auto-spawn ticket + transition to dispatch). Built distance-sorted crew dispatcher enforcing 2km proximity warning and emergency override justification. Implemented authoritative `RoadClosureManager.tsx` and backend endpoints (`GET /wards`, `GET /roads`, `PATCH /roads/:id/closure`). Verified full TypeScript build across backend and frontend. | `backend/services/incident-service/*`, `backend/services/ticket-service/*`, `web/*`, `architecture.md`, `progress.md` |
 | **2026-09-12** | Antigravity AI | Fixed Pyright static type checker error (`reportOptionalOperand: Operator "<" not supported for "None"`) in `backend/services/ai-service/tests/test_checks.py` (lines 34 and 46). Added explicit type narrowing `assert result.distance_delta_meters is not None` before comparing `distance_delta_meters` (`< 50.0` and `> 10000.0`), resolving the type mismatch with `Optional[float]` and making test assertions more explicit. Verified 0 Pyright errors and 14 passing pytest tests. | `backend/services/ai-service/tests/test_checks.py`, `progress.md` |
 | **2026-09-12** | Antigravity AI | Resolved Pyright static type checker error `Expected a callable, got None` on line 102 in `backend/services/ai-service/app/services/model_service.py`. Added explicit `Any` type annotation to `_yolo_model: Any = None` and `_is_loaded: bool = False`, added explicit `and cls._yolo_model is not None` guard before model invocation, and added numeric type guard for PIL `getextrema()` image analysis. Verified 0 Pyright diagnostics and all 14 passing pytest tests. | `backend/services/ai-service/app/services/model_service.py`, `progress.md` |
 | **2026-09-12** | Antigravity AI | Fixed Pyright & Pylance language server import resolution for `backend/services/ai-service` by adding `extraPaths` and `executionEnvironments` to `pyrightconfig.json` and `python.analysis.extraPaths` to `.vscode/settings.json`. Resolved `Cannot find module app.schemas.feedback` diagnostic in `routes_feedback.py`. Verified 14 passing pytest checks and zero Pyright diagnostics. | `pyrightconfig.json`, `.vscode/settings.json`, `progress.md` |

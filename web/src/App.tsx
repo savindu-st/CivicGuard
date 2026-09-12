@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore, RoleName } from './store/authStore';
 import { FieldCrewPortal } from './pages/crew/FieldCrewPortal';
+import { CouncilOfficerControlCenter } from './pages/officer/CouncilOfficerControlCenter';
 
 const OperationsOverview: React.FC = () => {
   return (
@@ -34,7 +35,12 @@ const OperationsOverview: React.FC = () => {
             <Activity className="w-4 h-4 text-orange-400" />
           </div>
           <div className="mt-2 text-2xl font-bold text-white">12 Verified</div>
-          <div className="mt-1 text-xs text-slate-400">Avg Confidence: 94.2%</div>
+          <div className="mt-1 text-xs text-slate-400 flex items-center justify-between">
+            <span>Avg Confidence: 94.2%</span>
+            <Link to="/officer" className="underline hover:text-white flex items-center gap-0.5 text-orange-400">
+              Open Queue &rarr;
+            </Link>
+          </div>
         </div>
 
         <div className="glass-panel p-5 border-l-4 border-l-blue-500">
@@ -59,6 +65,31 @@ const OperationsOverview: React.FC = () => {
           <div className="mt-2 text-2xl font-bold text-white">650 Beds</div>
           <div className="mt-1 text-xs text-emerald-400">518 Available</div>
         </div>
+      </div>
+
+      {/* Council Officer Control Center Launch Banner */}
+      <div className="glass-panel p-6 bg-gradient-to-r from-emerald-950/40 via-dark-850 to-brand-950/30 border border-emerald-500/30 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="badge-success">MUNICIPAL COMMAND & DISPATCH</span>
+            <span className="text-xs text-slate-400">• Section 3.1 Live Control Center</span>
+          </div>
+          <h2 className="text-lg font-extrabold text-white">
+            Council Officer Control Center & 5-Signal AI Triage
+          </h2>
+          <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+            Multi-ward live hazard triage grid, deep 5-signal AI verification scorecards (YOLOv8 vision, weather sensor correlation, 200m spatial clusters, scene authenticity, and risk priority), one-click field crew dispatch with 2km proximity warnings, and authoritative road closure controls.
+          </p>
+        </div>
+
+        <Link
+          to="/officer"
+          className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs tracking-wide shadow-lg shadow-emerald-600/30 flex items-center gap-2 flex-shrink-0 transition-all border border-emerald-400"
+        >
+          <ShieldAlert className="w-4 h-4" />
+          <span>Launch Officer Control Center</span>
+          <ExternalLink className="w-3.5 h-3.5" />
+        </Link>
       </div>
 
       {/* Field Crew Portal Banner */}
@@ -173,6 +204,17 @@ const NavigationHeader: React.FC = () => {
             Overview Desk
           </Link>
           <Link
+            to="/officer"
+            className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
+              location.pathname === '/officer'
+                ? 'bg-emerald-600 text-white border border-emerald-400 shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <ShieldAlert className="w-3.5 h-3.5" />
+            <span>Officer Control Center</span>
+          </Link>
+          <Link
             to="/crew"
             className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
               location.pathname === '/crew'
@@ -230,6 +272,7 @@ export const App: React.FC = () => {
         <NavigationHeader />
         <Routes>
           <Route path="/" element={<OperationsOverview />} />
+          <Route path="/officer" element={<CouncilOfficerControlCenter />} />
           <Route path="/crew" element={<FieldCrewPortal />} />
           <Route path="*" element={<OperationsOverview />} />
         </Routes>
