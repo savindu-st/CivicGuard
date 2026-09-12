@@ -4,72 +4,74 @@
 
 @layer base {
   body {
-    @apply bg-dark-900 text-slate-100 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen;
+    @apply bg-slate-50 text-slate-900 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen;
   }
 }
 
 @layer components {
-  /* Glassmorphism Panels */
+  /* Clean Surface Panels */
   .glass-panel {
-    @apply bg-dark-850/80 backdrop-blur-md border border-slate-700/50 shadow-xl rounded-xl;
+    @apply bg-white border border-slate-200/90 shadow-sm rounded-xl;
   }
   
   .glass-panel-hover {
-    @apply transition-all duration-200 hover:border-slate-600 hover:bg-dark-800/90;
+    @apply transition-all duration-200 hover:border-slate-300 hover:shadow-md hover:bg-white;
   }
 
-  /* Critical Urgency Badges */
+  /* Critical Urgency Badges - Light Mode High Contrast */
   .badge-critical {
-    @apply bg-red-500/10 text-red-400 border border-red-500/30 px-2.5 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5;
+    @apply bg-red-50 text-red-700 border border-red-200 px-2.5 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5;
   }
 
   .badge-high {
-    @apply bg-orange-500/10 text-orange-400 border border-orange-500/30 px-2.5 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5;
+    @apply bg-orange-50 text-orange-700 border border-orange-200 px-2.5 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5;
   }
 
   .badge-medium {
-    @apply bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5;
+    @apply bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5;
   }
 
   .badge-low {
-    @apply bg-blue-500/10 text-blue-400 border border-blue-500/30 px-2.5 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5;
+    @apply bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5;
   }
 
   .badge-success {
-    @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5;
+    @apply bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5;
   }
 }
 
-/* Custom Scrollbars */
+/* Custom Scrollbars - Clean Light */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b1120;
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #cbd5e1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #94a3b8;
 }
 
-/* Leaflet Map Styling Overrides for Dark Mode */
+/* Leaflet Map Styling Overrides for Clean Light Mode */
 .leaflet-container {
-  background: #0b1120 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: #f8fafc !important;
   font-family: inherit;
 }
 
 .leaflet-popup-content-wrapper {
-  background: #0f172a !important;
-  color: #f8fafc !important;
-  border: 1px solid rgba(51, 65, 85, 0.7);
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(226, 232, 240, 0.95);
   border-radius: 0.75rem !important;
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5) !important;
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05) !important;
 }
 
 .leaflet-popup-tip {
-  background: #0f172a !important;
+  background: #ffffff !important;
 }

@@ -23,7 +23,7 @@ export type EvidenceType = 'REPORT_PHOTO' | 'VERIFICATION_PHOTO' | 'COMPLETION_P
 
 export type AnalysisType = 'WEATHER' | 'CLUSTER' | 'IMAGE' | 'LOCATION' | 'RISK';
 
-export type AnalysisMethod = 'SYSTEM' | 'AI' | 'HEURISTIC_FALLBACK';
+export type AnalysisMethod = 'SYSTEM' | 'AI' | 'AI_GEMINI' | 'HEURISTIC_FALLBACK';
 
 export type VerdictDecision = 'CONFIRMED' | 'NEEDS_VERIFICATION' | 'REJECTED';
 
@@ -83,7 +83,9 @@ export interface HazardVerdict {
 
 export interface IncidentCreateDTO {
   incident_type: IncidentType;
+  title?: string;
   description?: string;
+  road_name?: string;
   latitude: number;
   longitude: number;
   photo_url?: string;
@@ -112,6 +114,8 @@ export interface SafePathResponseDTO {
 export interface HazardMapItem {
   id: string;
   incident_type: IncidentType;
+  title?: string;
+  description?: string;
   latitude: number;
   longitude: number;
   status: IncidentStatus;
@@ -122,6 +126,7 @@ export interface HazardMapItem {
   road_name?: string | null;
   is_road_closed: boolean;
   evidence_url?: string | null;
+  photo_url?: string | null;
   urgency?: string;
   created_at?: string;
 }

@@ -159,10 +159,15 @@ CREATE TABLE IF NOT EXISTS public.field_crews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
     crew_name VARCHAR(100) NOT NULL,
+    specialty VARCHAR(50) NOT NULL DEFAULT 'WATER_RESCUE', -- WATER_RESCUE, 4X4_DEBRIS, MEDICAL_TRIAGE, DRONE_RECON, HAM_RADIO
+    district VARCHAR(50) NOT NULL DEFAULT 'Colombo', -- Colombo, Kandy, Kalutara, Ratnapura, etc.
+    phone VARCHAR(20),
+    equipment JSONB DEFAULT '[]'::jsonb, -- e.g. ["Inflatable Boat", "4x Life Jackets", "4WD Winch Truck"]
     availability VARCHAR(20) DEFAULT 'AVAILABLE', -- AVAILABLE, BUSY, OFF_DUTY
     latitude DECIMAL(10,7),
     longitude DECIMAL(10,7),
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- 6.2 `council_tickets` (Council dispatch queue)
@@ -173,6 +178,10 @@ CREATE TABLE IF NOT EXISTS public.council_tickets (
     assigned_crew_id UUID REFERENCES public.field_crews(id) ON DELETE SET NULL,
     priority VARCHAR(20) DEFAULT 'MEDIUM', -- LOW, MEDIUM, HIGH, CRITICAL
     status VARCHAR(30) DEFAULT 'OPEN', -- OPEN, ASSIGNED, ACCEPTED, IN_PROGRESS, COMPLETED, CLOSED
+    required_specialty VARCHAR(50), -- e.g. 'WATER_RESCUE', '4X4_DEBRIS', 'MEDICAL_TRIAGE'
+    sitrep_notes TEXT, -- Ground field situation notes
+    evacuated_count INTEGER DEFAULT 0, -- Count of civilians rescued/evacuated
+    route_directions JSONB DEFAULT '[]'::jsonb, -- Turn-by-turn route steps
     description TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),

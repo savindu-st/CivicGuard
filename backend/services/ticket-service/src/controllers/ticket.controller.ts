@@ -22,12 +22,13 @@ export class TicketController {
 
   getTickets = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { status, priority, crew_id, officer_id, limit, offset } = req.query;
+      const { status, priority, crew_id, officer_id, incident_id, limit, offset } = req.query;
       const result = await this.ticketService.getTickets({
         status: status as any,
         priority: priority as any,
         crew_id: crew_id as any,
         officer_id: officer_id as any,
+        incident_id: incident_id as any,
         limit: limit ? Number(limit) : undefined,
         offset: offset ? Number(offset) : undefined,
       });
@@ -48,12 +49,15 @@ export class TicketController {
 
   assignCrew = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { crew_id } = req.body;
+      const { crew_id, emergency_override, justification } = req.body;
       if (!crew_id) {
         sendError(res, 'crew_id is required', 400);
         return;
       }
-      const ticket = await this.ticketService.assignTicketToCrew(req.params.id, crew_id);
+      const ticket = await this.ticketService.assignTicketToCrew(req.params.id, crew_id, {
+        emergency_override: Boolean(emergency_override),
+        justification,
+      });
       sendSuccess(res, ticket, 'Ticket assigned to field crew successfully');
     } catch (err: any) {
       sendError(res, err.message, 400);
@@ -74,12 +78,42 @@ export class TicketController {
     }
   };
 
+  returnTicket = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { reason, crew_id } = req.body;
+      if (!reason) {
+        sendError(res, 'Mandatory reason notes are required to return ticket', 400);
+        return;
+      }
+
+      // Resolve crew ID from body or from logged in user
+      let targetCrewId = crew_id;
+      if (!targetCrewId) {
+        const userId = (req as any).user?.userId;
+        if (userId) {
+          const crew = await this.crewService.getCrewByUserId(userId);
+          targetCrewId = crew?.id;
+        }
+      }
+
+      if (!targetCrewId) {
+        sendError(res, 'Could not determine crew identity for ticket return', 400);
+        return;
+      }
+
+      const ticket = await this.ticketService.returnTicket(req.params.id, targetCrewId, reason);
+      sendSuccess(res, ticket, 'Ticket returned to council dispatch queue');
+    } catch (err: any) {
+      sendError(res, err.message, 400);
+    }
+  };
+
   /**
    * Photo-Verified Resolution Closure.
    */
   completeTicket = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { notes, photo_url } = req.body;
+      const { notes, photo_url, sitrep_notes, evacuated_count } = req.body;
       const file = req.file;
 
       let finalPhotoUrl = photo_url || '';
@@ -111,7 +145,11 @@ export class TicketController {
         req.params.id,
         finalPhotoUrl,
         notes,
-        userId
+        userId,
+        {
+          sitrep_notes: sitrep_notes || notes,
+          evacuated_count: evacuated_count !== undefined ? Number(evacuated_count) : undefined,
+        }
       );
 
       sendSuccess(res, completedTicket, 'Ticket resolved and road reopened on public map');
@@ -121,12 +159,52 @@ export class TicketController {
   };
 
   // --- Field Crew Endpoints ---
+  getMyCrewProfile = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const userId = (req as any).user?.userId;
+      if (!userId) {
+        sendError(res, 'Authentication required', 401);
+        return;
+      }
+
+      const crew = await this.crewService.getCrewByUserId(userId);
+      if (!crew) {
+        sendError(res, 'No field crew profile associated with this user account', 404);
+        return;
+      }
+
+      const tasks = await this.crewService.getCrewTasks(crew.id);
+      sendSuccess(res, { crew, tasks });
+    } catch (err: any) {
+      sendError(res, err.message, 500);
+    }
+  };
+
   getAllCrews = async (req: Request, res: Response): Promise<void> => {
     try {
-      const crews = await this.crewService.getAllCrews();
+      const { district, officer_id, availability } = req.query;
+      const crews = await this.crewService.getAllCrews({
+        district: district as string,
+        officer_id: officer_id as string,
+        availability: availability as string,
+      });
       sendSuccess(res, { crews });
     } catch (err: any) {
       sendError(res, err.message, 500);
+    }
+  };
+
+  setAvailability = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { availability } = req.body;
+      if (!availability || !['AVAILABLE', 'BUSY', 'OFF_DUTY'].includes(availability)) {
+        sendError(res, 'Valid availability (AVAILABLE, BUSY, OFF_DUTY) is required', 400);
+        return;
+      }
+      const crew = await this.crewService.setCrewAvailability(req.params.id, availability);
+      sendSuccess(res, crew, `Crew availability updated to ${availability}`);
+    } catch (err: any) {
+      sendError(res, err.message, 400);
     }
   };
 
@@ -138,9 +216,28 @@ export class TicketController {
         return;
       }
       const crew = await this.crewService.updateCrewLocation(req.params.id, Number(latitude), Number(longitude));
-      sendSuccess(res, crew, 'Crew location updated');
+      sendSuccess(res, crew, 'Crew location updated and broadcasted');
     } catch (err: any) {
       sendError(res, err.message, 400);
+    }
+  };
+
+  triggerSos = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { latitude, longitude, message } = req.body;
+      if (latitude === undefined || longitude === undefined) {
+        sendError(res, 'latitude and longitude are required for SOS beacon', 400);
+        return;
+      }
+      const sos = await this.crewService.triggerCrewSos(
+        req.params.id,
+        Number(latitude),
+        Number(longitude),
+        message || 'EMERGENCY: Field crew requested backup'
+      );
+      sendSuccess(res, sos, '🚨 SOS emergency beacon broadcasted to command officers', 201);
+    } catch (err: any) {
+      sendError(res, err.message, 500);
     }
   };
 

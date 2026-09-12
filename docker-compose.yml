@@ -22,10 +22,20 @@ services:
     networks:
       - civicguard-net
     depends_on:
-      - incident-service
-      - ticket-service
-      - notification-service
-      - relief-service
+      incident-service:
+        condition: service_healthy
+      ticket-service:
+        condition: service_healthy
+      notification-service:
+        condition: service_healthy
+      relief-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   # -------------------------------------------------------------
   # AI Service (FastAPI + YOLO)
@@ -37,10 +47,17 @@ services:
     container_name: civicguard-ai-service
     environment:
       - PORT=5000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     ports:
       - "5000:5000"
     networks:
       - civicguard-net
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
 
   # -------------------------------------------------------------
   # Incident Service (Case Builder + Verification + Aggregator)
@@ -62,7 +79,18 @@ services:
     networks:
       - civicguard-net
     depends_on:
-      - ai-service
+      ai-service:
+        condition: service_healthy
+      notification-service:
+        condition: service_healthy
+      ticket-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4001/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   # -------------------------------------------------------------
   # Ticket Service (Council Tickets + Crew Dispatch)
@@ -82,6 +110,15 @@ services:
       - "4002:4002"
     networks:
       - civicguard-net
+    depends_on:
+      notification-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4002/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   # -------------------------------------------------------------
   # Notification Service (Socket.IO Real-Time Dispatch)
@@ -99,6 +136,12 @@ services:
       - "4003:4003"
     networks:
       - civicguard-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4003/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   # -------------------------------------------------------------
   # Relief Service (SOS Requests, Shelters & Supplies)
@@ -117,6 +160,15 @@ services:
       - "4004:4004"
     networks:
       - civicguard-net
+    depends_on:
+      notification-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4004/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   # -------------------------------------------------------------
   # Operations Web Application (React + Vite)
@@ -134,7 +186,14 @@ services:
     networks:
       - civicguard-net
     depends_on:
-      - kong
+      kong:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
 networks:
   civicguard-net:

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {
   getSupabaseClient,
   createLogger,
@@ -7,6 +8,7 @@ import {
   ShelterMatchDTO,
   ShelterMatchResult,
 } from '@civicguard/shared';
+import { config } from '../config';
 
 const logger = createLogger('ShelterService');
 
@@ -66,18 +68,42 @@ export class ShelterService {
       .from('shelters')
       .update({ current_occupancy: currentOccupancy })
       .eq('id', shelterId)
-      .select()
+      .select('*, wards(name)')
       .single();
 
     if (error || !data) throw error;
-    return { ...data, available_beds: Math.max(0, data.capacity - data.current_occupancy) };
+
+    const availableBeds = Math.max(0, data.capacity - data.current_occupancy);
+
+    // Broadcast shelter updated event to connected operators and public maps
+    try {
+      await axios.post(
+        `${config.notificationServiceUrl}/api/notifications/broadcast`,
+        {
+          rooms: ['relief', 'officers', 'public'],
+          event: 'relief:shelter_updated',
+          payload: {
+            shelter_id: shelterId,
+            current_occupancy: data.current_occupancy,
+            capacity: data.capacity,
+            available_beds: availableBeds,
+            ward_name: data.wards?.name,
+          },
+        },
+        { timeout: 3000 }
+      );
+    } catch (e: any) {
+      logger.warn(`Could not broadcast shelter occupancy update: ${e.message}`);
+    }
+
+    return { ...data, available_beds: availableBeds, ward_name: data.wards?.name };
   }
 
   /**
    * Automated Nearest Shelter Matching with Atomic Bed Reservation (ADR-008 & ADR-011).
    */
   async matchShelter(dto: ShelterMatchDTO, autoReserve: boolean = false): Promise<ShelterMatchResult | null> {
-    const { latitude, longitude, people_count } = dto;
+    const { latitude, longitude, people_count, help_request_id } = dto;
     const count = people_count || 1;
 
     // 1. Fetch all active shelters
@@ -136,6 +162,56 @@ export class ShelterService {
         bestMatch.availableBeds = updated.capacity - updated.current_occupancy;
         bestMatch.shelter.current_occupancy = updated.current_occupancy;
         bestMatch.shelter.available_beds = bestMatch.availableBeds;
+
+        // If a help request ID is attached, transition it to ASSIGNED and link shelter
+        if (help_request_id) {
+          try {
+            await this.supabase
+              .from('help_requests')
+              .update({
+                status: 'ASSIGNED',
+                description: bestMatch.shelter.name ? `[Assigned Shelter: ${bestMatch.shelter.name}]` : undefined,
+              })
+              .eq('id', help_request_id);
+
+            // Broadcast request assignment
+            await axios.post(
+              `${config.notificationServiceUrl}/api/notifications/broadcast`,
+              {
+                rooms: ['relief', 'officers'],
+                event: 'relief:updated',
+                payload: {
+                  request_id: help_request_id,
+                  status: 'ASSIGNED',
+                  matched_shelter_id: bestMatch.shelter.id,
+                  matched_shelter_name: bestMatch.shelter.name,
+                },
+              },
+              { timeout: 3000 }
+            );
+          } catch (e: any) {
+            logger.warn(`Could not link help request to shelter assignment: ${e.message}`);
+          }
+        }
+
+        // Broadcast shelter updated event
+        try {
+          await axios.post(
+            `${config.notificationServiceUrl}/api/notifications/broadcast`,
+            {
+              rooms: ['relief', 'officers', 'public'],
+              event: 'relief:shelter_updated',
+              payload: {
+                shelter_id: bestMatch.shelter.id,
+                current_occupancy: bestMatch.shelter.current_occupancy,
+                capacity: bestMatch.shelter.capacity,
+                available_beds: bestMatch.availableBeds,
+                ward_name: bestMatch.shelter.ward_name,
+              },
+            },
+            { timeout: 3000 }
+          );
+        } catch {}
       }
     }
 

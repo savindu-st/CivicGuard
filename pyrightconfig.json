@@ -1,6 +1,17 @@
 {
   "venvPath": ".",
   "venv": ".venv",
+  "extraPaths": [
+    "backend/services/ai-service"
+  ],
+  "executionEnvironments": [
+    {
+      "root": "backend/services/ai-service",
+      "extraPaths": [
+        "backend/services/ai-service"
+      ]
+    }
+  ],
   "include": [
     "backend/services/ai-service"
   ]

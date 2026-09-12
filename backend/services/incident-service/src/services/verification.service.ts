@@ -109,7 +109,9 @@ export class VerificationService {
     );
     analysisResults.push(...aiChecks);
 
-    // --- Signal Aggregation: Compute Composite Score ---
+    // --- Signal Aggregation: Compute Tri-Signal Composite Score (ADR-030) ---
+    // Formula: Image AI (60%) + Location Authenticity (20%) + Weather Telemetry (20%)
+    // Risk Urgency and Cluster Density are retained as operational context (0% scoring weight).
     const scoreMap: Record<string, number> = {};
     for (const res of analysisResults) {
       scoreMap[res.analysis_type] = res.score || 0.5;
@@ -118,9 +120,7 @@ export class VerificationService {
     const compositeScore =
       scoreMap['IMAGE'] * SIGNAL_WEIGHTS.IMAGE_AI +
       scoreMap['LOCATION'] * SIGNAL_WEIGHTS.LOCATION_AI +
-      scoreMap['RISK'] * SIGNAL_WEIGHTS.RISK_AI +
-      scoreMap['WEATHER'] * SIGNAL_WEIGHTS.WEATHER_CHECK +
-      scoreMap['CLUSTER'] * SIGNAL_WEIGHTS.CLUSTER_CHECK;
+      scoreMap['WEATHER'] * SIGNAL_WEIGHTS.WEATHER_CHECK;
 
     // Decision Logic
     let verdictDecision: VerdictDecision = 'NEEDS_VERIFICATION';
@@ -133,7 +133,7 @@ export class VerificationService {
     // Determine Urgency (P1 - P4)
     let urgency: IncidentSeverity = 'MEDIUM';
     const roadType = caseContext?.matchedRoad?.road_type;
-    if (compositeScore >= 0.85 && (roadType === 'HIGHWAY' || roadType === 'PRIMARY')) {
+    if (compositeScore >= VERIFICATION_THRESHOLDS.CONFIRMATION_SCORE && (roadType === 'HIGHWAY' || roadType === 'PRIMARY')) {
       urgency = 'CRITICAL';
     } else if (compositeScore >= 0.70 || roadType === 'SECONDARY') {
       urgency = 'HIGH';
@@ -168,7 +168,10 @@ export class VerificationService {
     caseContext?: CaseContext
   ): Promise<AnalysisResult[]> {
     try {
-      // Attempt call to Python AI Service
+      const roadType = caseContext?.matchedRoad?.road_type || 'SECONDARY';
+      const rainfallRate = Number(caseContext?.latestRainfall?.value || 0);
+
+      // Attempt call to Python AI Service (Gemini 3.5 Flash-Lite multimodal authority)
       const aiResponse = await axios.post(
         `${config.aiServiceUrl}/predict/hazard`,
         {
@@ -177,23 +180,34 @@ export class VerificationService {
           latitude,
           longitude,
           photo_url: photoUrl,
+          road_type: roadType,
+          rainfall_rate_mm_hr: rainfallRate,
         },
-        { timeout: 3000 }
+        { timeout: 15000 }
       );
 
       if (aiResponse.status === 200 && aiResponse.data) {
         const d = aiResponse.data;
+        const isHeuristic = d.verification_engine === 'heuristic_fallback' || d.verification_engine === 'none';
         return [
           {
             id: '',
             incident_id: incidentId,
             analysis_type: 'IMAGE',
-            method: 'AI',
+            method: isHeuristic ? 'HEURISTIC_FALLBACK' : 'AI_GEMINI',
             result: d.image_classification || 'Verified Hazard',
-            score: d.image_score || 0.88,
-            confidence: d.confidence || 0.92,
-            reason: d.image_reason || 'Computer vision verified hazard signature',
-            fallback_used: false,
+            score: d.image_score !== undefined ? d.image_score : 0.88,
+            confidence: d.confidence !== undefined ? d.confidence : 0.92,
+            reason: d.image_reason || 'Gemini 3.5 Flash-Lite verified hazard signature',
+            input_data: {
+              verification_engine: d.verification_engine || 'gemini-3.5-flash-lite',
+              background_detector: d.background_detector || 'yolov8n',
+              depth_benchmark: d.depth_benchmark,
+              detected_objects: d.detected_objects || [],
+              detections: d.detections || [],
+              gemini_status: d.gemini_status || 'ACTIVE',
+            },
+            fallback_used: isHeuristic,
           },
           {
             id: '',
@@ -201,9 +215,12 @@ export class VerificationService {
             analysis_type: 'LOCATION',
             method: 'AI',
             result: 'Valid Geolocation',
-            score: d.location_score || 0.90,
+            score: d.location_score !== undefined ? d.location_score : 0.90,
             confidence: 0.85,
             reason: d.location_reason || 'Scene visual cues match reported GPS coordinates',
+            input_data: {
+              verification_engine: 'location_check_exif_geofence',
+            },
             fallback_used: false,
           },
           {
@@ -212,9 +229,12 @@ export class VerificationService {
             analysis_type: 'RISK',
             method: 'AI',
             result: d.risk_urgency || 'P1',
-            score: d.risk_score || 0.85,
+            score: d.risk_score !== undefined ? d.risk_score : 0.85,
             confidence: 0.90,
             reason: d.risk_reason || 'High exposure to traffic corridor and rising floodwater',
+            input_data: {
+              verification_engine: 'risk_check_multi_factor',
+            },
             fallback_used: false,
           },
         ];

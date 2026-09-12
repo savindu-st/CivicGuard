@@ -9,6 +9,7 @@ router.post('/help-requests', controller.createHelpRequest);
 router.get('/help-requests', controller.getHelpRequests);
 router.get('/help-requests/:id', controller.getHelpRequestById);
 router.patch('/help-requests/:id/status', controller.updateRequestStatus);
+router.post('/simulate-sos', controller.simulateSos);
 
 // Shelter Management & Matching
 router.get('/shelters', controller.getShelters);
@@ -20,5 +21,13 @@ router.post('/match-shelter', controller.matchShelter);
 router.get('/resources', controller.getResources);
 router.post('/resources', controller.addResource);
 router.post('/resources/allocate', controller.allocateResource);
+router.post('/resources/allocate-parcel', controller.allocateMultiResources);
+
+// Community Volunteer Hub
+router.get('/volunteers/opportunities', controller.getVolunteerOpportunities);
+router.post('/volunteers/join', controller.joinVolunteerActivity);
+router.get('/volunteers/my-activities', controller.getMyVolunteerActivities);
+router.get('/volunteers/roster', controller.getVolunteerRoster);
+router.post('/volunteers/check-in', controller.checkInVolunteer);
 
 export default router;

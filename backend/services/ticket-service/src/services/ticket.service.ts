@@ -6,6 +6,7 @@ import {
   TicketCreateDTO,
   TicketPriority,
   TicketStatus,
+  calculateHaversineDistance,
 } from '@civicguard/shared';
 import { CrewService } from './crew.service';
 import { config } from '../config';
@@ -67,12 +68,13 @@ export class TicketService {
     priority?: TicketPriority;
     crew_id?: string;
     officer_id?: string;
+    incident_id?: string;
     limit?: number;
     offset?: number;
   }): Promise<{ tickets: CouncilTicket[]; total: number }> {
     let query = this.supabase
       .from('council_tickets')
-      .select('*, incidents(*, wards(name), roads(name, is_closed)), field_crews(crew_name, availability)', {
+      .select('*, incidents(*, wards(name), roads(name, is_closed)), field_crews(crew_name, availability, latitude, longitude)', {
         count: 'exact',
       })
       .order('created_at', { ascending: false });
@@ -81,6 +83,7 @@ export class TicketService {
     if (filters.priority) query = query.eq('priority', filters.priority);
     if (filters.crew_id) query = query.eq('assigned_crew_id', filters.crew_id);
     if (filters.officer_id) query = query.eq('assigned_officer_id', filters.officer_id);
+    if (filters.incident_id) query = query.eq('incident_id', filters.incident_id);
 
     const limit = filters.limit || 50;
     const offset = filters.offset || 0;
@@ -107,26 +110,68 @@ export class TicketService {
   }
 
   /**
-   * Assigns ticket to field crew and alerts crew mobile terminal.
+   * Assigns ticket to field crew with soft 2 km proximity rule.
    */
-  async assignTicketToCrew(ticketId: string, crewId: string): Promise<CouncilTicket> {
-    // 1. Update ticket status
+  async assignTicketToCrew(
+    ticketId: string,
+    crewId: string,
+    options?: { emergency_override?: boolean; justification?: string }
+  ): Promise<CouncilTicket> {
+    // 1. Proximity Check for Multi-Ticket Co-Assignment (Soft 2 km Rule)
+    const existingTasks = await this.crewService.getCrewTasks(crewId);
+    const activeTasks = existingTasks.filter(
+      (t) => ['ASSIGNED', 'ACCEPTED', 'IN_PROGRESS'].includes(t.status) && t.id !== ticketId
+    );
+
+    if (activeTasks.length > 0) {
+      const targetTicket = await this.getTicketById(ticketId);
+      const targetLat = targetTicket.incident?.latitude;
+      const targetLon = targetTicket.incident?.longitude;
+
+      if (targetLat && targetLon) {
+        for (const task of activeTasks) {
+          const activeLat = task.incidents?.latitude;
+          const activeLon = task.incidents?.longitude;
+          if (activeLat && activeLon) {
+            const distanceKm = calculateHaversineDistance(
+              Number(activeLat),
+              Number(activeLon),
+              Number(targetLat),
+              Number(targetLon)
+            );
+
+            if (distanceKm > 2.0 && !options?.emergency_override) {
+              throw new Error(
+                `Proximity warning: Target incident is ${distanceKm.toFixed(
+                  1
+                )} km away from crew's active assignment (exceeds 2.0 km soft limit). Emergency override required to assign.`
+              );
+            }
+          }
+        }
+      }
+    }
+
+    // 2. Update ticket status
     const { data: ticket, error: ticketErr } = await this.supabase
       .from('council_tickets')
       .update({
         assigned_crew_id: crewId,
         status: 'ASSIGNED',
+        description: options?.justification
+          ? `[OVERRIDE: ${options.justification}]`
+          : undefined,
       })
       .eq('id', ticketId)
-      .select('*, incidents(*)')
+      .select('*, incidents(*, wards(name), roads(name, is_closed)), field_crews(*)')
       .single();
 
     if (ticketErr || !ticket) throw ticketErr || new Error('Ticket update failed');
 
-    // 2. Mark crew as BUSY
+    // 3. Mark crew as BUSY
     await this.crewService.setCrewAvailability(crewId, 'BUSY');
 
-    // 3. Trigger push notification to crew channel & officer room
+    // 4. Trigger push notification to crew channel & officer room
     try {
       await axios.post(
         `${config.notificationServiceUrl}/api/notifications/broadcast`,
@@ -139,6 +184,10 @@ export class TicketService {
             priority: ticket.priority,
             description: ticket.description,
             crew_id: crewId,
+            crew_name: ticket.field_crews?.crew_name,
+            override: options?.emergency_override || false,
+            latitude: ticket.incidents?.latitude,
+            longitude: ticket.incidents?.longitude,
           },
         },
         { timeout: 3000 }
@@ -148,6 +197,64 @@ export class TicketService {
     }
 
     return ticket;
+  }
+
+  /**
+   * Field crew returns a ticket they cannot complete (e.g. equipment failure, impassable road).
+   */
+  async returnTicket(ticketId: string, crewId: string, reason: string): Promise<CouncilTicket> {
+    const ticket = await this.getTicketById(ticketId);
+    if (ticket.assigned_crew_id !== crewId) {
+      throw new Error('This ticket is not assigned to your crew');
+    }
+
+    const updatedDesc = ticket.description
+      ? `${ticket.description} | [RETURNED BY CREW]: ${reason}`
+      : `[RETURNED BY CREW]: ${reason}`;
+
+    const { data, error } = await this.supabase
+      .from('council_tickets')
+      .update({
+        assigned_crew_id: null,
+        status: 'OPEN',
+        description: updatedDesc,
+      })
+      .eq('id', ticketId)
+      .select('*, incidents(*)')
+      .single();
+
+    if (error || !data) throw error || new Error('Ticket return failed');
+
+    // Check remaining tasks before freeing crew availability
+    const remainingTasks = await this.crewService.getCrewTasks(crewId);
+    const stillActive = remainingTasks.some(
+      (t) => t.id !== ticketId && ['ASSIGNED', 'ACCEPTED', 'IN_PROGRESS'].includes(t.status)
+    );
+    if (!stillActive) {
+      await this.crewService.setCrewAvailability(crewId, 'AVAILABLE');
+    }
+
+    // Broadcast alert to officers command desk
+    try {
+      await axios.post(
+        `${config.notificationServiceUrl}/api/notifications/broadcast`,
+        {
+          rooms: ['officers'],
+          event: 'ticket:returned',
+          payload: {
+            ticket_id: ticketId,
+            crew_id: crewId,
+            reason,
+            priority: ticket.priority,
+          },
+        },
+        { timeout: 3000 }
+      );
+    } catch (e: any) {
+      logger.warn(`Could not broadcast ticket:returned: ${e.message}`);
+    }
+
+    return data;
   }
 
   /**
@@ -162,6 +269,7 @@ export class TicketService {
       .single();
 
     if (error || !data) throw error || new Error('Status update failed');
+
 
     try {
       await axios.post(
@@ -185,7 +293,8 @@ export class TicketService {
     ticketId: string,
     photoUrl: string,
     notes?: string,
-    userId?: string
+    userId?: string,
+    options?: { sitrep_notes?: string; evacuated_count?: number }
   ): Promise<CouncilTicket> {
     if (!photoUrl || photoUrl.length < 5) {
       throw new Error('Mandatory resolution proof photo is required to close ticket (ADR-005)');
@@ -202,23 +311,37 @@ export class TicketService {
       evidence_type: 'COMPLETION_PHOTO',
     });
 
-    // 3. Mark ticket COMPLETED
+    // 3. Mark ticket COMPLETED and save sitrep data
+    const updatePayload: Record<string, any> = {
+      status: 'COMPLETED',
+      completed_at: new Date().toISOString(),
+      description: notes ? `${ticket.description || ''} | Resolution Notes: ${notes}` : ticket.description,
+    };
+    if (options?.sitrep_notes) {
+      updatePayload.sitrep_notes = options.sitrep_notes;
+    }
+    if (options?.evacuated_count !== undefined) {
+      updatePayload.evacuated_count = options.evacuated_count;
+    }
+
     const { data: updatedTicket, error: updateErr } = await this.supabase
       .from('council_tickets')
-      .update({
-        status: 'COMPLETED',
-        completed_at: new Date().toISOString(),
-        description: notes ? `${ticket.description || ''} | Resolution Notes: ${notes}` : ticket.description,
-      })
+      .update(updatePayload)
       .eq('id', ticketId)
       .select()
       .single();
 
     if (updateErr) throw updateErr;
 
-    // 4. Free field crew availability back to AVAILABLE
+    // 4. Free field crew availability back to AVAILABLE only if no other active tasks remain
     if (ticket.assigned_crew_id) {
-      await this.crewService.setCrewAvailability(ticket.assigned_crew_id, 'AVAILABLE');
+      const remainingTasks = await this.crewService.getCrewTasks(ticket.assigned_crew_id);
+      const stillActive = remainingTasks.some(
+        (t) => t.id !== ticketId && ['ASSIGNED', 'ACCEPTED', 'IN_PROGRESS'].includes(t.status)
+      );
+      if (!stillActive) {
+        await this.crewService.setCrewAvailability(ticket.assigned_crew_id, 'AVAILABLE');
+      }
     }
 
     // 5. Call incident-service RPC to set incident status to RESOLVED (which automatically reopens road)
