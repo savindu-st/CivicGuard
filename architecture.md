@@ -653,4 +653,23 @@ stateDiagram-v2
   - Council Officer Command Center displays accurate, model-derived forensic explanations and depth benchmarks.
   - Preserves zero-impact isolation of YOLOv8 background object detections for tactical UI display.
 
+### ADR-033: Streamlining Public Map UI by Decoupling Standalone Photo Scanner Portal
+
+- **Date**: 2026-09-13
+- **Status**: Accepted
+- **Context**:
+  The public map page (`PublicHazardSafeRouteMap.tsx`) previously featured two parallel entry points for photo analysis: a standalone "AI Photo Scanner" modal (`CitizenPhotoScanPortal.tsx`) triggered via both a floating bottom action button and a top-ticker button, alongside the official "REPORT HAZARD ⚠️" workflow (`CitizenHazardReportModal.tsx`). During active disaster events, multiple competing calls-to-action created cognitive load and blurred the distinction between testing vision models and filing authoritative hazard reports.
+- **Decision**:
+  1. **Public Map UI Decoupling**:
+     - Removed the floating bottom action button (`AI PHOTO SCANNER ⚡`) and the top telemetry ticker button (`Scan Photo with Gemini AI ⚡`) from `PublicHazardSafeRouteMap.tsx`.
+     - Centered the single, primary `REPORT HAZARD ⚠️` floating action button with its animated warning gradient.
+     - Unmounted `CitizenPhotoScanPortal` from the public map page, while retaining `CitizenPhotoScanPortal.tsx` in `web/src/components/incidents/` unmounted for administrative/staff testing.
+  2. **Consolidated Citizen Reporting Integrity**:
+     - All citizen photo uploads and multimodal AI verifications are consolidated into `CitizenHazardReportModal.tsx`, which retains its camera/file upload, optional inline confidence check, and automated Gemini 3.5 Flash-Lite verification upon report submission.
+     - Preserved backend scan endpoints (`/api/incidents/scan-photo`, `/predict/scan-upload`) with zero regressions.
+- **Consequences**:
+  - Eliminates visual clutter on the public disaster map, focusing citizen interactions on safe detour navigation and direct emergency reporting.
+  - Retains 100% multimodal verification fidelity through the primary incident reporting pipeline.
+
+
 
