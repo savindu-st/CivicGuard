@@ -11,11 +11,13 @@ import {
   Building2,
   ExternalLink,
   Home,
+  Compass,
 } from 'lucide-react';
 import { useAuthStore, RoleName } from './store/authStore';
 import { FieldCrewPortal } from './pages/crew/FieldCrewPortal';
 import { CouncilOfficerControlCenter } from './pages/officer/CouncilOfficerControlCenter';
 import { ReliefLogisticsDesk } from './pages/relief/ReliefLogisticsDesk';
+import { PublicHazardSafeRouteMap } from './pages/public/PublicHazardSafeRouteMap';
 
 const OperationsOverview: React.FC = () => {
   return (
@@ -72,6 +74,31 @@ const OperationsOverview: React.FC = () => {
             </Link>
           </div>
         </div>
+      </div>
+
+      {/* Public Hazard & Safe Route Map Launch Banner */}
+      <div className="glass-panel p-6 bg-gradient-to-r from-rose-950/40 via-dark-850 to-amber-950/30 border border-rose-500/30 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="badge-critical">CIVIC RESILIENCE & EVACUATION</span>
+            <span className="text-xs text-slate-400">• Section 3.4 Public Hazard & Safe Route Map</span>
+          </div>
+          <h2 className="text-lg font-extrabold text-white">
+            Interactive Disaster Hazard Viewer & Safe Detour Corridor
+          </h2>
+          <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+            Real-time severity-scaled flood perimeters (100m–350m), closed road overlays, one-click citizen hazard reporting with interactive GPS pin-drop and photo proof, and automated safe detour routing bypassing impassable road segments to nearest relief shelters.
+          </p>
+        </div>
+
+        <Link
+          to="/map"
+          className="px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs tracking-wide shadow-lg shadow-rose-600/30 flex items-center gap-2 flex-shrink-0 transition-all border border-rose-400"
+        >
+          <Compass className="w-4 h-4" />
+          <span>Launch Public Map</span>
+          <ExternalLink className="w-3.5 h-3.5" />
+        </Link>
       </div>
 
       {/* Relief Logistics Desk Launch Banner */}
@@ -268,6 +295,17 @@ const NavigationHeader: React.FC = () => {
             <Home className="w-3.5 h-3.5" />
             <span>Relief Logistics Desk</span>
           </Link>
+          <Link
+            to="/map"
+            className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
+              location.pathname === '/map' || location.pathname === '/public'
+                ? 'bg-rose-600 text-white border border-rose-400 shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>Public Hazard Map</span>
+          </Link>
         </nav>
       </div>
 
@@ -323,6 +361,8 @@ export const App: React.FC = () => {
         <NavigationHeader />
         <Routes>
           <Route path="/" element={<OperationsOverview />} />
+          <Route path="/map" element={<PublicHazardSafeRouteMap />} />
+          <Route path="/public" element={<PublicHazardSafeRouteMap />} />
           <Route path="/officer" element={<CouncilOfficerControlCenter />} />
           <Route path="/crew" element={<FieldCrewPortal />} />
           <Route path="/relief" element={<ReliefLogisticsDesk />} />

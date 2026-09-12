@@ -339,6 +339,18 @@ flowchart TB
   5. **Dynamic Proximity Vectors & High-Priority Distress Interception**: Selecting an SOS request renders an animated dashed proximity vector connecting the citizen to the nearest qualifying shelter with live distance and travel ETA. Incoming P1 calls trigger a persistent pulsating red emergency banner with one-click "Pinpoint Distress GPS" camera navigation.
 - **Consequences**: Zero involuntary family separation; elimination of shelter bed over-allocation; instantaneous spatial awareness for humanitarian relief coordinators; seamless end-to-end integration across Kong Gateway, microservices, and web frontend.
 
+### ADR-021: Public Disaster Hazard Viewer, Dual-Mode Pin-Drop Ingestion, and Reactive Evacuation Corridor Routing Engine
+- **Date**: 2026-09-12
+- **Status**: Accepted
+- **Context**: During severe monsoon flooding (e.g., Kelani River overflows, Colombo canal backflow), citizens need immediate access to verified hazard zones and road closures without authentication hurdles. Stranded motorists require safe detours around submerged roads, while citizens on the ground need to report emerging hazards with accurate GPS pin-drop and photo proof to accelerate council response.
+- **Decision**:
+  1. **Open Public Portal (`/map`)**: Establish a dedicated, high-performance public disaster route at `/map` (with alias `/public`) accessible without credentials, with automatic persona attribute fill-in for authenticated citizens.
+  2. **Multi-Layer Leaflet Map (`PublicHazardMap.tsx`)**: Leverage `mapConfig.ts` with watermark-free Esri World Dark Gray Canvas tiles rendering severity-scaled pulsing circular danger buffers (100m–350m: Red for Critical, Orange for High, Amber for Medium) around active hazards, glowing red closed road segment polylines with barrier badges (`⛔ CLOSED`), and emergency shelter nodes.
+  3. **Dual-Mode Hazard Reporting Modal (`CitizenHazardReportModal.tsx`)**: Provide one-click HTML5 device geolocation, interactive "Drop Pin on Map" click-to-pin coordinate selection, Colombo/Kandy hazard hotspot presets, 4-tier flood depth benchmark selector (`SURFACE_PUDDLE` to `SUBMERGED_VEHICLES`), photo capture/upload (< 10MB), and an animated 5-signal AI verification progress stepper before flying the map camera to the registered incident.
+  4. **Reactive Evacuation Corridor Routing (`SafeRoutePlanner.tsx`)**: Integrate with `incident-service`'s `POST /api/incidents/routes/safe-path` for point-to-point routing, a one-click **"Evacuate to Nearest Safe Shelter"** action that evaluates candidate centers via `POST /api/relief/match-shelter` and calculates safe bypasses around closed roads, and automated real-time rerouting listening to Socket.IO `road:closed` events.
+  5. **Crowdsourced Corroboration Loop (ADR-012)**: Embed "Confirm 👍" and "Refute 👎" voting controls on public hazard cards to dynamically adjust confidence scores and auto-promote to `CONFIRMED` when threshold $\ge 0.85$ is reached.
+- **Consequences**: Zero barrier to access for vulnerable populations; proactive protection against vehicle inundation; rapid crowdsourced intelligence for municipal dispatchers; complete closed-loop integration across Kong Gateway, backend microservices, and the frontend web client.
+
 ---
 
 ## 5. Database Schema & Data Models Overview
