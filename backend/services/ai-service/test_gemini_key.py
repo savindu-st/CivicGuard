@@ -37,7 +37,11 @@ try:
     from google import genai
 except ImportError:
     print("❌ ERROR: 'google-genai' package is not installed.")
-    print("Run: pip install google-genai")
+    venv_py = Path(__file__).resolve().parent / ".venv" / "bin" / "python"
+    if venv_py.exists():
+        print(f"💡 Found virtual environment. Run with:\n    {venv_py} {Path(__file__).name}")
+    else:
+        print("Run: pip install google-genai")
     sys.exit(1)
 
 target_model = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
@@ -49,12 +53,23 @@ try:
         model=target_model,
         contents="Respond with: CIVIC_GUARD_ONLINE"
     )
-    result_text = response.text.strip()
-    print("✅ CONNECTION SUCCESSFUL!")
-    print(f"• Model: {target_model}")
-    print(f"• Response from Gemini: {result_text}")
-    print("=" * 60)
-    print("🎉 Your Gemini API key is valid and working!\n")
+    if response.text is not None:
+        result_text = response.text.strip()
+        print("✅ CONNECTION SUCCESSFUL!")
+        print(f"• Model: {target_model}")
+        print(f"• Response from Gemini: {result_text}")
+        print("=" * 60)
+        print("🎉 Your Gemini API key is valid and working!\n")
+    else:
+        finish_reason = None
+        if response.candidates and len(response.candidates) > 0:
+            finish_reason = getattr(response.candidates[0], "finish_reason", None)
+        print("⚠️ API CALL SUCCEEDED BUT RETURNED NO TEXT:")
+        print(f"• Model: {target_model}")
+        print(f"• Finish Reason: {finish_reason}")
+        print(f"• Raw Response: {response}")
+        print("=" * 60 + "\n")
+        sys.exit(1)
 except Exception as e:
     print(f"❌ API CALL FAILED: {e}")
     print("=" * 60 + "\n")
