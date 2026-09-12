@@ -23,6 +23,7 @@ import { SosTriageQueue } from '../../components/relief/SosTriageQueue';
 import { ShelterNetworkMap } from '../../components/relief/ShelterNetworkMap';
 import { NearestShelterMatcherModal } from '../../components/relief/NearestShelterMatcherModal';
 import { EmergencySuppliesModal } from '../../components/relief/EmergencySuppliesModal';
+import { VolunteerRosterDesk } from '../../components/relief/VolunteerRosterDesk';
 
 export const ReliefLogisticsDesk: React.FC = () => {
   const { user } = useAuthStore();
@@ -37,8 +38,21 @@ export const ReliefLogisticsDesk: React.FC = () => {
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
   const [selectedShelterId, setSelectedShelterId] = useState<string | null>(null);
 
-  // View Mode: Split-Screen Triage vs Registry Table
-  const [viewMode, setViewMode] = useState<'TRIAGE' | 'REGISTRY'>('TRIAGE');
+  // View Mode: Split-Screen Triage vs Registry Table vs Volunteer Forces
+  const [viewMode, setViewMode] = useState<'TRIAGE' | 'REGISTRY' | 'VOLUNTEERS'>('TRIAGE');
+
+  // Volunteer Forces State
+  const [volunteerRoster, setVolunteerRoster] = useState<any[]>([]);
+  const [shelterVolunteerStats, setShelterVolunteerStats] = useState<any[]>([]);
+  const [volunteerSummary, setVolunteerSummary] = useState<{
+    total_registered: number;
+    total_onsite: number;
+    total_completed: number;
+  }>({
+    total_registered: 0,
+    total_onsite: 0,
+    total_completed: 0,
+  });
 
   // Modal States
   const [isMatcherOpen, setIsMatcherOpen] = useState<boolean>(false);
@@ -56,19 +70,26 @@ export const ReliefLogisticsDesk: React.FC = () => {
   // Fetch all core relief logistics data
   const fetchReliefData = useCallback(async () => {
     try {
-      const [sheltersRes, requestsRes, resourcesRes] = await Promise.all([
+      const [sheltersRes, requestsRes, resourcesRes, rosterRes] = await Promise.all([
         api.get('/api/relief/shelters'),
         api.get('/api/relief/help-requests?limit=100'),
         api.get('/api/relief/resources'),
+        api.get('/api/relief/volunteers/roster'),
       ]);
 
       const fetchedShelters = sheltersRes.data?.data?.shelters || [];
       const fetchedRequests = requestsRes.data?.data?.requests || [];
       const fetchedResources = resourcesRes.data?.data?.resources || [];
+      const rosterData = rosterRes.data?.data || {};
 
       setShelters(fetchedShelters);
       setRequests(fetchedRequests);
       setResources(fetchedResources);
+      setVolunteerRoster(rosterData.roster || []);
+      setShelterVolunteerStats(rosterData.shelter_breakdowns || []);
+      if (rosterData.summary) {
+        setVolunteerSummary(rosterData.summary);
+      }
 
       // Check if there is an active pending P1 request
       const topP1 = fetchedRequests.find(
@@ -330,6 +351,15 @@ export const ReliefLogisticsDesk: React.FC = () => {
               <Home className="w-3 h-3" />
               <span>Shelter Registry ({shelters.length})</span>
             </button>
+            <button
+              onClick={() => setViewMode('VOLUNTEERS')}
+              className={`px-3 py-1 rounded-md font-semibold text-xs transition-all flex items-center gap-1.5 ${
+                viewMode === 'VOLUNTEERS' ? 'bg-white text-emerald-800 shadow-sm border border-slate-200/50 font-bold' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Volunteer Forces ({volunteerSummary.total_onsite}/{volunteerSummary.total_registered})</span>
+            </button>
           </div>
 
           <button
@@ -449,6 +479,15 @@ export const ReliefLogisticsDesk: React.FC = () => {
               />
             </div>
           </div>
+        ) : viewMode === 'VOLUNTEERS' ? (
+          /* Volunteer Forces & Attendance Roster View */
+          <VolunteerRosterDesk
+            roster={volunteerRoster}
+            shelterBreakdowns={shelterVolunteerStats}
+            summary={volunteerSummary}
+            onRefresh={fetchReliefData}
+            onOpenSuppliesForShelter={handleOpenSuppliesForShelter}
+          />
         ) : (
           /* Shelter & Warehouse Registry Management Table */
           <div className="flex-1 bg-white rounded-2xl border border-slate-200 p-6 space-y-6 overflow-y-auto shadow-sm">

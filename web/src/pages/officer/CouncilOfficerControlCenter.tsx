@@ -14,6 +14,8 @@ import {
   Layers,
   ArrowRight,
   ExternalLink,
+  ChevronDown,
+  Building2,
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
@@ -22,9 +24,27 @@ import { OfficerTacticalMap } from '../../components/map/OfficerTacticalMap';
 import { HazardTriageGrid } from '../../components/incidents/HazardTriageGrid';
 import { IncidentCommandInspector } from '../../components/incidents/IncidentCommandInspector';
 import { RoadClosureManager } from '../../components/incidents/RoadClosureManager';
+import { DistrictCrewRoster } from '../../components/crews/DistrictCrewRoster';
+
+const SRI_LANKA_DISTRICTS = [
+  'Colombo', 'Gampaha', 'Kalutara',
+  'Kandy', 'Matale', 'Nuwara Eliya',
+  'Galle', 'Matara', 'Hambantota',
+  'Jaffna', 'Kilinochchi', 'Mannar', 'Vavuniya', 'Mullaitivu',
+  'Batticaloa', 'Ampara', 'Trincomalee',
+  'Kurunegala', 'Puttalam',
+  'Anuradhapura', 'Polonnaruwa',
+  'Badulla', 'Monaragala',
+  'Ratnapura', 'Kegalle'
+];
 
 export const CouncilOfficerControlCenter: React.FC = () => {
   const { user } = useAuthStore();
+
+  // District Jurisdiction
+  const [selectedDistrict, setSelectedDistrict] = useState<string>(
+    (user as any)?.district || 'Colombo'
+  );
 
   // Data states
   const [incidents, setIncidents] = useState<any[]>([]);
@@ -41,8 +61,8 @@ export const CouncilOfficerControlCenter: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null);
 
-  // Sub-view mode (Triage vs Full Roads)
-  const [viewMode, setViewMode] = useState<'TRIAGE' | 'ROADS'>('TRIAGE');
+  // Sub-view mode (Triage vs Full Roads vs Tactical Crews)
+  const [viewMode, setViewMode] = useState<'TRIAGE' | 'ROADS' | 'CREWS'>('TRIAGE');
   const [liveAlertToast, setLiveAlertToast] = useState<string | null>(null);
   const [activeSosAlert, setActiveSosAlert] = useState<any | null>(null);
 
@@ -53,7 +73,7 @@ export const CouncilOfficerControlCenter: React.FC = () => {
         api.get('/api/incidents?limit=100'),
         api.get('/api/incidents/wards'),
         api.get('/api/incidents/roads'),
-        api.get('/api/tickets/crews'),
+        api.get(`/api/tickets/crews?district=${selectedDistrict}`),
         api.get('/api/tickets?limit=100'),
       ]);
 
@@ -67,7 +87,7 @@ export const CouncilOfficerControlCenter: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [selectedDistrict]);
 
   useEffect(() => {
     fetchOperationsData();
@@ -78,124 +98,115 @@ export const CouncilOfficerControlCenter: React.FC = () => {
     onEvent: (event, payload) => {
       if (event === 'crew:sos') {
         setActiveSosAlert(payload);
-        setLiveAlertToast(`🚨 EMERGENCY DISTRESS: Crew ${payload.crew_name || payload.crew_id} transmitted SOS!`);
+      } else if (event === 'incident:created' || event === 'incident:verified') {
         fetchOperationsData();
-        return;
-      }
-
-      if (
-        [
-          'hazard:new',
-          'hazard:updated',
-          'hazard:resolved',
-          'ticket:assigned',
-          'ticket:status_changed',
-          'road:closed',
-          'road:reopened',
-          'crew:location_updated',
-          'crew:availability_changed',
-          'corroboration:vote',
-          'crew:sos',
-        ].includes(event)
-      ) {
+        setLiveAlertToast(`⚡ New Ground Incident: ${payload?.title || 'Report Ingested'}`);
+      } else if (event === 'road:closed' || event === 'road:reopened') {
         fetchOperationsData();
-
-        if (event === 'hazard:new') {
-          setLiveAlertToast('🚨 New Citizen Hazard Ingested for Triage');
-        } else if (event === 'ticket:assigned') {
-          setLiveAlertToast('👷 Field Crew Dispatched to Emergency Scene');
-        } else if (event === 'road:closed') {
-          setLiveAlertToast('⛔ Road Closure Enforced on Public Disaster Map');
-        } else if (event === 'hazard:resolved') {
-          setLiveAlertToast('✓ Hazard Resolved & Road Reopened by Crew Photo Proof');
-        }
-
-        setTimeout(() => setLiveAlertToast(null), 5000);
+      } else if (event === 'ticket:completed' || event === 'crew:availability_changed') {
+        fetchOperationsData();
       }
     },
   });
 
-  // Calculate top KPI statistics
-  const activeHazardsCount = incidents.filter((i) =>
-    ['CONFIRMED', 'IN_PROGRESS', 'DISPATCHED'].includes(i.status)
+  // Fast Crew Dispatch Action
+  const handleDispatchCrew = async (crewId: string, incidentId: string) => {
+    try {
+      await api.post('/api/tickets', {
+        incident_id: incidentId,
+        assigned_crew_id: crewId,
+        priority: 'HIGH',
+        description: `Official command dispatch by ${selectedDistrict} District Officer`,
+      });
+      setLiveAlertToast('🚀 Field Response Crew Dispatched Successfully!');
+      fetchOperationsData();
+    } catch (err: any) {
+      console.error('Failed to dispatch crew:', err);
+      alert(err.response?.data?.message || 'Failed to dispatch squad');
+    }
+  };
+
+  // KPI calculations
+  const pendingTriageCount = incidents.filter(
+    (i) => i.status === 'REPORTED' || i.status === 'VERIFYING'
   ).length;
-  const needsVerificationCount = incidents.filter((i) => i.status === 'NEEDS_VERIFICATION').length;
+  const verifiedHazardsCount = incidents.filter((i) => i.status === 'VERIFIED').length;
   const closedRoadsCount = roads.filter((r) => r.is_closed).length;
   const activeCrewsCount = crews.filter((c) => c.availability === 'BUSY').length;
+  const availableCrewsCount = crews.filter((c) => c.availability === 'AVAILABLE').length;
 
   const selectedIncident = incidents.find((i) => i.id === selectedIncidentId);
 
   return (
-    <div className="flex-1 flex flex-col min-h-screen bg-slate-50 text-slate-900">
-      {/* 1. Top KPI Command Ribbon */}
-      <div className="border-b border-slate-200 bg-white/95 backdrop-blur-md px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
-        {/* Left: Branding & Role info */}
+    <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900 font-sans">
+      {/* 1. Command Header Bar */}
+      <div className="bg-white border-b border-slate-200 px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-30 shadow-xs">
+        {/* Left: District Command Branding & Switcher */}
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700">
-            <ShieldAlert className="w-5 h-5" />
+          <div className="p-2 rounded-xl bg-slate-900 text-white shadow-xs">
+            <ShieldAlert className="w-6 h-6 text-blue-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-black text-slate-900 tracking-wide uppercase">
-                Council Officer Control Center
+              <h1 className="text-base font-extrabold text-slate-900 tracking-tight">
+                CivicGuard Tactical Command Desk
               </h1>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                <Radio className="w-2.5 h-2.5" />
-                <span>LIVE COMMAND</span>
+              <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wide">
+                Officer Console
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 font-medium">
-              Ward Triage • 5-Signal AI Verification • Tactical Crew Dispatch • Road Closures
-            </p>
+
+            {/* District Jurisdiction Selector */}
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <Building2 className="w-3.5 h-3.5 text-slate-400" />
+              <span className="text-xs text-slate-500 font-medium">District Jurisdiction:</span>
+              <select
+                value={selectedDistrict}
+                onChange={(e) => setSelectedDistrict(e.target.value)}
+                className="text-xs font-bold text-blue-900 bg-blue-50/80 border border-blue-200 rounded-md px-2 py-0.5 cursor-pointer hover:bg-blue-100 transition-colors focus:ring-2 focus:ring-blue-500"
+              >
+                {SRI_LANKA_DISTRICTS.map((d) => (
+                  <option key={d} value={d}>
+                    {d} District Command (10 Squads)
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Center: Live KPI Counters */}
-        <div className="hidden lg:flex items-center gap-6">
-          <div className="flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-            <div>
-              <div className="text-[10px] text-slate-500 font-semibold uppercase">Active Hazards</div>
-              <div className="text-sm font-black text-slate-900">{activeHazardsCount} Verified</div>
-            </div>
-          </div>
-
-          <div className="h-6 w-px bg-slate-200"></div>
-
+        {/* Center: Real-time Tactical KPIs */}
+        <div className="flex items-center gap-4 lg:gap-6 text-xs">
           <div className="flex items-center gap-2.5">
             <div className="p-1 rounded bg-amber-50 text-amber-600 border border-amber-200">
               <Activity className="w-3.5 h-3.5" />
             </div>
             <div>
-              <div className="text-[10px] text-slate-500 font-semibold uppercase">Review Queue</div>
-              <div className="text-sm font-black text-amber-700">
-                {needsVerificationCount} Needs Action
-              </div>
+              <div className="text-[10px] text-slate-500 font-semibold uppercase">Pending Triage</div>
+              <div className="text-sm font-black text-slate-900">{pendingTriageCount}</div>
             </div>
           </div>
-
-          <div className="h-6 w-px bg-slate-200"></div>
 
           <div className="flex items-center gap-2.5">
-            <div className="p-1 rounded bg-red-50 text-red-600 border border-red-200">
-              <Ban className="w-3.5 h-3.5" />
+            <div className="p-1 rounded bg-rose-50 text-rose-600 border border-rose-200">
+              <AlertTriangle className="w-3.5 h-3.5" />
             </div>
             <div>
-              <div className="text-[10px] text-slate-500 font-semibold uppercase">Closed Roads</div>
-              <div className="text-sm font-black text-slate-900">{closedRoadsCount} Segments</div>
+              <div className="text-[10px] text-slate-500 font-semibold uppercase">Verified Hazards</div>
+              <div className="text-sm font-black text-slate-900">{verifiedHazardsCount}</div>
             </div>
           </div>
-
-          <div className="h-6 w-px bg-slate-200"></div>
 
           <div className="flex items-center gap-2.5">
             <div className="p-1 rounded bg-blue-50 text-blue-600 border border-blue-200">
               <Users className="w-3.5 h-3.5" />
             </div>
             <div>
-              <div className="text-[10px] text-slate-500 font-semibold uppercase">Deployed Crews</div>
+              <div className="text-[10px] text-slate-500 font-semibold uppercase">
+                {selectedDistrict} Squads
+              </div>
               <div className="text-sm font-black text-slate-900">
-                {activeCrewsCount} / {crews.length} Active
+                {availableCrewsCount} / {crews.length} Ready
               </div>
             </div>
           </div>
@@ -215,6 +226,17 @@ export const CouncilOfficerControlCenter: React.FC = () => {
               Hazard Triage & Map
             </button>
             <button
+              onClick={() => setViewMode('CREWS')}
+              className={`px-3 py-1 rounded-lg font-semibold transition-all flex items-center gap-1.5 ${
+                viewMode === 'CREWS'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Users className="w-3 h-3" />
+              <span>Tactical Crews ({crews.length})</span>
+            </button>
+            <button
               onClick={() => setViewMode('ROADS')}
               className={`px-3 py-1 rounded-lg font-semibold transition-all flex items-center gap-1.5 ${
                 viewMode === 'ROADS'
@@ -223,7 +245,7 @@ export const CouncilOfficerControlCenter: React.FC = () => {
               }`}
             >
               <Ban className="w-3 h-3" />
-              <span>Roads Network ({closedRoadsCount})</span>
+              <span>Roads ({closedRoadsCount})</span>
             </button>
           </div>
 
@@ -237,7 +259,7 @@ export const CouncilOfficerControlCenter: React.FC = () => {
         </div>
       </div>
 
-      {/* Critical Emergency SOS Distress Banner - Clean High-Priority Alert Card */}
+      {/* Critical Emergency SOS Distress Banner */}
       {activeSosAlert && (
         <div className="bg-white border-l-4 border-l-red-600 border-b border-slate-200 px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-md z-20">
           <div className="flex items-center gap-3.5">
@@ -257,16 +279,15 @@ export const CouncilOfficerControlCenter: React.FC = () => {
                 {activeSosAlert.crew_name || 'Field Response Unit'} — {activeSosAlert.message}
               </h2>
               <p className="text-xs text-slate-600">
-                Distress GPS: <span className="font-mono font-bold text-slate-900">{Number(activeSosAlert.latitude).toFixed(5)}, {Number(activeSosAlert.longitude).toFixed(5)}</span> • Immediate rescue backup required!
+                Distress GPS: <span className="font-mono font-bold text-slate-900">{Number(activeSosAlert.latitude).toFixed(5)}, {Number(activeSosAlert.longitude).toFixed(5)}</span> — Immediate rescue backup required!
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => {
-                setSelectedIncidentId(null);
-                setActiveSosAlert({ ...activeSosAlert, focusTrigger: Date.now() });
+                setViewMode('TRIAGE');
               }}
               className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5"
             >
@@ -317,7 +338,6 @@ export const CouncilOfficerControlCenter: React.FC = () => {
             onSelectRoad={(roadId) => {
               const road = roads.find((r) => r.id === roadId);
               if (road) {
-                // If road has associated incident, select it
                 const linkedInc = incidents.find((i) => i.road_id === road.id);
                 if (linkedInc) {
                   setSelectedIncidentId(linkedInc.id);
@@ -330,18 +350,29 @@ export const CouncilOfficerControlCenter: React.FC = () => {
           />
         </div>
 
-        {/* Right Pane (50% desktop): Master-Detail Inspector / Triage Grid / Roads */}
+        {/* Right Pane (50% desktop): Master-Detail Inspector / Triage Grid / Crews / Roads */}
         <div className="lg:col-span-6 flex flex-col h-full min-h-[500px]">
           {viewMode === 'ROADS' ? (
             <RoadClosureManager
               roads={roads}
               onRoadUpdated={fetchOperationsData}
               onSelectRoadOnMap={(road) => {
-                // Pan map to road by selecting any linked incident
                 const linkedInc = incidents.find((i) => i.road_id === road.id);
                 if (linkedInc) {
                   setSelectedIncidentId(linkedInc.id);
                 }
+              }}
+            />
+          ) : viewMode === 'CREWS' ? (
+            <DistrictCrewRoster
+              crews={crews}
+              selectedDistrict={selectedDistrict}
+              incidents={incidents}
+              selectedIncidentId={selectedIncidentId}
+              onDispatchCrew={handleDispatchCrew}
+              onSelectIncident={(id) => {
+                setSelectedIncidentId(id);
+                setViewMode('TRIAGE');
               }}
             />
           ) : selectedIncident ? (

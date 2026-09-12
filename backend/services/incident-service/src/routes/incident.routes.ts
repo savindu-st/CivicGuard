@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { IncidentController } from '../controllers/incident.controller';
-import { generateDemoToken, RoleName, sendSuccess, sendError } from '@civicguard/shared';
+import { generateDemoToken, RoleName, sendSuccess, sendError, authMiddleware } from '@civicguard/shared';
 
 const router = Router();
 const controller = new IncidentController();
@@ -28,6 +28,11 @@ router.get('/:id', controller.getIncidentById);
 router.post('/:id/corroborate', controller.corroborateIncident);
 router.post('/:id/verify', controller.manualVerify);
 router.patch('/:id/status', controller.updateStatus);
+
+// --- User Authentication & Session Endpoints ---
+router.post('/auth/register', controller.registerUser);
+router.post('/auth/login', controller.loginUser);
+router.get('/auth/me', authMiddleware, controller.getCurrentUser);
 
 // --- Demo Token Generator Endpoint (ADR-010) ---
 router.post('/auth/demo-token', (req, res) => {

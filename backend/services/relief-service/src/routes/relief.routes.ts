@@ -23,4 +23,11 @@ router.post('/resources', controller.addResource);
 router.post('/resources/allocate', controller.allocateResource);
 router.post('/resources/allocate-parcel', controller.allocateMultiResources);
 
+// Community Volunteer Hub
+router.get('/volunteers/opportunities', controller.getVolunteerOpportunities);
+router.post('/volunteers/join', controller.joinVolunteerActivity);
+router.get('/volunteers/my-activities', controller.getMyVolunteerActivities);
+router.get('/volunteers/roster', controller.getVolunteerRoster);
+router.post('/volunteers/check-in', controller.checkInVolunteer);
+
 export default router;

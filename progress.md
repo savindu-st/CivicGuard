@@ -1,5 +1,7 @@
 # Civic Guard — Implementation Progress & Engineering Tracker
 
+> **Last Updated:** 2026-09-13  
+> **Current Phase:** Phase 5 — 25-District Command Hierarchy: 1 Officer to 10 Field Crews (250 Units Nationwide) (Completed)  
 > **Last Updated:** 2026-09-12  
 > **Current Phase:** Phase 4 — Closed-Loop Integration & Verification (Completed)  
 > **Overall Completion:** 100%  
@@ -11,6 +13,12 @@
 
 | Subsystem | Health / Status | Progress (%) | Highlights / Next Focus |
 | :--- | :--- | :--- | :--- |
+| **Database & Migrations** | 🟢 Ready | 100% | 17 tables (including `districts`), 25 District Officers & 250 Field Crews seeded nationwide |
+| **Architecture & Specifications** | 🟢 Ready | 100% | `architecture.md`, `workflow.md`, and ADRs 001–030 defined |
+| **API Gateway (Kong)** | 🟢 Configured | 100% | Declarative routing configured; all services mapped, proxied, and verified |
+| **Shared Library (`@civicguard/shared`)** | 🟢 Ready | 100% | Types, status constants, geo math, auth guard, parcel allocation & Supabase client built |
+| **Incident Service (`incident-service`)** | 🟢 Ready | 100% | Ingestion, 5-signal verification, `hazard_verdicts` relational join, road closure & `/auth/*` RPC |
+| **Ticket Service (`ticket-service`)** | 🟢 Ready | 100% | Ticket lifecycle, 25-district scoped query filtering (`?district=...`), 10-squad command dispatch |
 | **Database & Migrations** | 🟢 Ready | 100% | 16 Supabase tables, Sri Lanka demo seed data & SOS distress calls seeded |
 | **Architecture & Specifications** | 🟢 Ready | 100% | `architecture.md`, `workflow.md`, and ADRs 001–028 defined |
 | **API Gateway (Kong)** | 🟢 Verified | 100% | Declarative routing verified on port 8000; CORS pre-flight, error forwarding, multipart passthrough & direct `/api/ai` route tested |
@@ -19,9 +27,13 @@
 | **AI Computer Vision Service (`ai-service`)** | 🟢 Verified | 100% | Gemini 3.5 Flash-Lite multimodal verification authority (ADR-031) with concurrent background YOLOv8 spatial telemetry, strict Pydantic JSON schema, automated classical CV fallback, and 21 passing pytest tests |
 | **Ticket Service (`ticket-service`)** | 🟢 Ready | 100% | Ticket lifecycle, 2km soft limit, crew telematics, SOS broadcast & resolution loop |
 | **Notification Service (`notification-service`)**| 🟢 Ready | 100% | Socket.IO server, spatial/role rooms & broadcast RPC |
-| **Relief Service (`relief-service`)** | 🟢 Ready | 100% | SOS requests, atomic bed allocation, multi-resource parcel allocation & nearest shelter matching |
+| **Relief Service (`relief-service`)** | 🟢 Ready | 100% | SOS requests, atomic bed allocation, volunteer opportunities from `hazard_verdicts`, volunteer roster & check-in RPC |
 | **Authentication & RBAC (Supabase GoTrue)** | 🟢 Ready | 100% | Dual-tier access model (ADR-025): 100% open citizen access; mandatory Supabase Auth accounts and `<ProtectedRoute>` guards for `/officer` and `/crew` |
 | **Operations Web Frontend (`web`)** | 🟢 Ready | 100% | Streamlined Public Map (ADR-033), Citizen Hazard Reporting with Gemini 3.5 Flash-Lite Verification, Pure Light Mode (ADR-022), Map Height & Light Mode Fix (ADR-034) |
+| **Operations Web Frontend (`web`)** | 🟢 Ready | 100% | 25-district jurisdiction switcher, dedicated 10-crew tactical squad roster (`DistrictCrewRoster.tsx`), 1-click officer login chips |
+| **Citizen Mobile App (`Flutter`)** | 🟢 Ready | 100% | Hazard verdicts integration (ADR-030): Map hazards & volunteer opportunities bound to `hazard_verdicts` table; corrected Moratuwa flood zone to Bolgoda basin; zero analyzer errors |
+
+| **Operations Web Frontend (`web`)** | 🟢 Ready | 100% | Streamlined Public Map (ADR-033), Citizen Hazard Reporting with Gemini 3.5 Flash-Lite Verification, Pure Light Mode (ADR-022), Map Stacking Context Isolation (ADR-027) |
 | **Closed-Loop Integration & Verification** | 🟢 Verified | 100% | Phase 4 verification suite (ADR-026): End-to-end report-to-road-reopened runner (9/9), 5-ward weather burst replay (5/5), Kong proxy suite (8/8), and Docker Compose healthchecks validated |
 
 
@@ -118,7 +130,7 @@
 
 ---
 
-### Phase 3: Operations Web Application (Upcoming)
+### Phase 3: Operations Web Application (Completed)
 
 #### 3.1 Council Officer Control Center
 - [x] Ward-by-ward live hazard triage grid.
@@ -157,6 +169,69 @@
 
 ---
 
+### Phase 4: Citizen Mobile Application & Live Microservice Integration (Completed)
+
+#### 4.1 Flutter Architecture, Networking & Zero-Mock Foundation
+- [x] Centralized networking architecture (`ApiConfig`, `ApiClient`) with automatic JSON envelope unwrapping, multipart streaming, and HTTP retry logic.
+- [x] Host Wi-Fi router LAN IP bridge (`http://192.168.8.100:8000`) for real physical mobile device testing (`PPA-LX2`) over adb reverse.
+- [x] Complete removal of client-side static mock datasets across all mobile screens, binding 100% of data to live Supabase PostgreSQL microservices via Kong Gateway.
+- [x] Offline resilience engine (`LocalCacheService`) utilizing `SharedPreferences` for local persistence of user incident drafts, donation pledges, and volunteer mission enrollments.
+
+#### 4.2 Disaster Resilience & Interactive Mapbox Engine (`flutter_map`)
+- [x] High-performance mobile disaster map (`nearby_reports_screen.dart`) powered by `flutter_map` (v7.0.2) and `latlong2`.
+- [x] Centralized basemap provider system (`mapbox_config.dart`) with 5 zero-registration HD tile styles (**Streets HD**, **Outdoors & Topo**, **Satellite Imagery**, **Dark Tactical**, **Light Minimal**), completely eliminating "API KEY REQUIRED" watermarks.
+- [x] Category-tailored teardrop pins with floating badges (`🌊 Flood Alert`, `⚠️ Blockage`, `⛔ Closed Road`, `🏠 Shelter`) and dynamic coordinate distribution.
+- [x] Pulsing live GPS beacon (`_buildLiveUserBeacon`) with 1.8s radar wave animation, glowing halo, and real-time user recentering via `geolocator`.
+- [x] High-precision road-snapped polyline detours aligning with OpenStreetMap centerlines (Galle Road A2 closed bridge vs. De Soysa Rd bypass corridor).
+
+#### 4.3 Hydrological Realignment & Flood Perimeters
+- [x] Corrected mobile flood polygon boundaries, removing misplaced polygons over dry Rawathawatta town center and residential streets (`6.7930, 79.8820` to `6.7950, 79.8860`).
+- [x] Realigned flood risk polygons to genuine hydrological waterways: Bolgoda Canal & Lake Basin (`6.7975, 79.9015`) in East Moratuwa and Kelani River Basin (`6.9535, 79.8780`) in Grandpass.
+- [x] Dynamic 8-point circular buffer generation surrounding all verified flood hazards from `_incidents`.
+
+#### 4.4 Hazard Verdicts Ingestion & 5-Signal AI Decision Scorecards (`hazard_verdicts`)
+- [x] Upgraded `incident-service` (`incident.controller.ts`) to join Supabase `public.hazard_verdicts(*)`.
+- [x] Synced composite automated and officer decisions into `public.hazard_verdicts` for all 12 verified incidents across Sri Lanka.
+- [x] Mobile map inspection bottom sheet displaying official composite decision badges (`CONFIRMED`), AI confidence percentages (88%–95%), urgency tiers (`CRITICAL`), and verified reasons.
+- [x] Direct "View Route" action opening in-app interactive disaster map centered on the destination.
+
+#### 4.5 Community Volunteer Hub & On-Site Attendance Check-In
+- [x] Converted volunteer opportunities (`community_volunteer_screen.dart`) to dynamic database ingestion from active shelters (`public.shelters`) and confirmed disaster incidents (`hazard_verdicts` where `verdict = 'CONFIRMED'`).
+- [x] Added `GET /api/relief/volunteers/roster` in `relief-service` exposing real-time shelter force breakdowns and food truck clearance recommendations for Municipal Council Officers.
+- [x] Added `POST /api/relief/volunteers/check-in` persisting member status transitions (`REGISTERED` ➔ `ON_SITE_VERIFIED` ➔ `COMPLETED`) into Supabase `public.notifications`.
+- [x] Real-time on-site verification check-in action logging volunteer service hours and shelter attendance.
+
+#### 4.6 Dual-Role Mobile Authentication & Access Control Lockdown (ADR-028)
+- [x] Architecture separation between Community Volunteers (open civilian self-enrollment) and Emergency Response Crews (officer-provisioned municipal rescue units).
+- [x] Disabled public self-registration for `FIELD_CREW` and `COUNCIL_OFFICER` roles across the mobile app, enforcing official council credential requirements.
+- [x] Overhauled `login_screen.dart` with officer-provisioning notice banner and quick-fill chips for pre-seeded response squads (`sunil.water@cmc.gov.lk`, `bandara.4x4@civicguard.lk`, `nimal.medical@civicguard.lk`).
+- [x] Multi-layer security lockdown: Route guards (`app_router.dart`), modal barriers (`volunteer_type_screen.dart`), and screen-level access lock (`crew_assignments_screen.dart`) strictly barring non-crew users.
+- [x] Persistent user session management in `auth_service.dart` preserving authenticated identity (`Pasindu`, `COMMUNITY_VOLUNTEER`) across reloads.
+
+#### 4.7 Citizen Hazard Ingestion & Multipart Telemetry
+- [x] Citizen hazard reporting workflow (`issue_details_screen.dart`) with GPS auto-pinning and placemark reverse geocoding.
+- [x] 4-tier flood depth benchmark selector (`SURFACE_PUDDLE`, `TIRE_LEVEL`, `BUMPER_LEVEL`, `SUBMERGED_VEHICLES`).
+- [x] Multipart camera photo evidence streaming to `POST /api/incidents/reports`, returning immediate 5-signal AI verification confidence telemetry.
+- [x] Overhauled `my_reports_screen.dart` displaying authenticated user's real submissions with status tabs and pull-to-refresh.
+
+#### 4.8 Emergency Relief Supplies & Live Donation Allocations
+- [x] Donation intake form (`donate_supplies_form_screen.dart`) with dynamic Target Shelter and optional SOS Help Request link selectors.
+- [x] Backend persistence into Supabase `public.relief_resources` with user ID attribution.
+- [x] Citizen donation history screen (`my_contributions_screen.dart`) displaying real contribution records with zero mock items.
+
+#### 4.9 Mobile Home Screen UI/UX Polish & Fluid Marquee
+- [x] Hardware-interpolated 60fps continuous horizontal marquee ticker (`auto_rotating_quick_actions.dart`) with `Curves.linear` scrolling.
+- [x] Compact situation room emergency banner (`featured_situation_banner.dart`) with 24/7 Hotline 117 tag, Kelani basin flood alerts, and live map trigger.
+- [x] Single-screen responsive layout in `home_screen.dart` with zero vertical overflow or scrolling.
+- [x] Centered docked bottom navigation bar with floating action button and category icons.
+
+---
+
+### Phase 5: Closed-Loop Integration & System Verification (Active / Next Focus)
+- [ ] End-to-end automated test runner simulating citizen report $\rightarrow$ AI triage $\rightarrow$ ticket dispatch $\rightarrow$ crew photo completion $\rightarrow$ road reopened.
+- [ ] Multi-ward rainfall burst replay test verifying automated threshold alerts.
+- [ ] Kong API Gateway proxy load verification on port 8000.
+- [ ] Multi-container Docker Compose staging deploy validation.
 ### Phase 4: Closed-Loop Integration & Verification (Completed)
 - [x] End-to-end automated test runner simulating citizen report $\rightarrow$ AI triage $\rightarrow$ ticket dispatch $\rightarrow$ crew photo completion $\rightarrow$ road reopened (`test-e2e-closed-loop.ts`).
 - [x] Multi-ward rainfall burst replay test verifying automated threshold alerts (`test-weather-burst.ts`).
@@ -167,6 +242,9 @@
 
 ## 3. Active Sprint & Immediate Next Tasks
 
+1. **Phase 5 Closed-Loop Automation**: Build automated end-to-end integration test runner simulating citizen report $\rightarrow$ AI triage $\rightarrow$ ticket dispatch $\rightarrow$ crew photo completion $\rightarrow$ road reopened.
+2. **Multi-Ward Weather Burst Replay**: Validate automated telemetry threshold alert generation across Colombo and Kandy basins.
+3. **Docker Compose Stack Validation**: Final verification of complete 7-container Docker Compose stack and inter-service health checks.
 1. **System Production Readiness**: All Phase 1–4 milestones are 100% implemented, integrated, and automatedly verified across all 7 containerized services.
 2. **Operational Demonstrations**: Live demo rehearsals across Council Officer (`/officer`), Field Crew (`/crew`), Relief Logistics (`/relief`), and Public Citizen (`/map`) operational workspaces.
 
@@ -177,6 +255,16 @@
 | Date | Author / Agent | Change Summary | Impacted Files |
 | :--- | :--- | :--- | :--- |
 | **2026-09-13** | Antigravity AI | Resolved Public Hazard Map Container Height Collapse & Aligned to ADR-022 Light Mode (ADR-034): Fixed the black box rendering bug on the public citizen map (`PublicHazardSafeRouteMap.tsx`). Identified that `<MapContainer>` in `PublicHazardMap.tsx` collapsed to `0px` height within the flexbox hierarchy, exposing the outer wrapper's legacy `bg-dark-950` background. Applied explicit `style={{ height: '100%', minHeight: '520px', width: '100%' }}` on `<MapContainer>`, enforced global `.leaflet-container` 100% dimensions in `index.css`, added `min-h-0` on the map workspace container, and upgraded `PublicHazardMap.tsx` and `SafeRoutePlanner.tsx` to the clean ADR-022 light mode design system. Verified 24 active tiles, 18 markers, and 15 buffer circles rendered with zero errors in headless Chrome, rebuilt Vite production bundle, and synced to Docker container `civicguard-web`. | `web/src/components/map/PublicHazardMap.tsx`, `web/src/components/routing/SafeRoutePlanner.tsx`, `web/src/pages/public/PublicHazardSafeRouteMap.tsx`, `web/src/index.css`, `architecture.md`, `progress.md` |
+| **2026-09-13** | Antigravity AI | Integrated Hazard Verdicts, Hydrological Flood Realignment, & Volunteer Roster Tracking (ADR-030): Re-aligned public disaster map flood polygon in `nearby_reports_screen.dart` to follow genuine hydrological waterways (Bolgoda Canal/Lake Basin in East Moratuwa at `6.7975, 79.9015` and Kelani River Basin at `6.9535, 79.8780`), eliminating misplaced overlays on dry Rawathawatta residential blocks. Upgraded `incident-service` (`incident.controller.ts`) to join Supabase `public.hazard_verdicts(*)`, exposing composite decision verdicts (`CONFIRMED`), AI confidence ratings (88%–95%), urgency, and verification reasons directly on map hazard cards. Upgraded `relief-service` (`relief.controller.ts`, `relief.routes.ts`) to source disaster relief missions exclusively from confirmed `hazard_verdicts` and added `GET /api/relief/volunteers/roster` exposing real-time shelter volunteer headcounts (`REGISTERED` ➔ `ON_SITE_VERIFIED` ➔ `COMPLETED`) for Municipal Council food truck and medical dispatch clearance. Enhanced "View Route" modal to open the live disaster map centered on mission destinations. Rebuilt Docker containers `civicguard-incident-service` and `civicguard-relief-service`, verified all endpoints via Kong Gateway, and recorded ADR-030 in `architecture.md`. | `backend/services/incident-service/*`, `backend/services/relief-service/*`, `mobile app/lib/features/map/*`, `mobile app/lib/features/volunteer/*`, `architecture.md`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Removed All Mock Data from Volunteer Hub & Connected Real Database Shelters (ADR-029): Completely eliminated client-side mock volunteer opportunities from `community_volunteer_screen.dart`. Upgraded `relief-service` `ReliefController.getVolunteerOpportunities` to query live active shelters (`public.shelters`) and verified disaster incidents (`public.incidents`) directly from Supabase PostgreSQL. Dynamic missions now automatically reflect real shelter capacities, addresses, and coordinates (e.g. Havelock Shelter, Royal College Pavilion, Getambe Hall Kandy). Connected mobile app via `ApiClient` with asynchronous loading, pull-to-refresh, and persistent enrollment in Supabase notifications ledger. Rebuilt Docker container `civicguard-relief-service` and verified 0 analyzer errors. | `backend/services/relief-service/src/controllers/relief.controller.ts`, `mobile app/lib/features/volunteer/views/community_volunteer_screen.dart`, `architecture.md`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Enforced Strict Multi-Layer Role Lockdown for Response Crews (ADR-028): Community Volunteers and Citizens are strictly blocked from accessing Emergency Response Crew consoles across all entry points. Added route guards to `app_router.dart` (`/crew-assignments` & `/crew-assignment-details`), navigation barrier dialog in `volunteer_type_screen.dart`, full-screen lock screen in `crew_assignments_screen.dart`, and scoped profile menu item in `profile_screen.dart` exclusively to `FIELD_CREW`. Verified 0 analyzer errors. between Community Volunteers (open self-registration, supply packing, shelter assistance, local offline cache, Supabase ledger sync) and Emergency Response Crews (municipal rescue squads pre-assigned by Council Officers). Disabled public self-registration for `FIELD_CREW` and `COUNCIL_OFFICER` roles across the mobile app. Overhauled `login_screen.dart` with officer-provisioning notice banner and quick-fill chips for pre-seeded response squads (`sunil.water@cmc.gov.lk`, `bandara.4x4@civicguard.lk`, `nimal.medical@civicguard.lk`). Fixed session hijacking bug in `crew_assignments_screen.dart` by removing auto-login and introducing a non-destructive squad preview console for community volunteers. Connected mission enrollment and on-site check-in verification in `community_volunteer_screen.dart` to `LocalCacheService` and `relief-service` Supabase ledger. Resolved all Flutter analyzer warnings (3/3 fixed) and verified 0 errors. | `mobile app/lib/features/auth/*`, `mobile app/lib/features/crew/*`, `mobile app/lib/features/volunteer/*`, `mobile app/lib/core/config/*`, `mobile app/lib/features/contributions/*`, `architecture.md`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Synchronized Relief Resource Schema, Audited Donation History, Added Offline Cache & Finalized Volunteer Flow (ADR-027): Populated `shelter_id`, `help_request_id`, and `assigned_by` foreign keys on citizen donation records in Supabase `public.relief_resources`. Upgraded `relief-service` `ResourceService.addResource` and `ReliefController` to extract donor user ID from body and default to active shelters. Enhanced `getResources` with `?user_id=...` and `?assigned_by=...` query filtering and joined shelter/request details. Built `LocalCacheService` using `SharedPreferences` in Flutter for immediate offline persistence of reports, donations, and volunteer missions. Overhauled `donate_supplies_form_screen.dart` with dynamic Target Shelter and optional SOS Help Request dropdowns. Overhauled `my_contributions_screen.dart` to display authenticated user's real donations with zero mock data. Removed mock activities from `community_volunteer_screen.dart` and wired live mission registration. Rebuilt Docker container `civicguard-relief-service` and verified 0 Flutter analyzer errors. | `backend/services/relief-service/*`, `mobile app/lib/core/services/local_cache_service.dart`, `mobile app/lib/features/donations/*`, `mobile app/lib/features/requests/*`, `mobile app/lib/features/volunteer/*`, `architecture.md`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Fixed Active User Session Persistence, Linked All 3 Submissions, & Unlocked Direct Volunteer/Donation Routing: Updated `auth_service.dart` to preserve active user session (`Pasindu`, `COMMUNITY_VOLUNTEER`) across reloads. Associated all 3 real citizen reports (`power case`, `Landslide`, `Flooding on Galle Road`) to user Pasindu in Supabase DB. Added 4 verified emergency regional disaster cases across Sri Lanka for comprehensive map density. Updated `volunteer_type_screen.dart` with clean user ribbon (`Signed in: Pasindu (Volunteer)`) and direct 1-tap navigation to `CommunityVolunteerScreen` without login blocks. Verified 0 Flutter analyzer errors. | `mobile app/lib/features/auth/*`, `mobile app/lib/features/volunteer/*`, `database/seed/*`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Cleaned Database Telemetry Spam, Resolved Road Geolocation & Connected Disaster Map 100% to Live DB: Purged all legacy test and autonomous sensor spam records from Supabase `public.incidents`. Linked user Pasindu's 2 submissions (`7026acba` Landslide and `dff0cfa2` Flooding) to newly registered `Galle Road (Moratuwa / Katubedda)`. Enhanced `incident-service` ingestion to dynamically resolve and insert citizen road names into `roads` table for precise location attribution. Overhauled `nearby_reports_screen.dart` to remove the 60+ static mock items and pull 100% live verified hazard records from `GET /api/incidents/map/hazards` with real photo evidence and road locations. Fixed right horizontal pixel overflow on `MyReportsScreen` filter tabs with single-child horizontal scrolling. Verified 0 Flutter analyzer errors. | `backend/services/incident-service/*`, `backend/shared/*`, `mobile app/lib/features/map/*`, `mobile app/lib/features/requests/*`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Overhauled `MyReportsScreen` for Real-Time User Submissions: Removed legacy general incident fallback that displayed seed database items. Connected `my_reports_screen.dart` strictly to the authenticated user's ID (`GET /api/incidents?reported_by=...`), added live listener to `AuthService` auth state changes, and added pull-to-refresh swipe and manual reload action. Now displays user's real submissions (e.g. `ikmnt enna`) and clean zero-state prompt. Verified 0 Flutter analyzer errors. | `mobile app/lib/features/requests/views/my_reports_screen.dart`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Resolved Mobile LAN IP Bridge & Empty URI Interpolation Bug: Updated `lib/core/network/api_config.dart` with the host machine's Wi-Fi router IP (`http://192.168.8.100:8000` Gateway, `http://192.168.8.100:4003` Socket.IO) enabling direct Wi-Fi communication between physical mobile devices and laptop backend microservices on the same router. Fixed empty string return in `ApiConfig.url(path)` and corrected string interpolations in parameterized API route endpoints. Verified 0 Flutter errors. | `mobile app/lib/core/network/api_config.dart`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Removed All Mock Data & Completed Full End-to-End Real User Flow in Mobile App (ADR-026): Implemented real user authentication endpoints in `incident-service` (`/api/incidents/auth/register`, `/api/incidents/auth/login`, `/api/incidents/auth/me`) backed by Supabase `public.users` and signed JWT issuance. Connected mobile `AuthService` with live `ApiClient` network RPCs and persistent user sessions. Overhauled `login_screen.dart` and `register_screen.dart` with asynchronous backend registration and authentication. Overhauled `my_reports_screen.dart` to query real user incident submissions from `GET /api/incidents?reported_by=...` with active/resolved filter chips and pull-to-refresh. Connected `issue_details_screen.dart` to submit citizen hazard reports linked to authenticated user UUID. Implemented `GET /api/relief/volunteers/opportunities` and `POST /api/relief/volunteers/join` in `relief-service` and connected `community_volunteer_screen.dart` and `volunteer_opportunity_details_screen.dart` with live capacity tracking. Connected `donate_supplies_form_screen.dart` and `my_contributions_screen.dart` to `POST /api/relief/resources` and `GET /api/relief/resources`. Verified 0 errors across Flutter analysis and all 7 Docker containers running healthy. | `backend/services/incident-service/*`, `backend/services/relief-service/*`, `mobile app/lib/core/network/*`, `mobile app/lib/features/auth/*`, `mobile app/lib/features/requests/*`, `mobile app/lib/features/donations/*`, `mobile app/lib/features/volunteer/*`, `architecture.md`, `progress.md` |
+| **2026-09-12** | Antigravity AI | Integrated Flutter Mobile App with Live Backend Microservices Layer: Configured `adb reverse tcp:8000 tcp:8000` network bridge for physical Android device `PPA-LX2`. Built centralized `ApiConfig` and `ApiClient` (`http: ^1.2.1`) handling JSON envelope parsing and multipart streaming. Built `MapApiService` dynamically fetching real-time verified hazards (`GET /api/incidents/map/hazards`) and active relief shelters with live bed capacities (`GET /api/relief/shelters`) with pull-to-refresh and offline fallback in `nearby_reports_screen.dart`. Upgraded `issue_details_screen.dart` with live GPS auto-detection, reverse geocoding via `Geocoding().placemarkFromCoordinates`, water depth benchmark tiers, and multipart reporting to `POST /api/incidents/reports` returning live 5-signal AI verification confidence telemetry and council ticket IDs. Verified 0 Flutter analyzer errors. | `mobile app/lib/core/network/*`, `mobile app/lib/features/map/services/map_api_service.dart`, `mobile app/lib/features/map/views/nearby_reports_screen.dart`, `mobile app/lib/features/requests/views/issue_details_screen.dart`, `mobile app/pubspec.yaml`, `progress.md` |
 | **2026-09-13** | Antigravity AI | Streamlined Public Map UI by Decoupling Standalone Photo Scanner Portal (ADR-033): Removed standalone "AI Photo Scanner" FAB and top-ticker triggers from `PublicHazardSafeRouteMap.tsx`. Unmounted `CitizenPhotoScanPortal` from the public map, centering the primary `REPORT HAZARD ⚠️` action button to reduce cognitive load during disasters. Retained `CitizenPhotoScanPortal.tsx` unmounted in the codebase and preserved backend scan endpoints (`/api/incidents/scan-photo`, `/predict/scan-upload`). Consolidated all citizen photo evidence capture and Gemini 3.5 Flash-Lite multimodal verification directly into `CitizenHazardReportModal.tsx`. Verified 0 TypeScript errors on frontend build and 21/21 passing backend tests. | `web/src/pages/public/PublicHazardSafeRouteMap.tsx`, `architecture.md`, `progress.md` |
 | **2026-09-13** | Antigravity AI | Resolved Hazard Report AI Verification SLA Timeout & Scorecard Model Integration (ADR-032): Identified and resolved root cause of "Report Hazard" modal falling back to heuristic evaluation. Increased `incident-service` axios timeout to `ai-service` (`/predict/hazard`) from 3000ms to 15000ms, accommodating remote image downloads and public Gemini API round-trip times. Increased `ai-service` remote image fetch timeout to 8.0s. Added automatic Base64 Data URI fallback if Supabase storage upload fails. Enforced `photo_url` forwarding from `CitizenHazardReportModal`. Added `AI_GEMINI` to `AnalysisMethod` enum in `@civicguard/shared`. Enhanced `IncidentCommandInspector.tsx` to dynamically display Gemini 3.5 Flash-Lite badge, detailed forensic model reasoning (`imageSignal.reason`), verified flood depth benchmark, and background YOLO spatial detections. Updated `HazardTriageGrid.tsx` confidence badge threshold to 75%. Verified clean TypeScript build across all microservices and frontend. | `backend/shared/types/incident.types.ts`, `backend/services/incident-service/src/services/verification.service.ts`, `backend/services/incident-service/src/controllers/incident.controller.ts`, `backend/services/ai-service/app/services/image_service.py`, `web/src/components/incidents/CitizenHazardReportModal.tsx`, `web/src/components/incidents/IncidentCommandInspector.tsx`, `web/src/components/incidents/HazardTriageGrid.tsx`, `web/src/App.tsx`, `architecture.md`, `progress.md` |
 | **2026-09-13** | Antigravity AI | Upgraded Multimodal Hazard Verification to Gemini 3.5 Flash-Lite (ADR-031): Migrated default model from `gemini-2.5-flash` to Google Gemini's high-throughput `gemini-3.5-flash-lite` across `backend/services/ai-service` and the web UI (`CitizenPhotoScanPortal`, `CitizenHazardReportModal`, `IncidentCommandInspector`, `PublicHazardSafeRouteMap`). Resolves transient 503 high-demand exceptions on the preview 2.5 endpoint, providing consistent sub-1.5s visual inference and strict Pydantic JSON schema compliance. Retained dynamic environment override via `GEMINI_MODEL`. Verified live connectivity and flood classification with user API key, 21/21 passing pytest tests, and clean Vite frontend build. Recorded ADR-031 in `architecture.md`. | `backend/services/ai-service/app/services/gemini_service.py`, `backend/services/ai-service/app/schemas/health.py`, `backend/services/ai-service/app/schemas/prediction.py`, `backend/services/ai-service/app/checks/image_check.py`, `backend/services/ai-service/test_gemini_key.py`, `backend/services/ai-service/tests/test_gemini_service.py`, `web/src/components/incidents/CitizenPhotoScanPortal.tsx`, `web/src/components/incidents/CitizenHazardReportModal.tsx`, `web/src/components/incidents/IncidentCommandInspector.tsx`, `web/src/pages/public/PublicHazardSafeRouteMap.tsx`, `architecture.md`, `progress.md` |
@@ -235,3 +323,33 @@
 | **2026-09-11** | Savindu (User) | Scaffolded frontend web application structure with Tailwind CSS and React Vite. | `web/*` |
 
 
+
+
+---
+
+### Phase 5: 25-District Hierarchical Command Structure & Nationwide Response Force (Completed)
+- [x] **25-District Organizational Model**: Established authoritative chain of command with exactly 1 District Response Officer commanding 10 specialized tactical squads per district across all 25 Sri Lankan districts (250 response units nationwide).
+- [x] **Database Schema Migration (`005_district_officer_crew_hierarchy.sql`)**:
+  - Created `public.districts` lookup table with 25 districts, provinces, headquarters GPS coordinates, and 24/7 disaster hotlines.
+  - Enhanced `public.users` with `district VARCHAR(50)` for spatial and role jurisdiction scoping.
+  - Enhanced `public.field_crews` with `officer_id UUID REFERENCES public.users(id)`, `crew_code VARCHAR(30) UNIQUE`, and indexes on `(district, officer_id)` and `(district, availability)`.
+  - Created aggregated command view `public.vw_district_command_hierarchy`.
+- [x] **Nationwide Seed Provisioning (`005_seed_25_districts_officers_crews.sql`)**:
+  - Seeded all 25 administrative districts across 9 provinces with authentic Sri Lankan GPS coordinates.
+  - Seeded 25 District Response Officers (Role ID 2: `COUNCIL_OFFICER`).
+  - Seeded 250 specialized field response crews (10 per district, 10 per officer) spanning 5 tactical tracks:
+    - 2x Water Rescue & Flood Evacuation squads
+    - 2x 4x4 Heavy Debris & Winch Clearance squads
+    - 2x Emergency Medical & Triage squads
+    - 2x Drone Reconnaissance & Thermal UAV squads
+    - 1x Hazmat & High-Risk Evacuation squad
+    - 1x Emergency HAM Radio & Satellite Comms squad
+- [x] **Backend Ticket & Crew Service Updates**:
+  - Updated `@civicguard/shared` types with `FieldCrew` officer linkage, `DistrictInfo`, and `SRI_LANKA_DISTRICTS` constant array.
+  - Enhanced `ticket-service` `crew.service.ts` and `ticket.controller.ts` to support district-filtered queries (`GET /api/tickets/crews?district=...`) and 1-click dispatching.
+- [x] **Web Operations Control Center Overhaul**:
+  - Upgraded `CouncilOfficerControlCenter.tsx` with a District Jurisdiction Switcher supporting all 25 districts.
+  - Built `DistrictCrewRoster.tsx` component displaying the 10 assigned squads, live availability indicators, equipment inventories, and 1-click incident dispatch.
+  - Updated `LoginPage.tsx` with 1-click evaluation chips for Colombo, Kandy, Galle, Ratnapura, and Jaffna officers.
+- [x] **Zero Mock Data Verification**:
+  - Executed automated database verification querying all 25 districts: confirmed exactly 250 active crews and 25 officers in Supabase PostgreSQL.

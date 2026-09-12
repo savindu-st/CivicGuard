@@ -17,10 +17,22 @@ export class CrewService {
   /**
    * Returns all field crews with user profile info.
    */
-  async getAllCrews(): Promise<FieldCrew[]> {
-    const { data, error } = await this.supabase
+  /**
+   * Returns field crews with optional district and availability filtering.
+   */
+  async getAllCrews(filter?: { district?: string; officer_id?: string; availability?: string }): Promise<FieldCrew[]> {
+    let query = this.supabase
       .from('field_crews')
       .select('*, users(name, phone)');
+
+    if (filter?.district && filter.district !== 'ALL') {
+      query = query.ilike('district', filter.district);
+    }
+    if (filter?.availability && filter.availability !== 'ALL') {
+      query = query.eq('availability', filter.availability);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
 
