@@ -774,6 +774,33 @@ stateDiagram-v2
   - Eliminates the black box bug; Leaflet tiles, hazard buffer circles, closed road markers, and shelter pins render immediately and reliably.
   - Complete aesthetic harmonization across the entire public citizen interface according to ADR-022.
 
+### ADR-035: Role-Based Sign-In & Single-Role Navigation Isolation
+
+- **Date**: 2026-09-13
+- **Status**: Accepted
+- **Context**:
+  Previously, the top navigation header displayed a multi-tab row exposing all operational roles (`Overview`, `Officer Center`, `Field Crew`, `Relief Desk`, `Public Map`) regardless of authentication status. Unauthenticated visitors or authenticated users in one specific role (e.g. Field Crew Lead) could click conflicting portals, triggering authorization errors (`AccessDenied`) or causing operational cross-contamination. Furthermore, the sign-in experience lacked direct accessibility from the homepage and required navigation away to a separate login page.
+- **Decision**:
+  1. **Top Navigation Header Streamlining**:
+     - Removed the center `<nav>` containing all role tabs from `NavigationHeader`.
+     - When unauthenticated: displays CivicGuard branding, Public Citizen open access indicator, a direct shortcut to Public Map, and a Staff Login button.
+     - When authenticated: strictly displays the user's account name pill (`Kasun Perera • Council Officer`), a direct "My Workspace" shortcut to their assigned portal, and a prominent "Sign Out" button.
+  2. **Homepage Role-Based Sign-In Hub**:
+     - Unauthenticated homepage presents an interactive 4-role gateway (Council Officer, Field Crew Lead, Relief Coordinator, Public Citizen).
+     - Each staff role card features a 1-click instant demo sign-in (using pre-configured municipal personas) and an expandable credential form for custom email/password authentication.
+     - The Public Citizen card provides 1-click open access to the live hazard map without requiring passwords.
+  3. **Post-Login Single-Role Isolation**:
+     - Once logged in, the homepage completely suppresses other role cards and portals.
+     - Displays only the authenticated user's active command station with live metrics and an authoritative "Launch Workspace" button, plus the universal Public Disaster Map.
+     - Displays an active session banner with a "Sign Out to Switch Accounts" control.
+  4. **Recreated Dedicated `/login` Page**:
+     - Modernized `/login` with clean role tabs, fast 1-click personnel chips, and active session detection ("You are already signed in as ...") offering "Continue to Workspace" or "Sign Out".
+- **Consequences**:
+  - Eliminates visual clutter and confusion from the top navigation bar.
+  - Prevents cross-role unauthorized access attempts by hiding irrelevant portals after login.
+  - Drastically accelerates operational evaluation and demonstration through homepage 1-click sign-in.
+
+
 
 
 
