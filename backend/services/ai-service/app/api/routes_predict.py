@@ -1,7 +1,18 @@
+import time
 import asyncio
-from fastapi import APIRouter, HTTPException
-from app.schemas.prediction import HazardPredictionRequest, HazardPredictionResponse
+import io
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from typing import Optional
+from PIL import Image
+from app.schemas.prediction import (
+    HazardPredictionRequest,
+    HazardPredictionResponse,
+    PhotoScanRequest,
+    PhotoScanResponse,
+    YoloDetectionItem,
+)
 from app.services.image_service import ImageService
+from app.services.model_service import ModelService
 from app.checks.image_check import ImageCheck
 from app.checks.location_check import LocationCheck
 from app.checks.risk_check import RiskCheck
@@ -14,7 +25,7 @@ async def predict_hazard(payload: HazardPredictionRequest) -> HazardPredictionRe
         # 1. Fetch / Decode Image within strict 1500ms SLA
         image, raw_bytes = await ImageService.load_image(payload.photo_url)
 
-        # 2. Concurrently execute Image AI and Location AI checks
+        # 2. Concurrently execute Image AI (Gemini 2.5 + background YOLO) and Location AI checks
         image_result, location_result = await asyncio.gather(
             ImageCheck.evaluate(image, payload.incident_type),
             LocationCheck.evaluate(payload.latitude, payload.longitude, raw_bytes),
@@ -39,6 +50,12 @@ async def predict_hazard(payload: HazardPredictionRequest) -> HazardPredictionRe
             risk_urgency=risk_result.urgency,
             risk_score=risk_result.score,
             risk_reason=risk_result.reason,
+            detected_objects=image_result.detected_objects,
+            detections=image_result.detections,
+            depth_benchmark=image_result.depth_benchmark,
+            verification_engine=image_result.verification_engine,
+            background_detector=image_result.background_detector,
+            gemini_status=image_result.gemini_status,
         )
     except Exception as e:
         # Failsafe fallback: return formatted fallback response rather than unhandled 500
@@ -52,4 +69,78 @@ async def predict_hazard(payload: HazardPredictionRequest) -> HazardPredictionRe
             risk_urgency="MEDIUM",
             risk_score=0.60,
             risk_reason="Heuristic corridor risk applied due to processing fallback",
+            detected_objects=[],
+            detections=[],
+            depth_benchmark=None,
+            verification_engine="heuristic_fallback",
+            background_detector="none",
+            gemini_status="FALLBACK",
         )
+
+@router.post("/predict/detect", response_model=PhotoScanResponse)
+async def detect_hazard_from_url(payload: PhotoScanRequest) -> PhotoScanResponse:
+    """
+    Multimodal hazard verification endpoint from Base64 Data URI, CDN URL, or local path.
+    - Verification verdict, depth benchmark, and confidence are SOLELY based on Gemini 2.5 Flash.
+    - Object bounding boxes and geometry are detected by background YOLOv8 for UI display.
+    """
+    t0 = time.perf_counter()
+    image, _ = await ImageService.load_image(payload.photo_url)
+    hazard_type = payload.hazard_type or "FLOOD"
+
+    check_result = await ImageCheck.evaluate(image, hazard_type)
+    elapsed_ms = round((time.perf_counter() - t0) * 1000, 2)
+
+    return PhotoScanResponse(
+        status="success",
+        overall_confidence=check_result.confidence,
+        hazard_classification=check_result.classification,
+        image_score=check_result.score,
+        depth_benchmark=check_result.depth_benchmark,
+        is_spam=check_result.is_spam,
+        reason=check_result.reason,
+        detected_objects=check_result.detected_objects,
+        detections=check_result.detections,
+        yolo_model_status="LOADED" if ModelService.is_ready() else "NOT_LOADED",
+        verification_engine=check_result.verification_engine,
+        background_detector=check_result.background_detector,
+        gemini_status=check_result.gemini_status,
+        inference_time_ms=elapsed_ms,
+    )
+
+@router.post("/predict/scan-upload", response_model=PhotoScanResponse)
+async def scan_uploaded_photo(
+    photo: UploadFile = File(...),
+    hazard_type: Optional[str] = Form("AUTO")
+) -> PhotoScanResponse:
+    """
+    Direct multipart file upload endpoint for Gemini 2.5 multimodal verification
+    with background YOLOv8 spatial object telemetry.
+    """
+    t0 = time.perf_counter()
+    try:
+        content = await photo.read()
+        image = Image.open(io.BytesIO(content)).convert("RGB")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid image format: {str(e)}")
+
+    check_result = await ImageCheck.evaluate(image, hazard_type or "AUTO")
+    elapsed_ms = round((time.perf_counter() - t0) * 1000, 2)
+
+    return PhotoScanResponse(
+        status="success",
+        overall_confidence=check_result.confidence,
+        hazard_classification=check_result.classification,
+        image_score=check_result.score,
+        depth_benchmark=check_result.depth_benchmark,
+        is_spam=check_result.is_spam,
+        reason=check_result.reason,
+        detected_objects=check_result.detected_objects,
+        detections=check_result.detections,
+        yolo_model_status="LOADED" if ModelService.is_ready() else "NOT_LOADED",
+        verification_engine=check_result.verification_engine,
+        background_detector=check_result.background_detector,
+        gemini_status=check_result.gemini_status,
+        inference_time_ms=elapsed_ms,
+    )
+

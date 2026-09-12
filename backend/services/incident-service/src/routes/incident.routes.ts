@@ -9,6 +9,7 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 
 
 // --- Citizen & Public Reporting ---
 router.post('/reports', upload.single('photo'), controller.createReport);
+router.post('/scan-photo', upload.single('photo'), controller.scanPhoto);
 router.get('/', controller.getIncidents);
 router.get('/map/hazards', controller.getHazardMap);
 router.post('/routes/safe-path', controller.getSafePath);
