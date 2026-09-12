@@ -68,12 +68,13 @@ export class TicketService {
     priority?: TicketPriority;
     crew_id?: string;
     officer_id?: string;
+    incident_id?: string;
     limit?: number;
     offset?: number;
   }): Promise<{ tickets: CouncilTicket[]; total: number }> {
     let query = this.supabase
       .from('council_tickets')
-      .select('*, incidents(*, wards(name), roads(name, is_closed)), field_crews(crew_name, availability)', {
+      .select('*, incidents(*, wards(name), roads(name, is_closed)), field_crews(crew_name, availability, latitude, longitude)', {
         count: 'exact',
       })
       .order('created_at', { ascending: false });
@@ -82,6 +83,7 @@ export class TicketService {
     if (filters.priority) query = query.eq('priority', filters.priority);
     if (filters.crew_id) query = query.eq('assigned_crew_id', filters.crew_id);
     if (filters.officer_id) query = query.eq('assigned_officer_id', filters.officer_id);
+    if (filters.incident_id) query = query.eq('incident_id', filters.incident_id);
 
     const limit = filters.limit || 50;
     const offset = filters.offset || 0;
@@ -161,7 +163,7 @@ export class TicketService {
           : undefined,
       })
       .eq('id', ticketId)
-      .select('*, incidents(*)')
+      .select('*, incidents(*, wards(name), roads(name, is_closed)), field_crews(*)')
       .single();
 
     if (ticketErr || !ticket) throw ticketErr || new Error('Ticket update failed');
@@ -182,7 +184,10 @@ export class TicketService {
             priority: ticket.priority,
             description: ticket.description,
             crew_id: crewId,
+            crew_name: ticket.field_crews?.crew_name,
             override: options?.emergency_override || false,
+            latitude: ticket.incidents?.latitude,
+            longitude: ticket.incidents?.longitude,
           },
         },
         { timeout: 3000 }

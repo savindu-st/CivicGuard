@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-
 import L from 'leaflet';
 import { Navigation, AlertTriangle, ShieldCheck, RefreshCw } from 'lucide-react';
 import { api } from '../../services/api';
+import { getMapTileConfig } from '../../utils/mapConfig';
 
 interface CrewNavMapProps {
   crewLat: number;
@@ -81,6 +82,7 @@ export const CrewNavigationMap: React.FC<CrewNavMapProps> = ({
   const [routeDistanceKm, setRouteDistanceKm] = useState<number | null>(null);
   const [isCalculatingRoute, setIsCalculatingRoute] = useState<boolean>(false);
   const [rerouteAlert, setRerouteAlert] = useState<string | null>(null);
+  const tileConfig = getMapTileConfig();
 
   const fetchSafeDetour = async () => {
     if (!targetLat || !targetLon) return;
@@ -177,8 +179,9 @@ export const CrewNavigationMap: React.FC<CrewNavMapProps> = ({
         className="w-full h-full"
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          attribution={tileConfig.attribution}
+          url={tileConfig.url}
+          maxZoom={tileConfig.maxZoom || 19}
         />
 
         <MapBoundsAdjuster bounds={bounds} />

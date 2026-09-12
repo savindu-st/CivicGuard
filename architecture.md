@@ -298,6 +298,33 @@ flowchart TB
   7. **Stage 6 Continuous Retuning Ledger**: Ingest field crew closure photos and officer overrides via `POST /feedback` to an append-only JSONL ledger (`data/feedback_records.jsonl`), exposing `GET /feedback/metrics` and `GET /feedback/export`.
 - **Consequences**: Zero external network dependency for model weights; sub-second CPU inference (< 500ms); strict SLA preservation; automated spam and spoofing defense; auditable retuning feedback loop.
 
+### ADR-018: Split-Screen Tactical Command Center with Guided Verification Chain, Distance-Ranked Crew Dispatch, and Authoritative Road Closure Infrastructure
+- **Date**: 2026-09-12
+- **Status**: Accepted
+- **Context**: Municipal emergency coordinators managing disaster triage require real-time geographic situational awareness without constantly switching context between maps, verification records, and dispatch rosters. Premature road openings or delayed dispatches directly endanger citizens during flash flooding.
+- **Decision**:
+  1. **Split-Screen Tactical Layout**: Implement a dual-pane operations workspace in `CouncilOfficerControlCenter.tsx`:
+     - **Left Pane (50%)**: Real-time Leaflet tactical map rendering flood hazard perimeters, glowing red closed road segments, field crew beacons, and **animated dashed dispatch vectors** connecting assigned crews to their active incident coordinates.
+     - **Right Pane (50%)**: Master-detail container hosting the ward-by-ward triage grid, transitioning into the deep `IncidentCommandInspector.tsx` upon marker or card selection.
+  2. **Interactive Map-to-Dispatch Flow**: Clicking any pin/hazard on the map immediately focuses the right-side inspector on that incident. Assigning a crew immediately paints the dispatch vector connecting the crew to the incident pin.
+  3. **Deep 5-Signal Scorecard Transparency**: Expose the 5 independent verification checks (Image AI, Weather Correlation, Spatio-Temporal Cluster, Location Authenticity, and Risk Urgency AI) with individual scores, methods (`AI` vs `HEURISTIC_FALLBACK`), and sensor metrics.
+  4. **Guided Automated Confirmation Chain**: When an officer clicks "Confirm Hazard", the system automatically updates the status to `CONFIRMED`, marks the associated road as closed on the map, auto-spawns the response ticket, and transitions the inspector directly to the Crew Dispatch tab.
+  5. **Distance-Ranked Crew Dispatch with 2 km Proximity Enforcement**: Field crews are ranked strictly by real-time Haversine distance. If a crew is $> 2.0\text{ km}$ away from an active assignment or currently `BUSY`, the UI warns the officer and enforces an inline **Emergency Override** toggle with mandatory justification notes, satisfying ADR-016.
+  6. **Authoritative Dual Road Closure Controls**: Expose `GET /api/incidents/roads` and `PATCH /api/incidents/roads/:id/closure` on `incident-service` to allow officers to manually toggle road closures both inline on incident cards and through a dedicated "Road Infrastructure Network" management tab.
+  7. **Closed-Loop Resolution Audit**: Provide a "Resolution Proof" tab displaying a side-by-side Before (citizen report photo) vs After (crew resolution photo proof) comparison for resolved incidents, satisfying ADR-005.
+- **Consequences**: Instantaneous situational awareness; frictionless transition from triage to dispatch; zero unvalidated road reopenings; complete closed-loop auditability.
+
+### ADR-019: Real-Time Field Crew SOS Distress Interception & Tactical Operations Pinpoint
+- **Date**: 2026-09-12
+- **Status**: Accepted
+- **Context**: Field rescue crews operating in flash flood zones (e.g. Tri-Forces, DMC teams) face immediate life-safety hazards (rising waters, landslides, trapped vehicles). Panic beacons triggered in `/crew` must immediately alert municipal dispatchers in `/officer` without requiring manual page refreshes, and must pinpoint the distress location visually on the tactical map.
+- **Decision**:
+  1. **Dual-Channel Broadcast**: In `ticket-service` `triggerCrewSos`, broadcast the `crew:sos` payload across both `['officers', 'public']` rooms to guarantee delivery even if an officer's socket connection initialized prior to persona verification.
+  2. **Authoritative Coordinate Sync**: Update the crew's `latitude` and `longitude` in the Supabase `field_crews` table upon SOS receipt so subsequent REST refetches reflect the live distress location.
+  3. **High-Priority Operations Banner**: Implement a persistent, pulsating red distress banner in `CouncilOfficerControlCenter.tsx` displaying the crew unit name, distress timestamp, exact GPS coordinates, and an immediate "Locate Distress GPS" action button.
+  4. **Tactical Map Distress Beacon**: Implement `createCrewSosIcon` in `OfficerTacticalMap.tsx` with a multi-layered pulsating radar ripple and emergency siren marker (`🚨`), accompanied by `MapSosPanController` that automatically flies the Leaflet map to the crew's coordinates at zoom level 16.
+- **Consequences**: Zero latency between crew distress and dispatcher awareness; immediate visual pinpointing on the dark-mode Leaflet tactical map; seamless coordination with incoming military and DMC backup units.
+
 ---
 
 ## 5. Database Schema & Data Models Overview
