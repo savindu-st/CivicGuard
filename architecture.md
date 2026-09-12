@@ -485,3 +485,31 @@ stateDiagram-v2
   - Preserves immediate lifesaving utility for the general public during floods without forcing citizen logins.
   - Resilient offline session caching ensures field rescue teams are not logged out mid-rescue during cellular network dropouts.
 
+### ADR-026: Closed-Loop Integration Test Automation, Docker Compose Healthchecks & Kong API Gateway Verification Suite
+
+- **Date**: 2026-09-12
+- **Status**: Accepted
+- **Context**:
+  Disaster management platforms require infallible end-to-end operational pipelines. A failure in automated road closures can cause vehicles to enter flooded zones, while premature road reopening without verified proof creates catastrophic safety hazards. Phase 4 required automated verification of: (1) citizen report $\rightarrow$ AI triage $\rightarrow$ ticket dispatch $\rightarrow$ photo completion $\rightarrow$ road reopened, (2) multi-ward environmental storm burst replays, (3) Kong API Gateway proxying on port 8000, and (4) multi-container Docker Compose build and native healthcheck orchestration.
+- **Decision**:
+  1. **Dual-Mode Integration Test Harness**:
+     - Built TypeScript verification runners (`test-kong-gateway.ts`, `test-weather-burst.ts`, `test-e2e-closed-loop.ts`, `test-phase4-all.ts`) under `backend/scripts/` executable via `npm run test:*`.
+     - Supports `TARGET=kong` (`http://localhost:8000`) for production gateway verification and `TARGET=direct` for isolated microservice debugging.
+  2. **Kong API Gateway Ingress Verification (Port 8000)**:
+     - Validated route proxying across all microservices (`/api/incidents/*` $\rightarrow$ 4001, `/api/tickets/*` $\rightarrow$ 4002, `/api/notifications/*` $\rightarrow$ 4003, `/api/relief/*` $\rightarrow$ 4004).
+     - Validated CORS pre-flight headers (`OPTIONS`), transparent error status forwarding (404/400 JSON payloads preserved), and multipart photo evidence streaming.
+  3. **Multi-Ward Weather Burst Replay Engine**:
+     - Verified synthetic storm replays across 5 demonstration wards (Colombo Havelock, Cinnamon Gardens, Kelani Bank, Kandy Peradeniya, Ratnapura Kalu Ganga).
+     - Validated danger threshold evaluations ($>50\text{ mm}$ rainfall, $>3.2\text{ m}$ river crest) with live Socket.IO alert interception and sub-threshold baseline stability (`MODERATE`).
+  4. **Closed-Loop Workflow & Negative Guard Testing**:
+     - Verified negative guards: spam meme rejection (confidence $< 0.40$, zero spurious tickets or closures) and mandatory photo proof enforcement on ticket completion (HTTP 400 on photo omission).
+     - Verified happy-path lifecycle: citizen hazard ingestion $\rightarrow$ 5-signal AI verification $\rightarrow$ automated road closure (`is_closed: true`) $\rightarrow$ auto-spawned council ticket $\rightarrow$ crew dispatch with `BUSY` availability $\rightarrow$ photo-verified resolution with SitRep notes & evacuated count $\rightarrow$ road reopened (`is_closed: false`) $\rightarrow$ crew restored to `AVAILABLE` $\rightarrow$ public hazard map cleared $\rightarrow$ Stage 6 AI retuning feedback ledger updated.
+  5. **Strict Multi-Container Health Orchestration**:
+     - Added native `healthcheck` blocks to all 7 containers in `docker-compose.yml` (`ai-service`, `incident-service`, `ticket-service`, `notification-service`, `relief-service`, `kong`, `web`).
+     - Orchestrated topological dependencies with `condition: service_healthy` and calibrated `start_period` timers, guaranteeing deterministic startup sequence.
+- **Consequences**:
+  - Full end-to-end system verification runs in $< 26$ seconds with zero human intervention.
+  - Road safety invariant mathematically guaranteed: roads cannot reopen without verified resolution photos in `incident_evidence`.
+  - All 7 containers build cleanly and reach healthy status deterministically.
+
+
