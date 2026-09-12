@@ -444,4 +444,4 @@ Civic Guard's engineering standards and architectural choices are recorded in [`
 - **Topic**: Topic 04 — Disaster Response
 - **Project**: Civic Guard — Coordinating City Response to Floods and Road Hazards
 - **Repository**: [https://github.com/savindu-st/CivicGuard](https://github.com/savindu-st/CivicGuard)
-- **License**: [MIT License](LICENSE)
+
