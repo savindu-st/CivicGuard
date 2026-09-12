@@ -24,6 +24,7 @@ import { CouncilOfficerControlCenter } from './pages/officer/CouncilOfficerContr
 import { ReliefLogisticsDesk } from './pages/relief/ReliefLogisticsDesk';
 import { PublicHazardSafeRouteMap } from './pages/public/PublicHazardSafeRouteMap';
 import { LoginPage } from './pages/auth/LoginPage';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 const OperationsOverview: React.FC = () => {
   return (
@@ -492,30 +493,64 @@ const NavigationHeader: React.FC = () => {
         </nav>
       </div>
 
-      {/* Right: User Profile & Role Switcher */}
+      {/* Right: User Profile & Role Switcher / Citizen Status */}
       <div className="flex items-center gap-3 text-xs">
-        {/* Active Persona Pill */}
-        <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-100 border border-slate-200">
-          <span className="text-sm">{roleMeta.icon}</span>
-          <div className="text-left">
-            <div className="text-xs font-bold text-slate-800 leading-tight">
-              {user?.name || 'Kasun Perera'}
+        {user ? (
+          <>
+            {/* Active Staff Persona Pill */}
+            <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-100 border border-slate-200">
+              <span className="text-sm">{roleMeta.icon}</span>
+              <div className="text-left">
+                <div className="text-xs font-bold text-slate-800 leading-tight">
+                  {user.name}
+                </div>
+                <div className="text-[10px] text-slate-500 font-medium">
+                  {roleMeta.label}
+                </div>
+              </div>
             </div>
-            <div className="text-[10px] text-slate-500 font-medium">
-              {roleMeta.label}
-            </div>
-          </div>
-        </div>
 
-        {/* Switch Role Button */}
-        <Link
-          to="/login"
-          className="px-3 py-1.5 rounded-lg bg-white border border-slate-300 hover:border-slate-400 text-slate-700 hover:text-slate-900 font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-xs"
-          title="Switch Active Persona"
-        >
-          <User className="w-3.5 h-3.5 text-slate-500" />
-          <span className="hidden md:inline">Switch Role</span>
-        </Link>
+            {/* Switch / Change Account Button */}
+            <Link
+              to="/login"
+              className="px-3 py-1.5 rounded-lg bg-white border border-slate-300 hover:border-slate-400 text-slate-700 hover:text-slate-900 font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-xs"
+              title="Switch Active Staff Account"
+            >
+              <User className="w-3.5 h-3.5 text-slate-500" />
+              <span className="hidden md:inline">Switch</span>
+            </Link>
+
+            {/* Sign Out Action */}
+            <button
+              onClick={() => logout()}
+              className="px-3 py-1.5 rounded-lg bg-white border border-slate-300 hover:border-rose-300 text-slate-700 hover:text-rose-700 font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-xs"
+              title="Sign out of municipal session"
+            >
+              <LogOut className="w-3.5 h-3.5 text-slate-500 group-hover:text-rose-600" />
+              <span className="hidden md:inline">Sign Out</span>
+            </button>
+          </>
+        ) : (
+          <>
+            {/* Citizen Guest Indicator */}
+            <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-emerald-50/70 border border-emerald-200">
+              <span className="text-sm">👤</span>
+              <div className="text-left">
+                <div className="text-xs font-bold text-slate-900 leading-tight">Public Citizen</div>
+                <div className="text-[10px] text-emerald-700 font-semibold">Open Access Active</div>
+              </div>
+            </div>
+
+            {/* Staff Sign In Link */}
+            <Link
+              to="/login"
+              className="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors flex items-center gap-1.5 shadow-xs"
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>Staff Login</span>
+            </Link>
+          </>
+        )}
 
         {/* Gateway Indicator */}
         <div className="hidden lg:flex items-center gap-1.5 pl-3 border-l border-slate-200 text-[11px] text-slate-500">
@@ -543,9 +578,30 @@ export const App: React.FC = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/map" element={<PublicHazardSafeRouteMap />} />
           <Route path="/public" element={<PublicHazardSafeRouteMap />} />
-          <Route path="/officer" element={<CouncilOfficerControlCenter />} />
-          <Route path="/crew" element={<FieldCrewPortal />} />
-          <Route path="/relief" element={<ReliefLogisticsDesk />} />
+          <Route
+            path="/officer"
+            element={
+              <ProtectedRoute allowedRoles={['COUNCIL_OFFICER']}>
+                <CouncilOfficerControlCenter />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/crew"
+            element={
+              <ProtectedRoute allowedRoles={['FIELD_CREW']}>
+                <FieldCrewPortal />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/relief"
+            element={
+              <ProtectedRoute allowedRoles={['RELIEF_COORDINATOR', 'COUNCIL_OFFICER']}>
+                <ReliefLogisticsDesk />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<OperationsOverview />} />
         </Routes>
       </div>

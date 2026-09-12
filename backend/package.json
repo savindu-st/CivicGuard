@@ -18,7 +18,11 @@
     "dev:incident": "npm run dev --workspace=@civicguard/incident-service",
     "dev:ticket": "npm run dev --workspace=@civicguard/ticket-service",
     "dev:notification": "npm run dev --workspace=@civicguard/notification-service",
-    "dev:relief": "npm run dev --workspace=@civicguard/relief-service"
+    "dev:relief": "npm run dev --workspace=@civicguard/relief-service",
+    "seed:auth": "tsx ../database/seed/004_provision_supabase_auth_users.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.1"
   },
   "keywords": [
     "disaster-response",

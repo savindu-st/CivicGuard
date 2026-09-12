@@ -457,3 +457,31 @@ stateDiagram-v2
   - District Officers can target dispatches to the exact qualified squad with matching gear.
   - Command centers gain real-time visibility into rescued/evacuated civilian headcounts and ground situational reports across all 25 Sri Lankan districts.
 
+### ADR-025: Dual-Tier Access Architecture with Native Supabase Auth & Role-Gated Operational Workspaces
+
+- **Date**: 2026-09-12
+- **Status**: Accepted
+- **Context**:
+  Field operational terminals (`/crew`) and municipal command centers (`/officer`) previously lacked mandatory credential verification and route protection. Unauthenticated visitors were automatically elevated to `COUNCIL_OFFICER` or `FIELD_CREW` via client-side fallbacks, posing severe authorization vulnerabilities. Concurrently, citizens and stranded commuters require frictionless, zero-barrier public disaster resilience access (viewing verified hazards, calculating detour corridors, submitting GPS pin-drop hazard reports) without mandatory account registration.
+- **Decision**:
+  1. **Dual-Tier Access Model**:
+     - *Tier 1 (Public Citizens)*: 100% open, unauthenticated guest access for `/map`, `/public`, and `/`. Citizens submit hazard reports, view flood danger perimeters, calculate evacuation paths, and vote on corroboration with zero account friction.
+     - *Tier 2 (Operational Staff)*: Strictly mandatory credential authentication for Council Officers (`/officer`) and Field Response Crews (`/crew`).
+  2. **Native Supabase Auth (GoTrue) Engine**:
+     - Standardized on Supabase Auth (`signInWithPassword`, `signOut`, `onAuthStateChange`) via `@supabase/supabase-js`, eliminating custom password-hashing server boilerplate and utilizing native token refresh with offline grace.
+     - Embedded operational metadata (`role`, `name`, `department`, `squadName`, `specialty`, `district`, `phone`) directly into `user_metadata` and synchronized with `public.users` and `public.field_crews`.
+  3. **Staff Account Provisioning**:
+     - Official municipal staff accounts are pre-provisioned via Supabase Admin API (`database/seed/004_provision_supabase_auth_users.ts` and `004_provision_supabase_auth_users.sql`) with confirmed emails and 1:1 squad lead bindings.
+  4. **Frontend Route Guards (`<ProtectedRoute>` & `<AccessDenied>`)**:
+     - Wrapped `/officer` (`COUNCIL_OFFICER`) and `/crew` (`FIELD_CREW`) with `<ProtectedRoute>`, redirecting unauthenticated visitors to `/login?redirect=...`.
+     - Unauthorized cross-role navigation triggers an authoritative `<AccessDenied>` screen with options to switch accounts or return to their authorized workspace.
+     - Removed legacy client-side auto-switch `useEffect` in `CouncilOfficerControlCenter.tsx` and eliminated the auto-login guest fallback in `authStore.ts`.
+  5. **Tabbed Operational Gateway (`/login`)**:
+     - Overhauled `/login` with dedicated tabs for Council Officers and Field Crew Leads, featuring 1-click **Demo Account Chips** for rapid evaluation, alongside a prominent open-access banner directing citizens to `/map`.
+  6. **Backend Token Verification**:
+     - Enhanced `@civicguard/shared` `verifyToken` in `auth.ts` to decode/verify Supabase Auth JWT claims (`sub` $\rightarrow$ `userId`, `user_metadata.role` $\rightarrow$ `roles`), preserving full compatibility with microservice `requireRole` guards and `GET /api/tickets/crews/me`.
+- **Consequences**:
+  - Guarantees zero authorization leakage: only authenticated staff can dispatch crews, manage road closures, and complete work orders.
+  - Preserves immediate lifesaving utility for the general public during floods without forcing citizen logins.
+  - Resilient offline session caching ensures field rescue teams are not logged out mid-rescue during cellular network dropouts.
+

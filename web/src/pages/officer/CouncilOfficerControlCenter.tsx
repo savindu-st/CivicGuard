@@ -24,7 +24,7 @@ import { IncidentCommandInspector } from '../../components/incidents/IncidentCom
 import { RoadClosureManager } from '../../components/incidents/RoadClosureManager';
 
 export const CouncilOfficerControlCenter: React.FC = () => {
-  const { user, switchPersona } = useAuthStore();
+  const { user } = useAuthStore();
 
   // Data states
   const [incidents, setIncidents] = useState<any[]>([]);
@@ -45,13 +45,6 @@ export const CouncilOfficerControlCenter: React.FC = () => {
   const [viewMode, setViewMode] = useState<'TRIAGE' | 'ROADS'>('TRIAGE');
   const [liveAlertToast, setLiveAlertToast] = useState<string | null>(null);
   const [activeSosAlert, setActiveSosAlert] = useState<any | null>(null);
-
-  // Auto-switch to COUNCIL_OFFICER persona when viewing control center
-  useEffect(() => {
-    if (user && user.role !== 'COUNCIL_OFFICER') {
-      switchPersona('COUNCIL_OFFICER');
-    }
-  }, [user, switchPersona]);
 
   // Fetch all core operational data
   const fetchOperationsData = useCallback(async () => {

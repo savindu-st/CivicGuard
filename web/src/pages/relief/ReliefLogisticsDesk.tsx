@@ -25,7 +25,7 @@ import { NearestShelterMatcherModal } from '../../components/relief/NearestShelt
 import { EmergencySuppliesModal } from '../../components/relief/EmergencySuppliesModal';
 
 export const ReliefLogisticsDesk: React.FC = () => {
-  const { user, switchPersona } = useAuthStore();
+  const { user } = useAuthStore();
 
   // Core Data States
   const [shelters, setShelters] = useState<any[]>([]);
@@ -52,13 +52,6 @@ export const ReliefLogisticsDesk: React.FC = () => {
   const [liveAlertToast, setLiveAlertToast] = useState<string | null>(null);
   const [activeP1Distress, setActiveP1Distress] = useState<any | null>(null);
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
-
-  // Auto-switch to RELIEF_COORDINATOR role when landing on desk
-  useEffect(() => {
-    if (user && user.role !== 'RELIEF_COORDINATOR') {
-      switchPersona('RELIEF_COORDINATOR');
-    }
-  }, [user, switchPersona]);
 
   // Fetch all core relief logistics data
   const fetchReliefData = useCallback(async () => {
