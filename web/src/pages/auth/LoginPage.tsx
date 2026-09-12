@@ -32,9 +32,37 @@ interface DemoChip {
 const DEMO_CHIPS: Record<ActiveTab, DemoChip[]> = {
   COUNCIL_OFFICER: [
     {
-      label: 'Kasun Perera',
-      sublabel: 'Colombo Municipal Council',
+      label: 'Kasun Perera (Colombo)',
+      sublabel: 'Colombo District Command (10 Squads)',
       email: 'kasun.officer@cmc.gov.lk',
+      password: 'Officer@123',
+      role: 'COUNCIL_OFFICER',
+    },
+    {
+      label: 'Officer Kandy',
+      sublabel: 'Central Province Command (10 Squads)',
+      email: 'officer.kandy@civicguard.gov.lk',
+      password: 'Officer@123',
+      role: 'COUNCIL_OFFICER',
+    },
+    {
+      label: 'Officer Galle',
+      sublabel: 'Southern Coastal Command (10 Squads)',
+      email: 'officer.galle@civicguard.gov.lk',
+      password: 'Officer@123',
+      role: 'COUNCIL_OFFICER',
+    },
+    {
+      label: 'Officer Ratnapura',
+      sublabel: 'Sabaragamuwa Flood/Landslide (10 Squads)',
+      email: 'officer.ratnapura@civicguard.gov.lk',
+      password: 'Officer@123',
+      role: 'COUNCIL_OFFICER',
+    },
+    {
+      label: 'Officer Jaffna',
+      sublabel: 'Northern Peninsula Command (10 Squads)',
+      email: 'officer.jaffna@civicguard.gov.lk',
       password: 'Officer@123',
       role: 'COUNCIL_OFFICER',
     },

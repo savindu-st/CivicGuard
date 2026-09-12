@@ -14,42 +14,49 @@ export class ResourceService {
   private supabase = getSupabaseClient();
 
   /**
-   * Lists inventory supplies across shelters.
+   * Lists inventory supplies across shelters. Supports filtering by shelter and donor/assigned_by.
    */
-  async getResources(shelterId?: string): Promise<ReliefResource[]> {
+  async getResources(shelterId?: string, donorId?: string): Promise<ReliefResource[]> {
     let query = this.supabase
       .from('relief_resources')
-      .select('*, shelters(name)')
+      .select('*, shelters(name), help_requests(description, help_type)')
       .order('created_at', { ascending: false });
 
     if (shelterId) query = query.eq('shelter_id', shelterId);
+    if (donorId) query = query.eq('assigned_by', donorId);
 
     const { data, error } = await query;
     if (error) throw error;
 
     return (data || []).map((r: any) => ({
       ...r,
-      shelter_name: r.shelters?.name,
+      shelter_name: r.shelters?.name || 'Central Relief Shelter',
+      help_request_desc: r.help_requests?.description,
+      help_type: r.help_requests?.help_type,
     }));
   }
 
   /**
-   * Adds supplies to a relief shelter.
+   * Adds supplies to a relief shelter, linking donor user ID, shelter, and optional help request.
    */
-  async addResource(dto: ResourceAllocateDTO, userId?: string): Promise<ReliefResource> {
+  async addResource(dto: any, userId?: string): Promise<ReliefResource> {
+    const donorId = dto.assigned_by || dto.donor_id || dto.user_id || userId || null;
+    const shelterId = dto.shelter_id || 'd1111111-1111-1111-1111-111111111111';
+    const helpRequestId = dto.help_request_id || null;
+
     const { data, error } = await this.supabase
       .from('relief_resources')
       .insert({
-        shelter_id: dto.shelter_id,
-        help_request_id: dto.help_request_id || null,
-        resource_type: dto.resource_type,
+        shelter_id: shelterId,
+        help_request_id: helpRequestId,
+        resource_type: dto.resource_type || 'FOOD',
         resource_name: dto.resource_name,
-        quantity: dto.quantity,
+        quantity: dto.quantity || 1,
         unit: dto.unit || 'PACK',
         status: 'AVAILABLE',
-        assigned_by: userId || null,
+        assigned_by: donorId,
       })
-      .select()
+      .select('*, shelters(name)')
       .single();
 
     if (error || !data) throw error;
@@ -60,13 +67,16 @@ export class ResourceService {
         {
           rooms: ['relief'],
           event: 'relief:shelter_updated',
-          payload: { shelter_id: dto.shelter_id, action: 'STOCK_ADDED' },
+          payload: { shelter_id: shelterId, action: 'STOCK_ADDED' },
         },
         { timeout: 3000 }
       );
     } catch {}
 
-    return data;
+    return {
+      ...data,
+      shelter_name: data.shelters?.name || 'Central Relief Shelter',
+    };
   }
 
   /**

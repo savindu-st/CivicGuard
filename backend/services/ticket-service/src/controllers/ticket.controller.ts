@@ -182,7 +182,12 @@ export class TicketController {
 
   getAllCrews = async (req: Request, res: Response): Promise<void> => {
     try {
-      const crews = await this.crewService.getAllCrews();
+      const { district, officer_id, availability } = req.query;
+      const crews = await this.crewService.getAllCrews({
+        district: district as string,
+        officer_id: officer_id as string,
+        availability: availability as string,
+      });
       sendSuccess(res, { crews });
     } catch (err: any) {
       sendError(res, err.message, 500);
