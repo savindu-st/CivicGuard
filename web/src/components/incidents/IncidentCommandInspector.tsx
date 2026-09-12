@@ -369,14 +369,14 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold uppercase tracking-wider">
                     <Sparkles className="w-4 h-4 text-brand-600" />
-                    <span>5-Signal Hybrid Verification Verdict</span>
+                    <span>Tri-Signal Hybrid Verification Verdict</span>
                   </div>
                   <h4 className="text-lg font-bold text-slate-900">
                     {verdictObj?.verdict || incident.status}
                   </h4>
                   <p className="text-xs text-slate-600">
                     Confidence Score: <span className="font-mono font-bold text-slate-900">{confidencePercent}%</span> •
-                    Threshold for Auto-Confirmation: <span className="font-mono text-emerald-700">&ge; 85%</span>
+                    Threshold for Auto-Confirmation: <span className="font-mono text-emerald-700">&ge; 75%</span>
                   </p>
                 </div>
 
@@ -385,7 +385,7 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
                   <div className="w-32 bg-slate-200 rounded-full h-3.5 border border-slate-300 overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
-                        Number(confidencePercent) >= 85
+                        Number(confidencePercent) >= 75
                           ? 'bg-emerald-600'
                           : Number(confidencePercent) >= 40
                           ? 'bg-amber-500'
@@ -395,7 +395,7 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
                     ></div>
                   </div>
                   <span className="text-[10px] text-slate-500">
-                    {Number(confidencePercent) >= 85
+                    {Number(confidencePercent) >= 75
                       ? 'High Confidence Match'
                       : 'Needs Officer Verification'}
                   </span>
@@ -433,42 +433,77 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
               </div>
             )}
 
-            {/* Exploded 5 Signals Breakdown Cards */}
+            {/* Tri-Signal Scoring Breakdown Cards */}
             <div className="space-y-2.5">
-              <h5 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                Individual Signal Breakdown (All 5 Checks)
-              </h5>
+              <div className="flex items-center justify-between">
+                <h5 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  Core Scoring Signals (Formula: 60% / 20% / 20%)
+                </h5>
+                <span className="text-[10px] text-slate-400 font-mono">Total: 100% Weight</span>
+              </div>
 
-              {/* Signal 1: Image AI (YOLO) */}
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+              {/* Signal 1: Image AI (Gemini 3.5 Flash-Lite & YOLO Background) - 60% */}
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-slate-900 flex items-center gap-1.5">
                     <Eye className="w-3.5 h-3.5 text-brand-600" />
-                    <span>1. Image AI (Computer Vision YOLOv8)</span>
+                    <span>1. Image AI (Gemini 3.5 Flash-Lite)</span>
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
-                    {imageSignal?.method === 'HEURISTIC_FALLBACK' ? 'Heuristic Fallback' : 'Deep Model (Port 5000)'}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-50 text-brand-700 border border-brand-200">
+                      60% Weight
+                    </span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      {imageSignal?.method === 'AI_GEMINI' || imageSignal?.input_data?.verification_engine?.includes('gemini')
+                        ? 'Gemini 3.5 Flash-Lite'
+                        : imageSignal?.method === 'HEURISTIC_FALLBACK'
+                        ? 'Heuristic Fallback'
+                        : 'Gemini 3.5 Flash-Lite'}
+                    </span>
+                  </div>
                 </div>
-                <p className="text-xs text-slate-700 leading-relaxed">
-                  {imageSignal?.result || 'Water level benchmark detected. Tire submerged (~40cm water depth).'}
+                <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                  {imageSignal?.reason || imageSignal?.result || 'Gemini 3.5 Flash-Lite verified visual hazard signature.'}
                 </p>
+                {imageSignal?.input_data?.depth_benchmark && (
+                  <div className="text-[11px] text-slate-600 flex items-center gap-1.5">
+                    <span className="font-semibold text-slate-700">Flood Depth:</span>
+                    <span className="font-mono font-bold text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded border border-brand-200">
+                      {imageSignal.input_data.depth_benchmark.replace('_', ' ')}
+                    </span>
+                  </div>
+                )}
+                {imageSignal?.input_data?.detected_objects && imageSignal.input_data.detected_objects.length > 0 && (
+                  <div className="text-[10px] text-slate-500">
+                    <span>YOLOv8 Objects: </span>
+                    <span className="font-mono text-slate-700">
+                      {imageSignal.input_data.detected_objects.join(', ')}
+                    </span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200">
-                  <span>Category: {incident.incident_type}</span>
-                  <span className="font-mono text-emerald-700 font-bold">Score: {imageSignal?.score ? (Number(imageSignal.score) * 100).toFixed(0) : '90'}%</span>
+                  <span>Classification: {imageSignal?.result || incident.incident_type}</span>
+                  <span className="font-mono text-emerald-700 font-bold">
+                    Score: {imageSignal?.score ? (Number(imageSignal.score) * 100).toFixed(0) : '90'}%
+                  </span>
                 </div>
               </div>
 
-              {/* Signal 2: Weather Telemetry Correlation */}
+              {/* Signal 2: Weather Telemetry Correlation - 20% */}
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-slate-900 flex items-center gap-1.5">
                     <CloudRain className="w-3.5 h-3.5 text-blue-600" />
-                    <span>2. Weather & Hydrological Telemetry</span>
+                    <span>2. Weather &amp; Hydrological Telemetry</span>
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                    System Correlation
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                      20% Weight
+                    </span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      Sensor Correlation
+                    </span>
+                  </div>
                 </div>
                 <p className="text-xs text-slate-700 leading-relaxed">
                   {weatherSignal?.reason || 'Heavy precipitation confirmed: Rainfall 91.5mm (Threshold 50mm). River gauge 3.6m.'}
@@ -479,63 +514,79 @@ export const IncidentCommandInspector: React.FC<IncidentCommandInspectorProps> =
                 </div>
               </div>
 
-              {/* Signal 3: Spatio-Temporal Cluster (200m) */}
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-slate-900 flex items-center gap-1.5">
-                    <Radio className="w-3.5 h-3.5 text-purple-600" />
-                    <span>3. Spatio-Temporal Cluster Density (200m / 3h)</span>
-                  </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
-                    Spatial Density
-                  </span>
-                </div>
-                <p className="text-xs text-slate-700 leading-relaxed">
-                  {clusterSignal?.result || 'Correlated citizen reports detected within 200m radius in rolling window.'}
-                </p>
-                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200">
-                  <span>Radius: 200m • Window: 3.0h</span>
-                  <span className="font-mono text-emerald-700 font-bold">Score: {clusterSignal?.score ? (Number(clusterSignal.score) * 100).toFixed(0) : '85'}%</span>
-                </div>
-              </div>
-
-              {/* Signal 4: Location & Scene Authenticity */}
+              {/* Signal 3: Location & Scene Authenticity - 20% */}
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-slate-900 flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>4. Location & Scene Authenticity</span>
+                    <span>3. Location Authenticity &amp; Territory</span>
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    Geospatial Verified
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      20% Weight
+                    </span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      Geospatial Match
+                    </span>
+                  </div>
                 </div>
                 <p className="text-xs text-slate-700 leading-relaxed">
-                  {locationSignal?.reason || 'Report coordinates lie squarely inside registered municipal ward bounds. Outdoor flood terrain match.'}
+                  {locationSignal?.reason || 'Report coordinates lie squarely inside registered municipal ward bounds. Outdoor terrain match.'}
                 </p>
                 <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200">
-                  <span>Ward: {incident.wards?.name}</span>
+                  <span>Ward: {incident.wards?.name || 'Municipal Ward'}</span>
                   <span className="font-mono text-emerald-700 font-bold">Score: {locationSignal?.score ? (Number(locationSignal.score) * 100).toFixed(0) : '92'}%</span>
                 </div>
               </div>
+            </div>
 
-              {/* Signal 5: Risk Urgency AI */}
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+            {/* Auxiliary Operational Context Section (Non-Scoring) */}
+            <div className="space-y-2.5 pt-2 border-t border-slate-200">
+              <div className="flex items-center justify-between">
+                <h5 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <ShieldAlert className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Auxiliary Operational Context (Non-Scoring)</span>
+                </h5>
+                <span className="text-[10px] text-slate-400">Informs Priority &amp; Dispatch</span>
+              </div>
+
+              {/* Auxiliary 1: Spatio-Temporal Cluster Density */}
+              <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/80 space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-slate-900 flex items-center gap-1.5">
-                    <ShieldAlert className="w-3.5 h-3.5 text-red-600" />
-                    <span>5. Risk Urgency AI Check</span>
+                  <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                    <Radio className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Spatio-Temporal Cluster Density (200m / 3h)</span>
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-red-50 text-red-700 border border-red-200">
-                    Criticality Rating
+                  <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
+                    Nearby Corroboration
                   </span>
                 </div>
-                <p className="text-xs text-slate-700 leading-relaxed">
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {clusterSignal?.result || 'Correlated citizen reports detected within 200m radius in rolling window.'}
+                </p>
+                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">
+                  <span>Radius: 200m • Window: 3.0h</span>
+                  <span className="font-mono text-slate-600 font-medium">{clusterSignal?.result || 'Corroborated'}</span>
+                </div>
+              </div>
+
+              {/* Auxiliary 2: Risk Urgency AI Check */}
+              <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/80 space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                    <ShieldAlert className="w-3.5 h-3.5 text-red-600" />
+                    <span>Risk Urgency &amp; Roadway Hierarchy</span>
+                  </span>
+                  <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-red-50 text-red-700 border border-red-200">
+                    Priority: {incident.severity}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
                   {riskSignal?.reason || `Primary arterial road obstruction. Risk level ${incident.severity} assigned based on critical connectivity.`}
                 </p>
-                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200">
-                  <span>Road Classification: Primary Arterial</span>
-                  <span className="font-mono text-red-600 font-bold">Priority: {incident.severity}</span>
+                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">
+                  <span>Road Classification: {incident.roads?.name || 'Primary Corridor'}</span>
+                  <span className="font-mono text-red-600 font-bold">Severity: {incident.severity}</span>
                 </div>
               </div>
             </div>

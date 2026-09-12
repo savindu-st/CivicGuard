@@ -6,6 +6,8 @@ class ModelDiagnostic(BaseModel):
     weights_path: str
     inference_device: str
     fallback_available: bool
+    gemini_ready: bool = False
+    gemini_model: str = "gemini-3.5-flash-lite"
 
 class HealthResponse(BaseModel):
     status: str

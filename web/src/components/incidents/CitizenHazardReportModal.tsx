@@ -25,6 +25,14 @@ export interface CitizenHazardReportModalProps {
   // Pin-Drop integration with map
   currentCoordinates: { latitude: number; longitude: number } | null;
   onEnablePinDropMode: () => void;
+  initialScanData?: {
+    photoFile?: File | null;
+    photoUrl?: string | null;
+    hazardType?: string;
+    depthBenchmark?: string;
+    confidence?: number;
+    detections?: any[];
+  } | null;
 }
 
 const SRI_LANKA_PRESETS = [
@@ -47,14 +55,28 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
   onReportSubmitted,
   currentCoordinates,
   onEnablePinDropMode,
+  initialScanData,
 }) => {
   const { user } = useAuthStore();
 
-  const [incidentType, setIncidentType] = useState<string>('FLOOD');
-  const [depthBenchmark, setDepthBenchmark] = useState<string>('BUMPER_LEVEL');
+  const [incidentType, setIncidentType] = useState<string>(initialScanData?.hazardType || 'FLOOD');
+  const [depthBenchmark, setDepthBenchmark] = useState<string>(initialScanData?.depthBenchmark || 'BUMPER_LEVEL');
   const [description, setDescription] = useState<string>('');
-  const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<File | null>(initialScanData?.photoFile || null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(initialScanData?.photoUrl || null);
+  const [scanConfidence, setScanConfidence] = useState<number | null>(initialScanData?.confidence || null);
+  const [isInlineScanning, setIsInlineScanning] = useState<boolean>(false);
+
+  // Sync initialScanData when modal opens
+  React.useEffect(() => {
+    if (initialScanData) {
+      if (initialScanData.hazardType) setIncidentType(initialScanData.hazardType);
+      if (initialScanData.depthBenchmark) setDepthBenchmark(initialScanData.depthBenchmark);
+      if (initialScanData.photoFile) setSelectedPhoto(initialScanData.photoFile);
+      if (initialScanData.photoUrl) setPhotoPreview(initialScanData.photoUrl);
+      if (initialScanData.confidence) setScanConfidence(initialScanData.confidence);
+    }
+  }, [initialScanData]);
 
   // Manual Coordinates Override (if citizen types or uses preset)
   const [manualLat, setManualLat] = useState<string>('');
@@ -96,6 +118,37 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
     );
   };
 
+  const handleInlineScan = async () => {
+    if (!photoPreview) return;
+    setIsInlineScanning(true);
+    setErrorMessage(null);
+    try {
+      let res;
+      if (selectedPhoto) {
+        const formData = new FormData();
+        formData.append('photo', selectedPhoto);
+        formData.append('hazard_type', incidentType);
+        res = await api.post('/api/incidents/scan-photo', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      } else {
+        res = await api.post('/api/incidents/scan-photo', {
+          photo_url: photoPreview,
+          hazard_type: incidentType,
+        });
+      }
+      const data = res.data?.data;
+      if (data) {
+        setScanConfidence(data.overall_confidence);
+        if (data.depth_benchmark) setDepthBenchmark(data.depth_benchmark);
+      }
+    } catch (err: any) {
+      setErrorMessage('Could not complete live Gemini check: ' + err.message);
+    } finally {
+      setIsInlineScanning(false);
+    }
+  };
+
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -105,6 +158,7 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
       }
       setSelectedPhoto(file);
       setPhotoPreview(URL.createObjectURL(file));
+      setScanConfidence(null);
       setErrorMessage(null);
     }
   };
@@ -116,7 +170,7 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
     const severity = DEPTH_BENCHMARKS.find((d) => d.id === depthBenchmark)?.severity || 'HIGH';
 
     setIsSubmitting(true);
-    setSubmissionStep(1); // 1. YOLO Image AI
+    setSubmissionStep(1); // 1. Gemini 3.5 Flash-Lite Image AI
 
     // Visual Stepper Timing Simulation
     const t1 = setTimeout(() => setSubmissionStep(2), 600); // 2. Weather Correlation
@@ -139,6 +193,8 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
       }
       if (selectedPhoto) {
         formData.append('photo', selectedPhoto);
+      } else if (photoPreview) {
+        formData.append('photo_url', photoPreview);
       }
 
       const res = await api.post('/api/incidents/reports', formData, {
@@ -181,7 +237,7 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
                 </span>
               </h2>
               <p className="text-xs text-slate-500 font-medium">
-                Submissions are verified instantly by 5-signal AI & environmental sensors
+                Submissions are verified instantly by Tri-Signal AI &amp; environmental sensors
               </p>
             </div>
           </div>
@@ -193,16 +249,16 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
           </button>
         </div>
 
-        {/* 5-Signal AI Verification Progress Overlay */}
+        {/* Tri-Signal AI Verification Progress Overlay */}
         {isSubmitting && (
           <div className="absolute inset-0 z-50 bg-white/98 backdrop-blur-md p-6 flex flex-col items-center justify-center space-y-6 text-slate-900">
             <div className="text-center space-y-2">
               <div className="inline-flex p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 animate-spin">
                 <Loader2 className="w-8 h-8" />
               </div>
-              <h3 className="text-lg font-black text-slate-900">5-Signal AI Verification Pipeline</h3>
+              <h3 className="text-lg font-black text-slate-900">Tri-Signal AI Verification Pipeline</h3>
               <p className="text-xs text-slate-600 max-w-sm">
-                Evaluating photo evidence, sensor telemetry, spatial clusters, and risk urgency index
+                Evaluating photo evidence (60%), sensor telemetry (20%), and location geofence (20%)
               </p>
             </div>
 
@@ -216,7 +272,7 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
               >
                 <span className="flex items-center gap-2 font-medium">
                   {submissionStep >= 1 ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Loader2 className="w-4 h-4 animate-spin" />}
-                  1. YOLOv8 Multimodal Vision Analysis
+                  1. Gemini 3.5 Flash-Lite Hazard Verification (60% Weight)
                 </span>
                 <span className="text-[10px] font-bold uppercase">{submissionStep >= 1 ? 'Passed' : 'Analyzing'}</span>
               </div>
@@ -230,7 +286,7 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
               >
                 <span className="flex items-center gap-2 font-medium">
                   {submissionStep >= 2 ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Loader2 className="w-4 h-4 animate-spin" />}
-                  2. Weather & River Sensor Correlation
+                  2. Weather &amp; River Sensor Correlation (20% Weight)
                 </span>
                 <span className="text-[10px] font-bold uppercase">{submissionStep >= 2 ? 'Correlated' : 'Checking'}</span>
               </div>
@@ -244,9 +300,9 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
               >
                 <span className="flex items-center gap-2 font-medium">
                   {submissionStep >= 3 ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Loader2 className="w-4 h-4 animate-spin" />}
-                  3. Spatio-Temporal Cluster (200m) Check
+                  3. Location Authenticity &amp; Territorial Geofence (20% Weight)
                 </span>
-                <span className="text-[10px] font-bold uppercase">{submissionStep >= 3 ? 'Indexed' : 'Matching'}</span>
+                <span className="text-[10px] font-bold uppercase">{submissionStep >= 3 ? 'Verified' : 'Validating'}</span>
               </div>
 
               <div
@@ -258,9 +314,9 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
               >
                 <span className="flex items-center gap-2 font-medium">
                   {submissionStep >= 4 ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Loader2 className="w-4 h-4 animate-spin" />}
-                  4. Location Authenticity & Territorial Geofence
+                  4. Spatio-Temporal Cluster (200m) Check (Operational Context)
                 </span>
-                <span className="text-[10px] font-bold uppercase">{submissionStep >= 4 ? 'Verified' : 'Validating'}</span>
+                <span className="text-[10px] font-bold uppercase">{submissionStep >= 4 ? 'Indexed' : 'Matching'}</span>
               </div>
 
               <div
@@ -272,9 +328,9 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
               >
                 <span className="flex items-center gap-2 font-medium">
                   {submissionStep >= 5 ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Loader2 className="w-4 h-4 animate-spin" />}
-                  5. Risk Urgency Index & Council Ticket Dispatch
+                  5. Risk Urgency Index &amp; Council Ticket Dispatch
                 </span>
-                <span className="text-[10px] font-bold uppercase">{submissionStep >= 5 ? 'Confirmed' : 'Computing'}</span>
+                <span className="text-[10px] font-bold uppercase">{submissionStep >= 5 ? 'Dispatched' : 'Queuing'}</span>
               </div>
             </div>
           </div>
@@ -425,7 +481,7 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
           <div className="space-y-3">
             <label className="font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
               <Camera className="w-3.5 h-3.5 text-emerald-600" />
-              <span>4. Photo Evidence (Required for YOLO AI Verification)</span>
+              <span>4. Photo Evidence (Required for Gemini AI Verification)</span>
             </label>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <label className="w-full sm:w-1/2 flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-slate-50 hover:bg-white cursor-pointer transition-all">
@@ -442,21 +498,53 @@ export const CitizenHazardReportModal: React.FC<CitizenHazardReportModalProps> =
               </label>
 
               {photoPreview ? (
-                <div className="relative w-full sm:w-1/2 aspect-video rounded-xl overflow-hidden border border-emerald-300 shadow-md">
-                  <img src={photoPreview} alt="Selected preview" className="w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedPhoto(null);
-                      setPhotoPreview(null);
-                    }}
-                    className="absolute top-1.5 right-1.5 p-1 rounded-full bg-slate-900/80 text-white hover:bg-red-600 transition-colors"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                  <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded bg-white/90 text-emerald-700 font-bold border border-emerald-200 text-[9px] shadow-xs">
-                    Ready for AI Inference
-                  </span>
+                <div className="w-full sm:w-1/2 space-y-2">
+                  <div className="relative aspect-video rounded-xl overflow-hidden border border-emerald-300 shadow-md">
+                    <img src={photoPreview} alt="Selected preview" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedPhoto(null);
+                        setPhotoPreview(null);
+                        setScanConfidence(null);
+                      }}
+                      className="absolute top-1.5 right-1.5 p-1 rounded-full bg-slate-900/80 text-white hover:bg-red-600 transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded bg-white/90 text-emerald-700 font-bold border border-emerald-200 text-[9px] shadow-xs">
+                      {scanConfidence !== null ? `Gemini Verified (${Math.round(scanConfidence * 100)}%)` : 'Ready for AI Verification'}
+                    </span>
+                  </div>
+
+                  {scanConfidence !== null ? (
+                    <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Confidence Value: {Math.round(scanConfidence * 100)}% (Verified)</span>
+                      </span>
+                      <span className="text-[10px] text-emerald-600 font-mono">Gemini 3.5 Verified</span>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleInlineScan}
+                      disabled={isInlineScanning}
+                      className="w-full py-2 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors shadow-xs"
+                    >
+                      {isInlineScanning ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Checking with Gemini 3.5...</span>
+                        </>
+                      ) : (
+                        <>
+                          <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                          <span>Check Confidence with Gemini 3.5 ⚡</span>
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="w-full sm:w-1/2 p-4 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 flex items-center gap-2">

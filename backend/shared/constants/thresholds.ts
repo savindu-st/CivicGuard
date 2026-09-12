@@ -1,5 +1,5 @@
 export const VERIFICATION_THRESHOLDS = {
-  CONFIRMATION_SCORE: 0.85,
+  CONFIRMATION_SCORE: 0.75,
   NEEDS_VERIFICATION_SCORE: 0.40,
 } as const;
 
@@ -20,9 +20,7 @@ export const CORROBORATION_WEIGHTS = {
 } as const;
 
 export const SIGNAL_WEIGHTS = {
-  IMAGE_AI: 0.35,
-  LOCATION_AI: 0.15,
-  RISK_AI: 0.15,
+  IMAGE_AI: 0.60,
+  LOCATION_AI: 0.20,
   WEATHER_CHECK: 0.20,
-  CLUSTER_CHECK: 0.15,
 } as const;

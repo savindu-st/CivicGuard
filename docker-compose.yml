@@ -47,6 +47,7 @@ services:
     container_name: civicguard-ai-service
     environment:
       - PORT=5000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     ports:
       - "5000:5000"
     networks:

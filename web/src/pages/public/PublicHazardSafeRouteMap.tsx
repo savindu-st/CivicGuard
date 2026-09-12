@@ -17,11 +17,14 @@ import {
   Mountain,
   Info,
   Radio,
+  Camera,
+  Sparkles,
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useSocket } from '../../hooks/useSocket';
 import { PublicHazardMap } from '../../components/map/PublicHazardMap';
 import { CitizenHazardReportModal } from '../../components/incidents/CitizenHazardReportModal';
+import { CitizenPhotoScanPortal, YoloDetection } from '../../components/incidents/CitizenPhotoScanPortal';
 import { SafeRoutePlanner } from '../../components/routing/SafeRoutePlanner';
 
 export const PublicHazardSafeRouteMap: React.FC = () => {
@@ -41,6 +44,17 @@ export const PublicHazardSafeRouteMap: React.FC = () => {
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
   const [isPinDropMode, setIsPinDropMode] = useState<boolean>(false);
   const [pinDropLocation, setPinDropLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  // Citizen AI Photo Scanner Portal State
+  const [isScanPortalOpen, setIsScanPortalOpen] = useState<boolean>(false);
+  const [prefilledScanData, setPrefilledScanData] = useState<{
+    photoFile: File | null;
+    photoUrl: string | null;
+    hazardType: string;
+    depthBenchmark: string;
+    confidence: number;
+    detections: YoloDetection[];
+  } | null>(null);
 
   // Safe Detour Route State
   const [routeCoordinates, setRouteCoordinates] = useState<[number, number][]>([]);
@@ -136,6 +150,24 @@ export const PublicHazardSafeRouteMap: React.FC = () => {
     }
   };
 
+  // Handle Escalation from YOLO Photo Scanner to Official Report
+  const handleEscalateToReport = (scanData: {
+    photoFile: File | null;
+    photoUrl: string | null;
+    hazardType: string;
+    depthBenchmark: string;
+    confidence: number;
+    detections: YoloDetection[];
+  }) => {
+    setPrefilledScanData(scanData);
+    setIsScanPortalOpen(false);
+    setIsReportModalOpen(true);
+    showToast(
+      `Photo verified by Gemini 3.5 (${Math.round(scanData.confidence * 100)}% confidence). Ready to report hazard!`,
+      'success'
+    );
+  };
+
   // Filtered Hazards
   const filteredHazards = hazards.filter((h) => {
     if (filterType === 'ALL') return true;
@@ -185,6 +217,14 @@ export const PublicHazardSafeRouteMap: React.FC = () => {
             <Home className="w-3.5 h-3.5" />
             <span>{totalAvailableBeds} Available Beds</span>
           </div>
+
+          <button
+            onClick={() => setIsScanPortalOpen(true)}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs transition-all shadow-xs"
+          >
+            <Camera className="w-3.5 h-3.5 text-blue-600" />
+            <span>Scan Photo with Gemini AI ⚡</span>
+          </button>
 
           <div className="flex items-center gap-1.5 text-[11px] text-slate-500 pl-2 border-l border-slate-200">
             <Radio className={`w-3.5 h-3.5 ${isConnected ? 'text-emerald-600' : 'text-slate-400'}`} />
@@ -257,17 +297,26 @@ export const PublicHazardSafeRouteMap: React.FC = () => {
           </div>
         </div>
 
-        {/* Floating Bottom Action Bar: Report Hazard FAB */}
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[1000] flex items-center gap-3 pointer-events-auto">
+        {/* Floating Bottom Action Bar: Report Hazard & AI Scanner FABs */}
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[1000] flex flex-wrap items-center justify-center gap-3 pointer-events-auto">
           <button
             onClick={() => {
               setIsPinDropMode(false);
+              setPrefilledScanData(null);
               setIsReportModalOpen(true);
             }}
-            className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-extrabold text-sm tracking-wide shadow-2xl shadow-red-600/40 flex items-center gap-2.5 border border-red-400 transition-all transform hover:scale-105"
+            className="px-5 py-3.5 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-extrabold text-sm tracking-wide shadow-2xl shadow-red-600/40 flex items-center gap-2 border border-red-400 transition-all transform hover:scale-105"
           >
-            <AlertTriangle className="w-5 h-5 animate-pulse" />
+            <AlertTriangle className="w-4 h-4 animate-pulse" />
             <span>REPORT HAZARD ⚠️</span>
+          </button>
+
+          <button
+            onClick={() => setIsScanPortalOpen(true)}
+            className="px-5 py-3.5 rounded-2xl bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 hover:from-slate-800 hover:to-indigo-900 text-white font-extrabold text-sm tracking-wide shadow-2xl shadow-blue-900/40 flex items-center gap-2 border border-blue-400/40 transition-all transform hover:scale-105"
+          >
+            <Camera className="w-4 h-4 text-cyan-400 animate-pulse" />
+            <span>AI PHOTO SCANNER ⚡</span>
           </button>
         </div>
 
@@ -322,11 +371,22 @@ export const PublicHazardSafeRouteMap: React.FC = () => {
         />
       </div>
 
+      {/* Citizen AI Photo Scan & YOLO Verification Portal */}
+      <CitizenPhotoScanPortal
+        isOpen={isScanPortalOpen}
+        onClose={() => setIsScanPortalOpen(false)}
+        onEscalateToReport={handleEscalateToReport}
+      />
+
       {/* Citizen Hazard Report Modal */}
       <CitizenHazardReportModal
         isOpen={isReportModalOpen}
-        onClose={() => setIsReportModalOpen(false)}
+        onClose={() => {
+          setIsReportModalOpen(false);
+          setPrefilledScanData(null);
+        }}
         currentCoordinates={pinDropLocation}
+        initialScanData={prefilledScanData}
         onEnablePinDropMode={() => {
           setIsPinDropMode(true);
           showToast('Click anywhere on the map to place your hazard report pin!', 'alert');
