@@ -22,6 +22,10 @@ export interface FieldCrew {
   user_id?: string | null;
   crew_name: string;
   crew_type?: CrewType | string;
+  specialty?: string; // 'WATER_RESCUE' | '4X4_DEBRIS' | 'MEDICAL_TRIAGE' | 'DRONE_RECON' | 'HAM_RADIO'
+  district?: string;
+  phone?: string | null;
+  equipment?: string[];
   availability: CrewAvailability;
   latitude?: number | null;
   longitude?: number | null;
@@ -29,6 +33,7 @@ export interface FieldCrew {
   contact_phone?: string | null;
   assigned_ward_id?: string | null;
   created_at?: string;
+  updated_at?: string;
   // Joined relation fields
   user_name?: string;
   user_phone?: string;
@@ -41,6 +46,10 @@ export interface CouncilTicket {
   assigned_crew_id?: string | null;
   priority: TicketPriority;
   status: TicketStatus;
+  required_specialty?: string | null;
+  sitrep_notes?: string | null;
+  evacuated_count?: number;
+  route_directions?: string[];
   description?: string | null;
   created_at?: string;
   updated_at?: string;

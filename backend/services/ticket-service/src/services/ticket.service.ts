@@ -293,7 +293,8 @@ export class TicketService {
     ticketId: string,
     photoUrl: string,
     notes?: string,
-    userId?: string
+    userId?: string,
+    options?: { sitrep_notes?: string; evacuated_count?: number }
   ): Promise<CouncilTicket> {
     if (!photoUrl || photoUrl.length < 5) {
       throw new Error('Mandatory resolution proof photo is required to close ticket (ADR-005)');
@@ -310,14 +311,22 @@ export class TicketService {
       evidence_type: 'COMPLETION_PHOTO',
     });
 
-    // 3. Mark ticket COMPLETED
+    // 3. Mark ticket COMPLETED and save sitrep data
+    const updatePayload: Record<string, any> = {
+      status: 'COMPLETED',
+      completed_at: new Date().toISOString(),
+      description: notes ? `${ticket.description || ''} | Resolution Notes: ${notes}` : ticket.description,
+    };
+    if (options?.sitrep_notes) {
+      updatePayload.sitrep_notes = options.sitrep_notes;
+    }
+    if (options?.evacuated_count !== undefined) {
+      updatePayload.evacuated_count = options.evacuated_count;
+    }
+
     const { data: updatedTicket, error: updateErr } = await this.supabase
       .from('council_tickets')
-      .update({
-        status: 'COMPLETED',
-        completed_at: new Date().toISOString(),
-        description: notes ? `${ticket.description || ''} | Resolution Notes: ${notes}` : ticket.description,
-      })
+      .update(updatePayload)
       .eq('id', ticketId)
       .select()
       .single();

@@ -113,7 +113,7 @@ export class TicketController {
    */
   completeTicket = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { notes, photo_url } = req.body;
+      const { notes, photo_url, sitrep_notes, evacuated_count } = req.body;
       const file = req.file;
 
       let finalPhotoUrl = photo_url || '';
@@ -145,7 +145,11 @@ export class TicketController {
         req.params.id,
         finalPhotoUrl,
         notes,
-        userId
+        userId,
+        {
+          sitrep_notes: sitrep_notes || notes,
+          evacuated_count: evacuated_count !== undefined ? Number(evacuated_count) : undefined,
+        }
       );
 
       sendSuccess(res, completedTicket, 'Ticket resolved and road reopened on public map');

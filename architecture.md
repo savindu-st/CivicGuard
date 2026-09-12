@@ -437,3 +437,23 @@ stateDiagram-v2
 - **AI Service Unavailability**: As established in ADR-003, if `ai-service` is unreachable, `incident-service` falls back to deterministic heuristic validation and flags the record for manual officer review.
 - **Notification Service Degradation**: If `notification-service` is down, tickets and incidents are still persisted to Supabase; frontend clients gracefully fall back to polling.
 - **Client Offline Incident Queuing**: Citizen client stores pending submissions in `localStorage`/`IndexedDB` with device timestamps when disconnected, batch-syncing once network connectivity is restored.
+
+---
+
+## 9. Architecture Decision Records (ADRs)
+
+### ADR-023: Emergency Response Crew Hierarchy, Specialty Tracks & Ground SitRep Schema
+
+- **Date**: 2026-09-12
+- **Status**: Accepted
+- **Context**: 
+  Disaster operations require a distinct operational separation between general Community Volunteers and specialized Emergency Response Crews. Each Sri Lankan District Officer oversees ~20 specialized field crews categorized by tactical capabilities (Water Rescue, 4x4 Debris, Medical Triage, Drone Recon, HAM Radio). Response crews require declared equipment tracking and ground SitRep reporting (evacuated civilian counts + photo proof) before tickets can be closed.
+- **Decision**:
+  1. Enhanced `field_crews` table with `specialty` (`VARCHAR(50)`), `district` (`VARCHAR(50)`), and `equipment` (`JSONB`).
+  2. Enhanced `council_tickets` table with `required_specialty` (`VARCHAR(50)`), `sitrep_notes` (`TEXT`), `evacuated_count` (`INTEGER`), and `route_directions` (`JSONB`).
+  3. Integrated `completeTicketWithPhoto` workflow in `ticket-service` to persist `sitrep_notes` and `evacuated_count` while automatically releasing crew availability upon task completion.
+  4. Structured mobile UI to provide dual tracks: Community Volunteers browse public verified feeds with multi-criteria filters, while Emergency Response Crews receive private dispatches from the District Officer with GPS navigation and tactical SitRep submission.
+- **Consequences**:
+  - District Officers can target dispatches to the exact qualified squad with matching gear.
+  - Command centers gain real-time visibility into rescued/evacuated civilian headcounts and ground situational reports across all 25 Sri Lankan districts.
+
