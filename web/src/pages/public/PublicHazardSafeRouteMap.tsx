@@ -194,7 +194,7 @@ export const PublicHazardSafeRouteMap: React.FC = () => {
       </div>
 
       {/* Main Map Workspace Area */}
-      <div className="relative flex-1 w-full h-full">
+      <div className="relative flex-1 w-full h-full min-h-0">
         {/* Floating Top-Left Controls: Layer Toggles & Hazard Category Filter */}
         <div className="absolute top-4 left-4 z-[1000] flex flex-col gap-2 pointer-events-auto max-w-sm">
           {/* Layer Toggles Pill Bar */}

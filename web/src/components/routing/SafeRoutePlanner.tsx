@@ -171,27 +171,27 @@ export const SafeRoutePlanner: React.FC<SafeRoutePlannerProps> = ({
   };
 
   return (
-    <div className="absolute top-4 right-4 z-[1000] w-full max-w-sm rounded-2xl bg-dark-900/95 border border-slate-700/80 shadow-2xl backdrop-blur-md overflow-hidden text-xs transition-all pointer-events-auto">
+    <div className="absolute top-4 right-4 z-[1000] w-full max-w-sm rounded-2xl bg-white/95 border border-slate-200 shadow-xl backdrop-blur-md overflow-hidden text-xs transition-all pointer-events-auto">
       {/* Header Bar */}
-      <div className="p-3.5 border-b border-slate-800 flex items-center justify-between bg-dark-850/60">
+      <div className="p-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50/90">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+          <div className="p-1.5 rounded-lg bg-cyan-50 border border-cyan-200 text-cyan-600">
             <Navigation className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="font-bold text-white text-xs flex items-center gap-1.5">
+            <h3 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
               Safe Evacuation Corridor
-              <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+              <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-cyan-50 text-cyan-700 border border-cyan-200">
                 ADR-014
               </span>
             </h3>
-            <p className="text-[10px] text-slate-400">Routes dynamically around submerged roads</p>
+            <p className="text-[10px] text-slate-500">Routes dynamically around submerged roads</p>
           </div>
         </div>
 
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-dark-800 transition-colors"
+          className="p-1 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors"
         >
           {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
@@ -199,15 +199,15 @@ export const SafeRoutePlanner: React.FC<SafeRoutePlannerProps> = ({
 
       {/* Alert Banner for Detours */}
       {alertBanner && (
-        <div className="px-3.5 py-2 bg-orange-500/15 border-b border-orange-500/30 text-orange-300 flex items-center gap-2 text-[11px] font-semibold animate-pulse">
-          <AlertTriangle className="w-3.5 h-3.5 text-orange-400 flex-shrink-0" />
+        <div className="px-3.5 py-2 bg-orange-50 border-b border-orange-200 text-orange-800 flex items-center gap-2 text-[11px] font-semibold animate-pulse">
+          <AlertTriangle className="w-3.5 h-3.5 text-orange-600 flex-shrink-0" />
           <span>{alertBanner}</span>
         </div>
       )}
 
       {errorMessage && (
-        <div className="px-3.5 py-2 bg-red-500/15 border-b border-red-500/30 text-red-300 flex items-center gap-2 text-[11px]">
-          <ShieldAlert className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
+        <div className="px-3.5 py-2 bg-red-50 border-b border-red-200 text-red-700 flex items-center gap-2 text-[11px]">
+          <ShieldAlert className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
@@ -227,15 +227,15 @@ export const SafeRoutePlanner: React.FC<SafeRoutePlannerProps> = ({
 
           {/* Origin Section */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-slate-400 font-semibold">
+            <div className="flex items-center justify-between text-[11px] text-slate-500 font-semibold">
               <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-400"></span> Start / Origin:
+                <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Start / Origin:
               </span>
-              <span className="text-slate-300 font-mono text-[10px]">
+              <span className="text-slate-600 font-mono text-[10px]">
                 {originLat.toFixed(4)}, {originLon.toFixed(4)}
               </span>
             </div>
-            <div className="p-2 rounded-xl bg-dark-800 border border-slate-700 text-white font-medium text-xs">
+            <div className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-medium text-xs">
               {originName}
             </div>
 
@@ -250,7 +250,7 @@ export const SafeRoutePlanner: React.FC<SafeRoutePlannerProps> = ({
                     setOriginLon(p.lon);
                     setOriginName(p.name);
                   }}
-                  className="px-2 py-0.5 rounded bg-dark-800 hover:bg-dark-750 text-slate-400 hover:text-slate-200 border border-slate-700/60 text-[10px] transition-colors"
+                  className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200 text-[10px] transition-colors"
                 >
                   {p.name.split(' ')[0]}
                 </button>
@@ -260,11 +260,11 @@ export const SafeRoutePlanner: React.FC<SafeRoutePlannerProps> = ({
 
           {/* Destination Section */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-slate-400 font-semibold">
+            <div className="flex items-center justify-between text-[11px] text-slate-500 font-semibold">
               <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-cyan-400"></span> Destination / Shelter:
+                <span className="w-2 h-2 rounded-full bg-cyan-500"></span> Destination / Shelter:
               </span>
-              <span className="text-slate-300 font-mono text-[10px]">
+              <span className="text-slate-600 font-mono text-[10px]">
                 {destLat.toFixed(4)}, {destLon.toFixed(4)}
               </span>
             </div>
@@ -279,7 +279,7 @@ export const SafeRoutePlanner: React.FC<SafeRoutePlannerProps> = ({
                   setDestLon(lon);
                   setDestName(selected?.name || 'Selected Shelter');
                 }}
-                className="w-full p-2 rounded-xl bg-dark-800 border border-slate-700 text-white text-xs focus:outline-none focus:border-cyan-500"
+                className="w-full p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-cyan-500"
               >
                 {shelters.map((s) => (
                   <option key={s.id} value={`${s.latitude},${s.longitude}`}>
@@ -288,7 +288,7 @@ export const SafeRoutePlanner: React.FC<SafeRoutePlannerProps> = ({
                 ))}
               </select>
             ) : (
-              <div className="p-2 rounded-xl bg-dark-800 border border-slate-700 text-white font-medium text-xs">
+              <div className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-medium text-xs">
                 {destName}
               </div>
             )}
@@ -314,7 +314,7 @@ export const SafeRoutePlanner: React.FC<SafeRoutePlannerProps> = ({
               <button
                 type="button"
                 onClick={clearRoute}
-                className="px-3 py-2.5 rounded-xl bg-dark-800 hover:bg-dark-750 text-slate-400 hover:text-white border border-slate-700 transition-colors"
+                className="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200 transition-colors"
                 title="Clear route"
               >
                 Clear
@@ -324,40 +324,40 @@ export const SafeRoutePlanner: React.FC<SafeRoutePlannerProps> = ({
 
           {/* Route Summary Card */}
           {routeResult && (
-            <div className="p-3 rounded-xl bg-dark-800/90 border border-slate-700 space-y-2.5 animate-in fade-in">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5 animate-in fade-in">
               <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5 font-bold text-white">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <div className="flex items-center gap-1.5 font-bold text-slate-900">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   <span>Passable Corridor</span>
                 </div>
-                <span className="text-cyan-400 font-extrabold text-sm font-mono">
+                <span className="text-cyan-600 font-extrabold text-sm font-mono">
                   {routeResult.distanceKm} km
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300">
+              <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600">
                 <div className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
+                  <Clock className="w-3.5 h-3.5 text-slate-500" />
                   <span>Car: ~{Math.round((routeResult.distanceKm / 30) * 60)} min</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
+                  <Clock className="w-3.5 h-3.5 text-slate-500" />
                   <span>Foot: ~{Math.round((routeResult.distanceKm / 4.5) * 60)} min</span>
                 </div>
               </div>
 
               {/* Avoided Closed Roads List */}
               {routeResult.avoidedRoads && routeResult.avoidedRoads.length > 0 && (
-                <div className="pt-2 border-t border-slate-700/60 space-y-1">
-                  <div className="text-[10px] text-orange-400 font-bold uppercase tracking-wider">
+                <div className="pt-2 border-t border-slate-200 space-y-1">
+                  <div className="text-[10px] text-orange-600 font-bold uppercase tracking-wider">
                     Avoided Closed Hazards:
                   </div>
                   {routeResult.avoidedRoads.map((r: any) => (
                     <div
                       key={r.id || r.name}
-                      className="text-[10px] text-slate-300 flex items-center gap-1 bg-red-950/40 p-1 rounded border border-red-800/40"
+                      className="text-[10px] text-red-800 flex items-center gap-1 bg-red-50 p-1 rounded border border-red-200"
                     >
-                      <span className="text-red-400">⛔</span>
+                      <span className="text-red-500">⛔</span>
                       <span className="truncate">{r.name}</span>
                     </div>
                   ))}
@@ -366,12 +366,12 @@ export const SafeRoutePlanner: React.FC<SafeRoutePlannerProps> = ({
 
               {/* Step-by-Step Waypoint Preview */}
               {routeResult.path && routeResult.path.length > 0 && (
-                <div className="pt-2 border-t border-slate-700/60 space-y-1 text-[10px]">
-                  <div className="text-slate-400 font-semibold">Waypoint Itinerary:</div>
-                  <div className="space-y-0.5 text-slate-300 font-mono">
+                <div className="pt-2 border-t border-slate-200 space-y-1 text-[10px]">
+                  <div className="text-slate-500 font-semibold">Waypoint Itinerary:</div>
+                  <div className="space-y-0.5 text-slate-600 font-mono">
                     {routeResult.path.map((step: any, idx: number) => (
                       <div key={idx} className="flex items-center gap-1">
-                        <span className="text-cyan-400">{idx + 1}.</span>
+                        <span className="text-cyan-600">{idx + 1}.</span>
                         <span>{step.name || `Waypoint (${step.latitude.toFixed(3)}, ${step.longitude.toFixed(3)})`}</span>
                       </div>
                     ))}

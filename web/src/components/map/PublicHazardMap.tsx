@@ -226,7 +226,7 @@ export const PublicHazardMap: React.FC<PublicHazardMapProps> = ({
   };
 
   return (
-    <div className="relative isolate z-0 w-full h-full min-h-[500px] overflow-hidden rounded-2xl border border-slate-700/60 bg-dark-950 shadow-2xl">
+    <div className="relative isolate z-0 w-full h-full min-h-[500px] overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-slate-50">
       {/* Pin-Drop Active Banner Mode */}
       {isPinDropMode && (
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] px-4 py-2 rounded-xl bg-red-600/95 text-white border border-red-400 shadow-2xl backdrop-blur-md flex items-center gap-2.5 text-xs font-bold animate-bounce pointer-events-auto">
@@ -237,10 +237,10 @@ export const PublicHazardMap: React.FC<PublicHazardMapProps> = ({
 
       {/* Reroute Alert Banner */}
       {isRerouted && routeCoordinates.length > 0 && (
-        <div className="absolute top-4 left-4 z-[1000] max-w-sm px-3.5 py-2 rounded-xl bg-dark-900/95 text-orange-300 border border-orange-500/40 shadow-2xl backdrop-blur-md flex items-center gap-2 text-xs font-semibold pointer-events-auto">
-          <AlertTriangle className="w-4 h-4 text-orange-400 flex-shrink-0 animate-pulse" />
+        <div className="absolute top-4 left-4 z-[1000] max-w-sm px-3.5 py-2 rounded-xl bg-white/95 text-orange-800 border border-orange-200 shadow-md backdrop-blur-md flex items-center gap-2 text-xs font-semibold pointer-events-auto">
+          <AlertTriangle className="w-4 h-4 text-orange-600 flex-shrink-0 animate-pulse" />
           <div>
-            <span className="font-bold text-white">Safe Detour Active:</span> Bypassing{' '}
+            <span className="font-bold text-slate-900">Safe Detour Active:</span> Bypassing{' '}
             {avoidedClosedRoads.length > 0 ? avoidedClosedRoads[0].name : 'closed flood segment'}
           </div>
         </div>
@@ -251,6 +251,7 @@ export const PublicHazardMap: React.FC<PublicHazardMapProps> = ({
         zoom={14}
         scrollWheelZoom={true}
         className="w-full h-full z-0 cursor-crosshair"
+        style={{ height: '100%', minHeight: '520px', width: '100%' }}
       >
         <TileLayer
           attribution={tileConfig.attribution}
